@@ -1,13 +1,14 @@
 use std::env;
 
 use all_aoc::cli::{
-    commands::{download::download, prepare::prepare},
+    commands::{download::download, prepare::prepare, solve::solve},
     day::Day,
 };
 #[derive(Debug)]
 enum Command {
     Download { days: Vec<Day> },
     Prepare { days: Vec<Day> },
+    Solve { days: Vec<Day>, submit: Option<u8> },
 }
 impl Command {
     fn execute(&self) -> Result<(), String> {
@@ -25,6 +26,12 @@ impl Command {
                     if let Err(e) = prepare(*day) {
                         return Err(e.to_string());
                     }
+                }
+                Ok(())
+            }
+            Command::Solve { days, submit } => {
+                for day in days {
+                    solve(*day, false, *submit)
                 }
                 Ok(())
             }
@@ -58,6 +65,20 @@ fn parse(args: &[String]) -> Result<Command, String> {
                 days: parse_day(day)?,
             })
         }
+        "solve" => {
+            let day = args.get(2).ok_or("Missing Day".to_string())?;
+            let submit = args.get(3).is_some_and(|x| x == "--submit").then(|| {
+                args.get(4)
+                    .expect("if --submit flag is set, there has to be a next argument")
+                    .parse()
+                    .expect("Has to be a number")
+            });
+            Ok(Command::Solve {
+                days: parse_day(day)?,
+                submit,
+            })
+        }
+
         c => Err(format!("Unknown Subcommand {c}")),
     }
 }

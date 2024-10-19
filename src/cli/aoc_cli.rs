@@ -5,11 +5,13 @@ use std::{
 };
 pub enum AOCCommands {
     Download,
+    Submit,
 }
 impl From<AOCCommands> for String {
     fn from(value: AOCCommands) -> Self {
         match value {
             AOCCommands::Download => "download",
+            AOCCommands::Submit => "submit",
         }
         .to_string()
     }
@@ -21,6 +23,7 @@ pub enum AOCError {
     BadExitStatus(Output),
     FailedCreateDir(PathBuf),
     FileError(String),
+    FileNotExist(PathBuf),
 }
 impl Display for AOCError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

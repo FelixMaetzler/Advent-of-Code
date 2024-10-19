@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{fmt::Display, path::PathBuf};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Day {
@@ -17,5 +17,21 @@ impl Day {
     }
     pub fn examples_path(&self) -> PathBuf {
         PathBuf::from(format!("data/examples/{}/{}.txt", self.year, self.day))
+    }
+    pub fn bin_name(&self) -> String {
+        format!("{}_{}", self.year, self.day)
+    }
+    pub fn as_args(&self) -> Vec<String> {
+        vec![
+            "--year".to_string(),
+            self.year.to_string(),
+            "--day".to_string(),
+            self.day.to_string(),
+        ]
+    }
+}
+impl Display for Day {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:02}.12.{}", self.day, self.year)
     }
 }
