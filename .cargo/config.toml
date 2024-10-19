@@ -1,0 +1,5 @@
+[alias]
+download = "run --quiet --release -- download"
+prepare = "run --quiet --release -- prepare"
+[env]
+AOC_YEAR = "2020"
