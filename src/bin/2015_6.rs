@@ -100,10 +100,10 @@ fn generate_all_combs(range: RangeInclusive<Position>) -> impl Iterator<Item = P
 
     (start.y..=end.y).flat_map(move |y| (start.x..=end.x).map(move |x| Position { x, y }))
 }
+#[cfg(feature = "expensive")]
 #[cfg(test)]
 mod tests {
     use super::*;
-
     #[test]
     fn test_part_one_actual() {
         let result = part_one(&all_aoc::cli::read_inputs_file(DAY));
