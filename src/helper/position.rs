@@ -1,7 +1,9 @@
+use std::str::FromStr;
+
 #[derive(Debug, Default, PartialEq, Eq, Hash, Clone, Copy)]
 pub struct Position {
-    x: i64,
-    y: i64,
+    pub x: i64,
+    pub y: i64,
 }
 impl Position {
     pub fn direction(&self, d: Direction) -> Self {
@@ -25,6 +27,16 @@ impl Position {
         }
     }
 }
+impl FromStr for Position {
+    type Err = ();
+    /// x,y
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (x, y) = s.split_once(',').unwrap();
+        let (x, y) = (x.parse().unwrap(), y.parse().unwrap());
+        Ok(Self { x, y })
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Direction {
     North,
