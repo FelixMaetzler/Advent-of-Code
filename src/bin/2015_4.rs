@@ -15,19 +15,18 @@ fn solve(input: &str, zero_count: usize) -> Option<u32> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    #[cfg(feature = "expensive")]
     #[test]
     fn test_part_one() {
         assert_eq!(Some(609_043), part_one("abcdef"));
         assert_eq!(Some(1_048_970), part_one("pqrstuv"));
     }
-
     #[test]
     fn test_part_one_actual() {
         let result = part_one(&all_aoc::cli::read_inputs_file(DAY));
         assert_eq!(result, Some(117_946));
     }
-
+    #[cfg(feature = "expensive")]
     #[test]
     fn test_part_two_actual() {
         let result = part_two(&all_aoc::cli::read_inputs_file(DAY));
