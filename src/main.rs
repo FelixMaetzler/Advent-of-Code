@@ -16,7 +16,8 @@ impl Command {
             Command::Download { days } => {
                 for day in days {
                     if let Err(e) = download(*day) {
-                        return Err(e.to_string());
+                        eprintln!("Error while downloading {}.{}: {e}", day.day, day.year);
+                        //return Err(e.to_string());
                     }
                 }
                 Ok(())
@@ -24,6 +25,7 @@ impl Command {
             Command::Prepare { days } => {
                 for day in days {
                     if let Err(e) = prepare(*day) {
+                        eprintln!("Error while preparing {}.{}: {e}", day.day, day.year);
                         return Err(e.to_string());
                     }
                 }

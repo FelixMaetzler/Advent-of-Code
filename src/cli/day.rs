@@ -7,16 +7,16 @@ pub struct Day {
 }
 impl Day {
     pub fn input_path(&self) -> PathBuf {
-        PathBuf::from(format!("data/inputs/{}/{}.txt", self.year, self.day))
+        PathBuf::from(format!("data/inputs/{}/{:02}.txt", self.year, self.day))
     }
     pub fn puzzle_path(&self) -> PathBuf {
-        PathBuf::from(format!("data/puzzles/{}/{}.md", self.year, self.day))
+        PathBuf::from(format!("data/puzzles/{}/{:02}.md", self.year, self.day))
     }
     pub fn bin_path(&self) -> PathBuf {
-        PathBuf::from(format!("src/bin/{}_{}.rs", self.year, self.day))
+        PathBuf::from(format!("src/bin/{}_{:02}.rs", self.year, self.day))
     }
     pub fn examples_path(&self) -> PathBuf {
-        PathBuf::from(format!("data/examples/{}/{}.txt", self.year, self.day))
+        PathBuf::from(format!("data/examples/{}/{:02}.txt", self.year, self.day))
     }
     pub fn bin_name(&self) -> String {
         format!("{}_{}", self.year, self.day)
