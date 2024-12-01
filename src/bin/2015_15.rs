@@ -30,7 +30,6 @@ impl FromStr for Ingridient {
 pub fn part_one(input: &str) -> Option<i32> {
     let vec = parse(input);
     let comb = generate_combinations(100, vec.len());
-    dbg!(&comb.len());
     let comb = comb
         .into_iter()
         .filter(|v| v.iter().sum::<i32>() == 100)
