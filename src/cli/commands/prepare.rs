@@ -7,21 +7,26 @@ use super::download::download;
 pub fn prepare(day: Day) -> Result<(), AOCError> {
     download(day)?;
     let bin_path = day.bin_path();
-    create_path(&bin_path).map_err(|_| AOCError::FailedCreateDir(bin_path.clone()))?;
-    let mut file = OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .open(bin_path)
+    if !bin_path.exists() {
+        create_path(&bin_path).map_err(|_| AOCError::FailedCreateDir(bin_path.clone()))?;
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(bin_path)
+            .map_err(|e| AOCError::FileError(e.to_string()))?;
+        file.write_all(
+            MODULE_TEMPLATE
+                .replace("DAY_NUMBER", &format!("{}, {}", day.day, day.year))
+                .as_bytes(),
+        )
         .map_err(|e| AOCError::FileError(e.to_string()))?;
-    file.write_all(
-        MODULE_TEMPLATE
-            .replace("DAY_NUMBER", &format!("{}, {}", day.day, day.year))
-            .as_bytes(),
-    )
-    .map_err(|e| AOCError::FileError(e.to_string()))?;
+    }
     let examples_path = day.examples_path();
-    create_path(&examples_path).map_err(|_| AOCError::FailedCreateDir(examples_path.clone()))?;
-    let _ = fs::File::create_new(examples_path);
+    if !examples_path.exists() {
+        create_path(&examples_path)
+            .map_err(|_| AOCError::FailedCreateDir(examples_path.clone()))?;
+        let _ = fs::File::create_new(examples_path);
+    }
     Ok(())
 }
 
