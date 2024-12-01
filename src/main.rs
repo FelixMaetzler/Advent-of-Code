@@ -6,9 +6,17 @@ use all_aoc::cli::{
 };
 #[derive(Debug)]
 enum Command {
-    Download { days: Vec<Day> },
-    Prepare { days: Vec<Day> },
-    Solve { days: Vec<Day>, submit: Option<u8> },
+    Download {
+        days: Vec<Day>,
+    },
+    Prepare {
+        days: Vec<Day>,
+    },
+    Solve {
+        days: Vec<Day>,
+        submit: Option<u8>,
+        release: bool,
+    },
 }
 impl Command {
     fn execute(&self) -> Result<(), String> {
@@ -31,9 +39,13 @@ impl Command {
                 }
                 Ok(())
             }
-            Command::Solve { days, submit } => {
+            Command::Solve {
+                days,
+                submit,
+                release,
+            } => {
                 for day in days {
-                    solve(*day, false, *submit)
+                    solve(*day, *release, *submit)
                 }
                 Ok(())
             }
@@ -68,16 +80,29 @@ fn parse(args: &[String]) -> Result<Command, String> {
             })
         }
         "solve" => {
-            let day = args.get(2).ok_or("Missing Day".to_string())?;
-            let submit = args.get(3).is_some_and(|x| x == "--submit").then(|| {
-                args.get(4)
-                    .expect("if --submit flag is set, there has to be a next argument")
-                    .parse()
-                    .expect("Has to be a number")
-            });
+            let mut iter = args.iter().skip(2);
+            let day = iter.next().ok_or("Missing Day".to_string())?;
+            let mut release = false;
+            let mut submit = None;
+            while let Some(a) = iter.next() {
+                match a.as_str() {
+                    "--release" => release = true,
+                    "--submit" => {
+                        submit = Some(
+                            iter.next()
+                                .ok_or("if --submit flag is set, there has to be a next argument")?
+                                .parse()
+                                .map_err(|e| format!("Has to be a number: {e}"))?,
+                        )
+                    }
+                    x => Err(format!("This argument is not supported: {x}"))?,
+                }
+            }
+
             Ok(Command::Solve {
                 days: parse_day(day)?,
                 submit,
+                release,
             })
         }
 
