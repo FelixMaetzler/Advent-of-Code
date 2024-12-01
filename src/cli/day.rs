@@ -19,7 +19,7 @@ impl Day {
         PathBuf::from(format!("data/examples/{}/{:02}.txt", self.year, self.day))
     }
     pub fn bin_name(&self) -> String {
-        format!("{}_{}", self.year, self.day)
+        format!("{}_{:02}", self.year, self.day)
     }
     pub fn as_args(&self) -> Vec<String> {
         vec![
