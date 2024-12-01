@@ -2,14 +2,18 @@ use std::process::{Command, Stdio};
 
 use crate::Day;
 
-pub fn solve(day: Day, release: bool, submit: Option<u8>) {
+pub fn solve(day: Day, release: bool, submit: Option<u8>, time: bool) {
     let mut args = vec!["run".to_string()];
     if release {
         args.push("--release".to_string());
     }
+
     args.push("--bin".to_string());
     args.push(day.bin_name());
-
+    args.push("--".to_string());
+    if time {
+        args.push("--time".to_string());
+    }
     let output = Command::new("cargo")
         .args(args)
         .stdout(Stdio::piped())

@@ -29,6 +29,9 @@ impl Day {
             self.day.to_string(),
         ]
     }
+    pub fn exists(&self) -> bool {
+        self.bin_path().exists()
+    }
 }
 impl Display for Day {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

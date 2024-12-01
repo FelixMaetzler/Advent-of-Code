@@ -16,6 +16,7 @@ enum Command {
         days: Vec<Day>,
         submit: Option<u8>,
         release: bool,
+        time: bool,
     },
 }
 impl Command {
@@ -43,9 +44,12 @@ impl Command {
                 days,
                 submit,
                 release,
+                time,
             } => {
                 for day in days {
-                    solve(*day, *release, *submit)
+                    if day.exists() {
+                        solve(*day, *release, *submit, *time)
+                    }
                 }
                 Ok(())
             }
@@ -83,10 +87,12 @@ fn parse(args: &[String]) -> Result<Command, String> {
             let mut iter = args.iter().skip(2);
             let day = iter.next().ok_or("Missing Day".to_string())?;
             let mut release = false;
+            let mut time = false;
             let mut submit = None;
             while let Some(a) = iter.next() {
                 match a.as_str() {
                     "--release" => release = true,
+                    "--time" => time = true,
                     "--submit" => {
                         submit = Some(
                             iter.next()
@@ -103,6 +109,7 @@ fn parse(args: &[String]) -> Result<Command, String> {
                 days: parse_day(day)?,
                 submit,
                 release,
+                time,
             })
         }
 
