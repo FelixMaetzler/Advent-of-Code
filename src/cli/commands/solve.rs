@@ -1,44 +1,57 @@
-use std::process::{Command, Stdio};
+use std::{
+    io::{self, Write},
+    time::Duration,
+};
 
 use crate::Day;
 
-pub fn solve(day: Day, release: bool, submit: Option<u8>, time: bool) {
-    let mut args = vec!["run".to_string()];
-    if release {
-        args.push("--release".to_string());
-    }
+pub fn solve_single_day(day: Day, release: bool, submit: Option<u8>, time: bool) {
+    let (e1, e2) = day.execute(release, time, submit);
+    println!("{}\n{}", e1.pretty_print(), e2.pretty_print())
+}
+pub fn solve_year(days: Vec<Day>, release: bool, time: bool) {
+    let mut part_1 = vec![];
+    let mut part_2 = vec![];
+    let year = days[0].year;
+    let days = days
+        .into_iter()
+        .filter(|days| days.bin_path().exists())
+        .collect::<Vec<_>>();
 
-    args.push("--bin".to_string());
-    args.push(day.bin_name());
-    args.push("--".to_string());
-    if time {
-        args.push("--time".to_string());
+    for (i, day) in days.iter().enumerate() {
+        let i = i + 1;
+        let (p1, p2) = day.execute(release, time, None);
+        part_1.push(p1);
+        part_2.push(p2);
+
+        let bar = "=".repeat(i) + &" ".repeat(days.len() - i);
+        print!("\r{bar} {}/{}", i, days.len());
+        io::stdout().flush().unwrap();
     }
-    let output = Command::new("cargo")
-        .args(args)
-        .stdout(Stdio::piped())
-        .stderr(Stdio::inherit())
-        .output()
+    println!();
+    part_1.retain_mut(|p| p.result.is_some());
+    part_2.retain_mut(|p| p.result.is_some());
+    println!(
+        "In the Year {year} you solved {} Part Ones and {} Part Twos.",
+        part_1.len(),
+        part_2.len()
+    );
+    let min = part_1
+        .iter()
+        .chain(part_2.iter())
+        .map(|p| p.durations.iter().min().unwrap())
+        .min()
         .unwrap();
-
-    let output = String::from_utf8_lossy(&output.stdout);
-    println!("{output}");
-    if let Some(x) = submit {
-        for line in output.lines() {
-            if line.contains(&format!("part {x} is:")) {
-                let answer = line.split_once(": ").unwrap().1;
-                let mut args = day.as_args();
-                args.push("submit".to_string());
-                args.push(x.to_string());
-                args.push(answer.to_string());
-
-                Command::new("aoc")
-                    .args(args)
-                    .stdout(Stdio::inherit())
-                    .stderr(Stdio::inherit())
-                    .output()
-                    .unwrap();
-            }
-        }
-    }
+    let max = part_1
+        .iter()
+        .chain(part_2.iter())
+        .map(|p| p.durations.iter().max().unwrap())
+        .max()
+        .unwrap();
+    let over_1_ms = part_1
+        .iter()
+        .chain(part_2.iter())
+        .filter(|p| p.average_duration() >= Duration::from_millis(1))
+        .count();
+    println!("The minimum Duration of a Part is {min:.2?} and the max is {max:.2?}. {over_1_ms}/{} are over 1 ms.", part_1.len()+part_2.len());
 }

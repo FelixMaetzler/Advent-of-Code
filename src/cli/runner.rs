@@ -1,8 +1,8 @@
 use std::{
     cmp,
     fmt::Display,
-    io::{stdout, Write},
     process::{self, Command, Stdio},
+    str::FromStr,
     time::{Duration, Instant},
 };
 
@@ -10,46 +10,157 @@ use crate::Day;
 pub const ANSI_BOLD: &str = "\u{1b}[1m";
 pub const ANSI_ITALIC: &str = "\u{1b}[3m";
 pub const ANSI_RESET: &str = "\u{1b}[0m";
-pub fn run_part<I: Clone, T: Display>(func: impl Fn(I) -> Option<T>, input: I, day: Day, part: u8) {
-    let part_str = format!("Part {part}");
+pub struct PartDayResult<T> {
+    pub day: Day,
+    pub part: u8,
+    pub result: Option<T>,
+    pub durations: Vec<Duration>,
+}
 
-    let (result, duration, samples) =
-        run_timed(func, input, |result| print_result(result, &part_str, ""));
+impl<T> PartDayResult<T>
+where
+    T: ToString + FromStr,
+{
+    fn serialize(&self) -> String {
+        let day = self.day;
+        let part = self.part;
+        let result = self
+            .result
+            .as_ref()
+            .map(|r| r.to_string())
+            .unwrap_or_else(|| "None".to_string());
+        let durations = self
+            .durations
+            .iter()
+            .map(|d| d.as_nanos().to_string())
+            .collect::<Vec<_>>()
+            .join(";");
 
-    print_result(&result, &part_str, &format_duration(&duration, samples));
+        format!("{},{},{},{}", day, part, result, durations)
+    }
 
-    if let Some(result) = result {
+    pub fn deserialize(input: &str) -> Result<Self, String> {
+        let parts: Vec<&str> = input.split(',').collect();
+        if parts.len() != 4 {
+            return Err("Invalid input format".into());
+        }
+
+        let day = Day::from_str(parts[0]).map_err(|_| "Invalid day value".to_string())?;
+        let part = parts[1]
+            .parse::<u8>()
+            .map_err(|_| "Invalid part value".to_string())?;
+        let result = if parts[2] == "None" {
+            None
+        } else {
+            Some(
+                parts[2]
+                    .parse::<T>()
+                    .map_err(|_| "Invalid result value".to_string())?,
+            )
+        };
+        let durations = parts[3]
+            .split(';')
+            .map(|d| d.parse::<u64>().map(Duration::from_nanos))
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|_| "Invalid duration value".to_string())?;
+
+        Ok(PartDayResult {
+            day,
+            part,
+            result,
+            durations,
+        })
+    }
+}
+impl<T> PartDayResult<T>
+where
+    T: Display,
+{
+    pub fn pretty_print(&self) -> String {
+        let avg = self.average_duration();
+        if let Some(x) = &self.result {
+            match self.durations.len() {
+                0 => unreachable!(),
+                1 => format!(
+                    "Part {}: {ANSI_BOLD}{}{ANSI_RESET} ({:.02?})",
+                    self.part,
+                    x,
+                    avg,
+                ), 2..25 => format!(
+                    "Part {}: {ANSI_BOLD}{}{ANSI_RESET} ({:.02?} @ {} samples)",
+                    self.part,
+                    x,
+                    avg,
+                    self.durations.len()
+                ),
+                25.. => format!(
+                    "Part {}: {ANSI_BOLD}{}{ANSI_RESET} ({:.02?} @ {} samples  with {:?} std, {:?}..{:?})",
+                    self.part,
+                    x,
+                    avg,
+                    self.durations.len(),
+                    self.standard_deviation(),
+                    self.durations.iter().min().unwrap(),
+                    self.durations.iter().max().unwrap(),
+                ),
+            }
+        } else {
+            format!("Part {ANSI_BOLD}{}{ANSI_RESET}: ✖", self.part)
+        }
+    }
+}
+impl<T> PartDayResult<T> {
+    pub fn average_duration(&self) -> Duration {
+        self.durations.iter().sum::<Duration>() / (self.durations.len() as u32)
+    }
+    fn standard_deviation(&self) -> Duration {
+        let average = self.average_duration().as_nanos();
+        let mut erg = 0;
+        for n in &self.durations {
+            erg += (n.as_nanos().abs_diff(average)).pow(2);
+        }
+        let erg = erg as f64 / (self.durations.len() - 1) as f64;
+        Duration::from_nanos(erg.sqrt() as u64)
+    }
+}
+pub fn run_part<I: Clone, T: FromStr + Display>(
+    func: impl Fn(I) -> Option<T>,
+    input: I,
+    day: Day,
+    part: u8,
+) {
+    let (result, durations) = run_timed(func, input);
+    let res = PartDayResult {
+        day,
+        part,
+        result,
+        durations,
+    };
+    if std::env::args().any(|x| x == "--machine-readable") {
+        println!("{}", res.serialize());
+    } else {
+        println!("{}", res.pretty_print());
+    }
+
+    if let Some(result) = res.result {
         submit_result(result, day, part);
     }
 }
-/// Run a solution part. The behavior differs depending on whether we are running a release or debug build:
-///  1. in debug, the function is executed once.
-///  2. in release, the function is benched (approx. 1 second of execution time or 10 samples, whatever take longer.)
-fn run_timed<I: Clone, T>(
-    func: impl Fn(I) -> T,
-    input: I,
-    hook: impl Fn(&T),
-) -> (T, Duration, u128) {
+
+fn run_timed<I: Clone, T>(func: impl Fn(I) -> T, input: I) -> (T, Vec<Duration>) {
     let timer = Instant::now();
     let result = func(input.clone());
     let base_time = timer.elapsed();
 
-    hook(&result);
-
     let run = if std::env::args().any(|x| x == "--time") {
         bench(func, input, &base_time)
     } else {
-        (base_time, 1)
+        vec![base_time]
     };
 
-    (result, run.0, run.1)
+    (result, run)
 }
-fn bench<I: Clone, T>(func: impl Fn(I) -> T, input: I, base_time: &Duration) -> (Duration, u128) {
-    let mut stdout = stdout();
-
-    print!(" > {ANSI_ITALIC}benching{ANSI_RESET}");
-    let _ = stdout.flush();
-
+fn bench<I: Clone, T>(func: impl Fn(I) -> T, input: I, base_time: &Duration) -> Vec<Duration> {
     let bench_iterations =
         (Duration::from_secs(1).as_nanos() / cmp::max(base_time.as_nanos(), 10)).clamp(10, 10000);
 
@@ -63,68 +174,7 @@ fn bench<I: Clone, T>(func: impl Fn(I) -> T, input: I, base_time: &Duration) -> 
         timers.push(timer.elapsed());
     }
 
-    (
-        #[allow(clippy::cast_possible_truncation)]
-        Duration::from_nanos(average_duration(&timers) as u64),
-        bench_iterations,
-    )
-}
-fn average_duration(numbers: &[Duration]) -> u128 {
-    numbers
-        .iter()
-        .map(std::time::Duration::as_nanos)
-        .sum::<u128>()
-        / numbers.len() as u128
-}
-fn standard_deviation(numbers: &[Duration]) -> u128 {
-    let average = average_duration(numbers);
-    let mut erg = 0;
-    for n in numbers {
-        erg += (n.as_nanos() - average).pow(2);
-    }
-    let erg = erg as f64 / (numbers.len() - 1) as f64;
-    erg.sqrt() as u128
-}
-fn print_result<T: Display>(result: &Option<T>, part: &str, duration_str: &str) {
-    let is_intermediate_result = duration_str.is_empty();
-
-    match result {
-        Some(result) => {
-            if result.to_string().contains('\n') {
-                let str = format!("{part}: ▼ {duration_str}");
-                if is_intermediate_result {
-                    print!("{str}");
-                } else {
-                    print!("\r");
-                    println!("{str}");
-                    println!("{result}");
-                }
-            } else {
-                let str = format!("{part}: {ANSI_BOLD}{result}{ANSI_RESET}{duration_str}");
-                if is_intermediate_result {
-                    print!("{str}");
-                } else {
-                    print!("\r");
-                    println!("{str}");
-                }
-            }
-        }
-        None => {
-            if is_intermediate_result {
-                print!("{part}: ✖");
-            } else {
-                print!("\r");
-                println!("{part}: ✖             ");
-            }
-        }
-    }
-}
-fn format_duration(duration: &Duration, samples: u128) -> String {
-    if samples == 1 {
-        format!(" ({duration:.1?})")
-    } else {
-        format!(" ({duration:.1?} @ {samples} samples)")
-    }
+    timers
 }
 
 /// Parse the arguments passed to `solve` and try to submit one part of the solution if:

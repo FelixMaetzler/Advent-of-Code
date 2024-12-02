@@ -1,39 +1,55 @@
 use std::env;
 
 use all_aoc::cli::{
-    commands::{download::download, prepare::prepare, solve::solve},
+    commands::{
+        download::download,
+        prepare::prepare,
+        solve::{solve_single_day, solve_year},
+    },
     day::Day,
 };
 #[derive(Debug)]
 enum Command {
     Download {
-        days: Vec<Day>,
+        days: Days,
     },
     Prepare {
-        days: Vec<Day>,
+        days: Days,
     },
     Solve {
-        days: Vec<Day>,
+        days: Days,
         submit: Option<u8>,
         release: bool,
         time: bool,
     },
 }
+#[derive(Debug)]
+enum Days {
+    Day(Day),
+    Year(u16),
+}
+impl Days {
+    fn to_vec(&self) -> Vec<Day> {
+        match self {
+            Days::Day(day) => vec![*day],
+            Days::Year(year) => (1..=25).map(|day| Day { day, year: *year }).collect(),
+        }
+    }
+}
 impl Command {
     fn execute(&self) -> Result<(), String> {
         match self {
             Command::Download { days } => {
-                for day in days {
-                    if let Err(e) = download(*day) {
+                for day in days.to_vec() {
+                    if let Err(e) = download(day) {
                         eprintln!("Error while downloading {}.{}: {e}", day.day, day.year);
-                        //return Err(e.to_string());
                     }
                 }
                 Ok(())
             }
             Command::Prepare { days } => {
-                for day in days {
-                    if let Err(e) = prepare(*day) {
+                for day in days.to_vec() {
+                    if let Err(e) = prepare(day) {
                         eprintln!("Error while preparing {}.{}: {e}", day.day, day.year);
                         return Err(e.to_string());
                     }
@@ -46,11 +62,22 @@ impl Command {
                 release,
                 time,
             } => {
-                for day in days {
-                    if day.exists() {
-                        solve(*day, *release, *submit, *time)
+                match days {
+                    Days::Day(day) => {
+                        if day.exists() {
+                            solve_single_day(*day, *release, *submit, *time)
+                        } else {
+                            eprintln!("Binary for Day {day} not found");
+                        }
+                    }
+                    Days::Year(_) if submit.is_some() => {
+                        return Err("Sumbit Flag with multiple Days is not supported".to_string())
+                    }
+                    days @ Days::Year(_) => {
+                        solve_year(days.to_vec(), *release, *time);
                     }
                 }
+
                 Ok(())
             }
         }
@@ -88,11 +115,13 @@ fn parse(args: &[String]) -> Result<Command, String> {
             let day = iter.next().ok_or("Missing Day".to_string())?;
             let mut release = false;
             let mut time = false;
+
             let mut submit = None;
             while let Some(a) = iter.next() {
                 match a.as_str() {
                     "--release" => release = true,
                     "--time" => time = true,
+                    "--machine-readable" => (),
                     "--submit" => {
                         submit = Some(
                             iter.next()
@@ -116,7 +145,7 @@ fn parse(args: &[String]) -> Result<Command, String> {
         c => Err(format!("Unknown Subcommand {c}")),
     }
 }
-fn parse_day(arg: &str) -> Result<Vec<Day>, String> {
+fn parse_day(arg: &str) -> Result<Days, String> {
     // possible Ways:
     // 17           needs year from env
     // 17.2023      specified year
@@ -139,11 +168,11 @@ fn parse_day(arg: &str) -> Result<Vec<Day>, String> {
                 year += 2000;
             }
         }
-        Ok(vec![Day { day, year }])
+        Ok(Days::Day(Day { day, year }))
     } else {
-        let n = arg.parse::<u32>().map_err(|e| e.to_string())?;
+        let n = arg.parse::<u16>().map_err(|e| e.to_string())?;
         if (1..=25).contains(&n) {
-            Ok(vec![Day {
+            Ok(Days::Day(Day {
                 day: n as u8,
                 year: match std::env::var("AOC_YEAR") {
                     Ok(x) => x.parse::<u16>().map_err(|e| e.to_string())?,
@@ -152,14 +181,9 @@ fn parse_day(arg: &str) -> Result<Vec<Day>, String> {
                             .to_string(),
                     ),
                 },
-            }])
+            }))
         } else if n >= 2015 {
-            Ok((1..=25)
-                .map(|day| Day {
-                    day,
-                    year: n as u16,
-                })
-                .collect())
+            Ok(Days::Year(n))
         } else {
             Err(format!("'{n}' is not a day"))
         }

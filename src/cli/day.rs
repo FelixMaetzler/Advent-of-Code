@@ -1,4 +1,11 @@
-use std::{fmt::Display, path::PathBuf};
+use std::{
+    fmt::Display,
+    path::PathBuf,
+    process::{Command, Stdio},
+    str::FromStr,
+};
+
+use super::runner::PartDayResult;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Day {
@@ -32,9 +39,74 @@ impl Day {
     pub fn exists(&self) -> bool {
         self.bin_path().exists()
     }
+    pub fn execute(
+        &self,
+        release: bool,
+        time: bool,
+        submit: Option<u8>,
+    ) -> (PartDayResult<String>, PartDayResult<String>) {
+        let mut args = vec!["run".to_string()];
+        if release {
+            args.push("--release".to_string());
+        }
+
+        args.push("--bin".to_string());
+        args.push(self.bin_name());
+        args.push("--quiet".to_string());
+        args.push("--".to_string());
+        if time {
+            args.push("--time".to_string());
+        }
+        if let Some(x) = submit {
+            args.push("--submit".to_string());
+            args.push(x.to_string());
+        }
+        args.push("--machine-readable".to_string());
+
+        let output = Command::new("cargo")
+            .args(args)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::inherit())
+            .output()
+            .unwrap();
+
+        let output = String::from_utf8_lossy(&output.stdout);
+        (
+            PartDayResult::deserialize(output.lines().nth(0).unwrap()).unwrap(),
+            PartDayResult::deserialize(output.lines().nth(1).unwrap()).unwrap(),
+        )
+    }
 }
 impl Display for Day {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:02}.12.{}", self.day, self.year)
+    }
+}
+impl FromStr for Day {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut it = s.split('.');
+        let day = it
+            .next()
+            .expect("There has to be a Day")
+            .parse()
+            .expect("Is not an Integer");
+        if !(1..=25).contains(&day) {
+            return Err(format!("Day is out iof range: {day}"));
+        }
+        let month = it.next().expect("There has to be a month");
+        if month != "12" {
+            return Err(format!("Month is not 12: {month}"));
+        }
+        let year = it
+            .next()
+            .expect("There has to be a Year")
+            .parse()
+            .expect("Is not an integer");
+        if year < 2015 {
+            return Err(format!("Year has to be greater or equal to 2015: {year}"));
+        }
+        Ok(Day { day, year })
     }
 }
