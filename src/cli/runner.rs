@@ -42,7 +42,11 @@ where
     pub fn deserialize(input: &str) -> Result<Self, String> {
         let parts: Vec<&str> = input.split(',').collect();
         if parts.len() != 4 {
-            return Err("Invalid input format".into());
+            return Err(format!(
+                "Invalid input format. Got {} but expected 4. Parts: {:?}",
+                parts.len(),
+                &parts
+            ));
         }
 
         let day = Day::from_str(parts[0]).map_err(|_| "Invalid day value".to_string())?;
@@ -210,7 +214,7 @@ fn submit(day: Day, part: u8, answer: String) {
         eprintln!("command \"aoc\" not found or not callable. Try running \"cargo install aoc-cli\" to install it.");
         process::exit(1);
     }
-    println!("Submitting result via aoc-cli...");
+    //println!("Submitting result via aoc-cli...");
     let mut args = day.as_args();
     args.push("submit".to_string());
     args.push(part.to_string());
