@@ -1,7 +1,9 @@
 use std::{ops::Mul, str::FromStr};
 
 use all_aoc::helper::parser::{
-    match_literal, middle, right, separated_pair, unsigned_integer, Parser,
+    character::{tag, unsigned_integer},
+    sequence::{delimited, right, separated_pair},
+    Parser,
 };
 
 all_aoc::solution!(3, 2024);
@@ -25,7 +27,7 @@ where
     T: FromStr + Mul<Output = T> + 'a,
 {
     right(
-        match_literal("mul"),
+        tag("mul"),
         enclosed_in_parentheses(separated_pair(
             unsigned_integer::<T>,
             ",",
@@ -38,17 +40,17 @@ fn enclosed_in_parentheses<'a, P, A>(parser: P) -> impl Parser<'a, A>
 where
     P: Parser<'a, A>,
 {
-    middle(match_literal("("), parser, match_literal(")"))
+    delimited(tag("("), parser, tag(")"))
 }
 pub fn part_two(input: &str) -> Option<u32> {
     let mut sum = 0;
     let mut enable = true;
     let mut input = input;
     while !input.is_empty() {
-        if let Ok((rest, _)) = match_literal("do()").parse(input) {
+        if let Ok((rest, _)) = tag("do()").parse(input) {
             enable = true;
             input = rest;
-        } else if let Ok((rest, _)) = match_literal("don't()").parse(input) {
+        } else if let Ok((rest, _)) = tag("don't()").parse(input) {
             enable = false;
             input = rest;
         } else if let Ok((rest, erg)) = mul_parser::<u32>().parse(input) {
