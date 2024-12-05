@@ -34,6 +34,12 @@ pub fn generate_combinations<T: Clone>(input: &[T]) -> Vec<Vec<T>> {
 
     result
 }
+pub fn generate_combinations_until<T: Clone>(input: &[T], max_len: usize) -> Vec<Vec<T>> {
+    generate_combinations(input)
+        .into_iter()
+        .filter(|v| v.len() <= max_len)
+        .collect()
+}
 #[cfg(test)]
 mod tests {
     use crate::helper::permutations::generate_combinations;
