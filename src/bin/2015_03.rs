@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use all_aoc::helper::position::{Direction, Position};
+use all_aoc::helper::position::{Direction4, Position};
 
 all_aoc::solution!(3, 2015);
 
@@ -9,7 +9,7 @@ pub fn part_one(input: &str) -> Option<usize> {
     let mut set = HashSet::with_capacity(input.chars().count());
     set.insert(curr);
     for c in input.chars() {
-        let d = Direction::from_hat(c).unwrap();
+        let d = Direction4::from_hat(c).unwrap();
         curr = curr.direction(d);
         set.insert(curr);
     }
@@ -22,7 +22,7 @@ pub fn part_two(input: &str) -> Option<usize> {
     let mut set = HashSet::with_capacity(input.chars().count());
     set.insert(santa);
     for (i, c) in input.char_indices() {
-        let d = Direction::from_hat(c).unwrap();
+        let d = Direction4::from_hat(c).unwrap();
         match i % 2 {
             0 => {
                 santa = santa.direction(d);

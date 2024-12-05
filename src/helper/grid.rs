@@ -4,6 +4,8 @@ use std::ops::Deref;
 use std::ops::DerefMut;
 use std::ops::Index;
 use std::ops::IndexMut;
+
+use super::position::Direction8;
 pub trait OwnIndex<T>
 where
     Self: Copy,
@@ -191,12 +193,48 @@ impl<T> Grid<T> {
             Some((index.to_flat_index(self), self.get(index).unwrap()))
         }
     }
-    pub fn get_south(&self, index: impl OwnIndex<T>) -> Option<(usize, &T)> {
+    pub fn get_north_east(&self, index: impl OwnIndex<T>) -> Option<(usize, &T)> {
         let index = index.to_2d_index(self);
-        let index = (index.0 + 1, index.1);
-        if index.0 >= self.height() {
+        if index.0 == 0 || index.1 >= self.width() - 1 {
             None
         } else {
+            let index = (index.0 - 1, index.1 + 1);
+            Some((index.to_flat_index(self), self.get(index).unwrap()))
+        }
+    }
+    pub fn get_north_west(&self, index: impl OwnIndex<T>) -> Option<(usize, &T)> {
+        let index = index.to_2d_index(self);
+        if index.0 == 0 || index.1 == 0 {
+            None
+        } else {
+            let index = (index.0 - 1, index.1 - 1);
+            Some((index.to_flat_index(self), self.get(index).unwrap()))
+        }
+    }
+    pub fn get_south(&self, index: impl OwnIndex<T>) -> Option<(usize, &T)> {
+        let index = index.to_2d_index(self);
+        if index.0 >= self.height() - 1 {
+            None
+        } else {
+            let index = (index.0 + 1, index.1);
+            Some((index.to_flat_index(self), self.get(index).unwrap()))
+        }
+    }
+    pub fn get_south_east(&self, index: impl OwnIndex<T>) -> Option<(usize, &T)> {
+        let index = index.to_2d_index(self);
+        if index.0 >= self.height() - 1 || index.1 >= self.width() - 1 {
+            None
+        } else {
+            let index = (index.0 + 1, index.1 + 1);
+            Some((index.to_flat_index(self), self.get(index).unwrap()))
+        }
+    }
+    pub fn get_south_west(&self, index: impl OwnIndex<T>) -> Option<(usize, &T)> {
+        let index = index.to_2d_index(self);
+        if index.0 >= self.height() - 1 || index.1 == 0 {
+            None
+        } else {
+            let index = (index.0 + 1, index.1 - 1);
             Some((index.to_flat_index(self), self.get(index).unwrap()))
         }
     }
@@ -211,11 +249,23 @@ impl<T> Grid<T> {
     }
     pub fn get_east(&self, index: impl OwnIndex<T>) -> Option<(usize, &T)> {
         let index = index.to_2d_index(self);
-        let index = (index.0, index.1 + 1);
-        if index.1 >= self.width() {
+        if index.1 >= self.width() - 1 {
             None
         } else {
+            let index = (index.0, index.1 + 1);
             Some((index.to_flat_index(self), self.get(index).unwrap()))
+        }
+    }
+    pub fn get_dir8(&self, index: impl OwnIndex<T>, dir: Direction8) -> Option<(usize, &T)> {
+        match dir {
+            Direction8::North => self.get_north(index),
+            Direction8::NorthEast => self.get_north_east(index),
+            Direction8::East => self.get_east(index),
+            Direction8::SouthEast => self.get_south_east(index),
+            Direction8::South => self.get_south(index),
+            Direction8::SouthWest => self.get_south_west(index),
+            Direction8::West => self.get_west(index),
+            Direction8::NorthWest => self.get_north_west(index),
         }
     }
     #[inline(always)]

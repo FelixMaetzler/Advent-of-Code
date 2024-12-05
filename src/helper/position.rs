@@ -6,21 +6,21 @@ pub struct Position {
     pub y: i64,
 }
 impl Position {
-    pub fn direction(&self, d: Direction) -> Self {
+    pub fn direction(&self, d: Direction4) -> Self {
         match d {
-            Direction::North => Position {
+            Direction4::North => Position {
                 x: self.x,
                 y: self.y + 1,
             },
-            Direction::East => Position {
+            Direction4::East => Position {
                 x: self.x + 1,
                 y: self.y,
             },
-            Direction::West => Position {
+            Direction4::West => Position {
                 x: self.x - 1,
                 y: self.y,
             },
-            Direction::South => Position {
+            Direction4::South => Position {
                 x: self.x,
                 y: self.y - 1,
             },
@@ -38,21 +38,40 @@ impl FromStr for Position {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Direction {
+pub enum Direction4 {
     North,
     East,
     West,
     South,
 }
-impl Direction {
+impl Direction4 {
     /// Converts ^, <, v, > into Direction
     pub fn from_hat(c: char) -> Result<Self, char> {
         match c {
-            '^' => Ok(Direction::North),
-            '>' => Ok(Direction::East),
-            '<' => Ok(Direction::West),
-            'v' => Ok(Direction::South),
+            '^' => Ok(Direction4::North),
+            '>' => Ok(Direction4::East),
+            '<' => Ok(Direction4::West),
+            'v' => Ok(Direction4::South),
             c => Err(c),
         }
+    }
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Direction8 {
+    North,
+    NorthEast,
+    East,
+    SouthEast,
+    South,
+    SouthWest,
+    West,
+    NorthWest,
+}
+impl Direction8 {
+    pub fn all_dirs() -> [Direction8; 8] {
+        use Direction8::*;
+        [
+            North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest,
+        ]
     }
 }
