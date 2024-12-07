@@ -37,7 +37,7 @@ impl FromStr for Position {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Direction4 {
     North,
     East,
@@ -53,6 +53,25 @@ impl Direction4 {
             '<' => Ok(Direction4::West),
             'v' => Ok(Direction4::South),
             c => Err(c),
+        }
+    }
+
+    pub fn turn_right(&self) -> Direction4 {
+        match self {
+            Direction4::North => Self::East,
+            Direction4::East => Self::South,
+            Direction4::West => Self::North,
+            Direction4::South => Self::West,
+        }
+    }
+}
+impl From<Direction4> for Direction8 {
+    fn from(val: Direction4) -> Self {
+        match val {
+            Direction4::North => Direction8::North,
+            Direction4::East => Direction8::East,
+            Direction4::West => Direction8::West,
+            Direction4::South => Direction8::South,
         }
     }
 }
