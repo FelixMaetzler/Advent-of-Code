@@ -1,9 +1,52 @@
-use std::str::FromStr;
+use std::{
+    ops::{Add, Mul, Sub},
+    str::FromStr,
+};
 
 #[derive(Debug, Default, PartialEq, Eq, Hash, Clone, Copy)]
 pub struct Position {
     pub x: i64,
     pub y: i64,
+}
+impl Sub for Position {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        }
+    }
+}
+impl Add for Position {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
+    }
+}
+impl Mul<i64> for Position {
+    type Output = Position;
+
+    fn mul(self, rhs: i64) -> Self::Output {
+        Self {
+            x: self.x * rhs,
+            y: self.y * rhs,
+        }
+    }
+}
+impl Mul<Position> for i64 {
+    type Output = Position;
+
+    fn mul(self, rhs: Position) -> Self::Output {
+        Position {
+            x: self * rhs.x,
+            y: self * rhs.y,
+        }
+    }
 }
 impl Position {
     pub fn direction(&self, d: Direction4) -> Self {
