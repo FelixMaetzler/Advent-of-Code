@@ -1,6 +1,9 @@
 use std::str::FromStr;
 
+use all_aoc::helper::misc::number_to_digit_count;
+
 all_aoc::solution!(7, 2024);
+#[derive(Debug)]
 struct Equation {
     result: u64,
     numbers: Vec<u64>,
@@ -35,25 +38,30 @@ impl Equation {
         (0..comb).any(|comb| self.test_one_comb_part_1(comb))
     }
     fn test_all_combs_part_2(&self) -> bool {
-        let comb = 3_u64.pow((self.numbers.len() - 1) as u32);
-        (0..comb).any(|comb| self.test_one_comb_part_2(comb))
-    }
-    fn test_one_comb_part_2(&self, comb: u64) -> bool {
-        let mut comb = comb;
-        let mut sum = *self.numbers.first().expect("cant be empty");
-        for n in &self.numbers[1..] {
-            match comb % 3 {
-                0 => sum += n,
-                1 => sum *= n,
-                2 => sum = format!("{}{}", sum, n).parse().unwrap(),
-                _ => unreachable!("Mod 3 has only 0-2"),
-            }
-            comb /= 3;
-        }
-        debug_assert_eq!(comb, 0);
-        sum == self.result
+        recurse(self.result, &self.numbers)
     }
 }
+fn recurse(result: u64, numbers: &[u64]) -> bool {
+    let last = match numbers.last() {
+        Some(x) => *x,
+        None => return result == 0,
+    };
+
+    let next = &numbers[..numbers.len() - 1];
+    let m = 10_u64.pow(number_to_digit_count(last) as u32);
+    if result % m == last && recurse((result - last) / m, next) {
+        return true;
+    }
+    if result % last == 0 && recurse(result / last, next) {
+        return true;
+    }
+    if last > result {
+        false
+    } else {
+        recurse(result - last, next)
+    }
+}
+
 pub fn part_one(input: &str) -> Option<u64> {
     let eqs = parse(input);
     Some(
