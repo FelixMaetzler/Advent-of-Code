@@ -1,14 +1,18 @@
 use std::{
+    fmt::Debug,
     ops::{Add, Mul, Sub},
     str::FromStr,
 };
 
 #[derive(Debug, Default, PartialEq, Eq, Hash, Clone, Copy)]
-pub struct Position {
-    pub x: i64,
-    pub y: i64,
+pub struct Position<T> {
+    pub x: T,
+    pub y: T,
 }
-impl Sub for Position {
+impl<T> Sub for Position<T>
+where
+    T: Sub<Output = T>,
+{
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -18,7 +22,10 @@ impl Sub for Position {
         }
     }
 }
-impl Add for Position {
+impl<T> Add for Position<T>
+where
+    T: Add<Output = T>,
+{
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -28,49 +35,51 @@ impl Add for Position {
         }
     }
 }
-impl Mul<i64> for Position {
-    type Output = Position;
+impl<T> Mul<T> for Position<T>
+where
+    T: Mul<Output = T> + Copy,
+{
+    type Output = Position<T>;
 
-    fn mul(self, rhs: i64) -> Self::Output {
+    fn mul(self, rhs: T) -> Self::Output {
         Self {
             x: self.x * rhs,
             y: self.y * rhs,
         }
     }
 }
-impl Mul<Position> for i64 {
-    type Output = Position;
 
-    fn mul(self, rhs: Position) -> Self::Output {
-        Position {
-            x: self * rhs.x,
-            y: self * rhs.y,
-        }
-    }
-}
-impl Position {
+impl<T> Position<T>
+where
+    T: Add<Output = T> + Sub<Output = T> + Copy,
+    i32: Into<T>,
+{
     pub fn direction(&self, d: Direction4) -> Self {
         match d {
             Direction4::North => Position {
                 x: self.x,
-                y: self.y + 1,
+                y: self.y + 1.into(),
             },
             Direction4::East => Position {
-                x: self.x + 1,
+                x: self.x + 1.into(),
                 y: self.y,
             },
             Direction4::West => Position {
-                x: self.x - 1,
+                x: self.x - 1.into(),
                 y: self.y,
             },
             Direction4::South => Position {
                 x: self.x,
-                y: self.y - 1,
+                y: self.y - 1.into(),
             },
         }
     }
 }
-impl FromStr for Position {
+impl<T> FromStr for Position<T>
+where
+    T: FromStr,
+    T::Err: Debug,
+{
     type Err = ();
     /// x,y
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -79,6 +88,31 @@ impl FromStr for Position {
         Ok(Self { x, y })
     }
 }
+macro_rules! impl_mul_for_type {
+    ($type:ty) => {
+        impl Mul<Position<$type>> for $type {
+            type Output = Position<$type>;
+
+            fn mul(self, rhs: Position<$type>) -> Self::Output {
+                Position {
+                    x: self * rhs.x,
+                    y: self * rhs.y,
+                }
+            }
+        }
+    };
+}
+macro_rules! call_macro_with_types {
+    ($macro_name:ident, [$($type:ty),*]) => {
+        $(
+            $macro_name!($type);
+        )*
+    };
+}
+call_macro_with_types!(
+    impl_mul_for_type,
+    [u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64]
+);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Direction4 {

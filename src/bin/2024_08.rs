@@ -57,21 +57,21 @@ pub fn part_two(input: &str) -> Option<usize> {
 
     Some(set.count())
 }
-fn parse(input: &str) -> (HashMap<char, Vec<Position>>, Position) {
+fn parse(input: &str) -> (HashMap<char, Vec<Position<i32>>>, Position<i32>) {
     let mut map = HashMap::new();
     for (y, l) in input.lines().enumerate() {
         for (x, c) in l.chars().enumerate() {
-            let x = x as i64;
-            let y = y as i64;
             if c != '.' {
+                let x = x as i32;
+                let y = y as i32;
                 map.entry(c)
-                    .and_modify(|v: &mut Vec<Position>| v.push(Position { x, y }))
+                    .and_modify(|v: &mut Vec<Position<i32>>| v.push(Position { x, y }))
                     .or_insert(vec![Position { x, y }]);
             }
         }
     }
-    let y_max = input.lines().count() as i64;
-    let x_max = input.lines().next().unwrap().chars().count() as i64;
+    let y_max = input.lines().count() as i32;
+    let x_max = input.lines().next().unwrap().chars().count() as i32;
     (map, Position { x: x_max, y: y_max })
 }
 #[cfg(test)]
@@ -99,6 +99,6 @@ mod tests {
     #[test]
     fn test_part_two_actual() {
         let result = part_two(&all_aoc::cli::read_inputs_file(DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(766));
     }
 }

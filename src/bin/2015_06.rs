@@ -11,7 +11,7 @@ enum Mode {
 
 struct Instruction {
     m: Mode,
-    range: RangeInclusive<Position>,
+    range: RangeInclusive<Position<i32>>,
 }
 impl FromStr for Instruction {
     type Err = ();
@@ -94,7 +94,7 @@ fn parse(input: &str) -> Vec<Instruction> {
         .map(|l| Instruction::from_str(l).unwrap())
         .collect()
 }
-fn generate_all_combs(range: RangeInclusive<Position>) -> impl Iterator<Item = Position> {
+fn generate_all_combs(range: RangeInclusive<Position<i32>>) -> impl Iterator<Item = Position<i32>> {
     let start = *range.start();
     let end = *range.end();
 

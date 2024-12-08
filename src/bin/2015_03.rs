@@ -5,7 +5,7 @@ use all_aoc::helper::position::{Direction4, Position};
 all_aoc::solution!(3, 2015);
 
 pub fn part_one(input: &str) -> Option<usize> {
-    let mut curr = Position::default();
+    let mut curr = Position::<i32>::default();
     let mut set = HashSet::with_capacity(input.chars().count());
     set.insert(curr);
     for c in input.chars() {
@@ -17,8 +17,8 @@ pub fn part_one(input: &str) -> Option<usize> {
 }
 
 pub fn part_two(input: &str) -> Option<usize> {
-    let mut santa = Position::default();
-    let mut robo = Position::default();
+    let mut santa = Position::<i32>::default();
+    let mut robo = Position::<i32>::default();
     let mut set = HashSet::with_capacity(input.chars().count());
     set.insert(santa);
     for (i, c) in input.char_indices() {
