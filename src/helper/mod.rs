@@ -1,3 +1,4 @@
+pub mod graph;
 pub mod grid;
 pub mod md5;
 pub mod misc;

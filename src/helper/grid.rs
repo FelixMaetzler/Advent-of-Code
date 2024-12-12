@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 use std::fmt::Write;
+use std::hash::Hash;
 use std::ops::Deref;
 use std::ops::DerefMut;
 use std::ops::Index;
@@ -8,7 +9,7 @@ use std::ops::IndexMut;
 use super::position::Direction8;
 pub trait OwnIndex<T>
 where
-    Self: Copy,
+    Self: Copy + Eq + PartialEq + Hash,
 {
     fn to_flat_index(&self, grid: &Grid<T>) -> usize;
     fn to_2d_index(&self, grid: &Grid<T>) -> (usize, usize);
@@ -143,7 +144,7 @@ impl<T> Grid<T> {
         }
         ret
     }
-    pub fn neighbours8_with_index(&self, index: impl OwnIndex<T>) -> Vec<(T, impl OwnIndex<T>)>
+    pub fn neighbours8_with_index(&self, index: impl OwnIndex<T>) -> Vec<(impl OwnIndex<T>, T)>
     where
         T: Clone,
     {
@@ -151,35 +152,35 @@ impl<T> Grid<T> {
         let mut ret = vec![];
         if y.checked_sub(1).is_some() {
             let index = (y - 1, x);
-            ret.push((self.get(index).unwrap().clone(), index));
+            ret.push((index, self.get(index).unwrap().clone()));
             let index = (y - 1, x + 1);
             if let Some(a) = self.get(index) {
-                ret.push((a.clone(), index));
+                ret.push((index, a.clone()));
             }
         }
         if x.checked_sub(1).is_some() {
             let index = (y, x - 1);
-            ret.push((self.get(index).unwrap().clone(), index));
+            ret.push((index, self.get(index).unwrap().clone()));
             let index = (y + 1, x - 1);
             if let Some(a) = self.get(index) {
-                ret.push((a.clone(), index));
+                ret.push((index, a.clone()));
             }
         }
         if x.checked_sub(1).is_some() && y.checked_sub(1).is_some() {
             let index = (y - 1, x - 1);
-            ret.push((self.get(index).unwrap().clone(), index));
+            ret.push((index, self.get(index).unwrap().clone()));
         }
         let index = (y + 1, x);
         if let Some(a) = self.get(index) {
-            ret.push((a.clone(), index));
+            ret.push((index, a.clone()));
         }
         let index = (y + 1, x + 1);
         if let Some(a) = self.get(index) {
-            ret.push((a.clone(), index));
+            ret.push((index, a.clone()));
         }
         let index = (y, x + 1);
         if let Some(a) = self.get(index) {
-            ret.push((a.clone(), index));
+            ret.push((index, a.clone()));
         }
 
         ret
