@@ -1,5 +1,8 @@
 pub fn number_to_digit_count(x: u64) -> u8 {
-    (x as f64).log10().floor() as u8 + 1
+    match x.checked_ilog10() {
+        Some(x) => (x + 1) as u8,
+        None => 1,
+    }
 }
 #[cfg(test)]
 mod tests {
