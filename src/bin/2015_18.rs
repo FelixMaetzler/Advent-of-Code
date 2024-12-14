@@ -1,5 +1,6 @@
-use all_aoc::helper::dense_grid::DenseGrid;
 use std::fmt::Debug;
+
+use all_aoc::helper::grid::{dense_grid::DenseGrid, Grid};
 all_aoc::solution!(18, 2015);
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum State {
@@ -37,9 +38,9 @@ fn solve_part_1(input: &str, iterations: u32) -> Option<usize> {
         let size = grid_copy.len();
         for i in 0..size {
             let neigbors = grid_copy
-                .neighbours8(i)
-                .into_iter()
-                .filter(|s| *s == State::On)
+                .get_neigbors8(i)
+                .map(|(_, x)| x)
+                .filter(|s| **s == State::On)
                 .count();
             let new_state = match grid_copy.get(i).unwrap() {
                 State::On => {
@@ -60,9 +61,9 @@ fn solve_part_2(input: &str, iterations: u32) -> Option<usize> {
         let size = grid_copy.len();
         for i in 0..size {
             let neigbors = grid_copy
-                .neighbours8(i)
-                .into_iter()
-                .filter(|s| *s == State::On)
+                .get_neigbors8(i)
+                .map(|(_, x)| x)
+                .filter(|s| **s == State::On)
                 .count();
             let new_state = match grid_copy.get(i).unwrap() {
                 State::On => {

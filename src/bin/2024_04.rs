@@ -1,5 +1,5 @@
 use all_aoc::helper::{
-    dense_grid::{DenseGrid, OwnIndex},
+    grid::{dense_grid::DenseGrid, grid_index::GridIndex, Grid},
     position::Direction8,
 };
 
@@ -26,22 +26,22 @@ pub fn part_two(input: &str) -> Option<usize> {
             .count(),
     )
 }
-fn check_part1(grid: &DenseGrid<char>, idx: impl OwnIndex<char>, dir: Direction8) -> bool {
+fn check_part1(grid: &DenseGrid<char>, idx: impl GridIndex<char>, dir: Direction8) -> bool {
     let mut index = idx.to_flat_index(grid);
     if grid.get(index).is_none_or(|c| *c != 'X') {
         return false;
     };
     match grid.get_dir8(index, dir) {
-        Some((i, 'M')) => index = i,
+        Some((i, 'M')) => index = i.to_flat_index(grid),
         _ => return false,
     }
     match grid.get_dir8(index, dir) {
-        Some((i, 'A')) => index = i,
+        Some((i, 'A')) => index = i.to_flat_index(grid),
         _ => return false,
     }
     matches!(grid.get_dir8(index, dir), Some((_, 'S')))
 }
-fn check_part2(grid: &DenseGrid<char>, index: impl OwnIndex<char>) -> bool {
+fn check_part2(grid: &DenseGrid<char>, index: impl GridIndex<char>) -> bool {
     if grid.get(index).is_none_or(|c| *c != 'A') {
         return false;
     };

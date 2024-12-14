@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use all_aoc::helper::{
-    dense_grid::{DenseGrid, OwnIndex},
+    grid::{dense_grid::DenseGrid, grid_index::GridIndex, Grid},
     position::Direction8,
 };
 
@@ -20,9 +20,8 @@ impl Region {
             .iter()
             .map(|i| {
                 4 - grid
-                    .neighbours4(*i)
-                    .into_iter()
-                    .filter(|c| *c == self.name)
+                    .get_neigbors4(*i)
+                    .filter(|(_, c)| **c == self.name)
                     .count()
             })
             .sum()
@@ -40,10 +39,10 @@ impl Region {
         for (dir1, dir2) in outside_edges {
             if grid
                 .get_dir8(index, dir1)
-                .is_none_or(|(i, _)| !self.members.contains(&i))
+                .is_none_or(|(i, _)| !self.members.contains(&i.to_flat_index(grid)))
                 && grid
                     .get_dir8(index, dir2)
-                    .is_none_or(|(i, _)| !self.members.contains(&i))
+                    .is_none_or(|(i, _)| !self.members.contains(&i.to_flat_index(grid)))
             {
                 count += 1;
             }
@@ -57,13 +56,13 @@ impl Region {
         for (d1, d2, d3) in inside_edges {
             if grid
                 .get_dir8(index, d1)
-                .is_some_and(|(i, _)| self.members.contains(&i))
+                .is_some_and(|(i, _)| self.members.contains(&i.to_flat_index(grid)))
                 && grid
                     .get_dir8(index, d2)
-                    .is_some_and(|(i, _)| self.members.contains(&i))
+                    .is_some_and(|(i, _)| self.members.contains(&i.to_flat_index(grid)))
                 && grid
                     .get_dir8(index, d3)
-                    .is_none_or(|(i, _)| !self.members.contains(&i))
+                    .is_none_or(|(i, _)| !self.members.contains(&i.to_flat_index(grid)))
             {
                 count += 1;
             }
@@ -109,9 +108,8 @@ fn collect_region(start: usize, grid: &DenseGrid<char>) -> Region {
         if !members.insert(x) {
             continue;
         }
-        grid.neighbours4_with_index(x)
-            .iter()
-            .filter(|(_, c)| *c == name)
+        grid.get_neigbors4(x)
+            .filter(|(_, c)| **c == name)
             .map(|(i, _)| i.to_flat_index(grid))
             .for_each(|i| {
                 stack.push(i);

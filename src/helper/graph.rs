@@ -1,9 +1,10 @@
-use super::dense_grid::{DenseGrid, OwnIndex};
+use super::grid::{grid_index::GridIndex, Grid};
+
 /// `curr_to_neighbor_comparison` is a function that
 ///  has as arguments the current node and the neighbor node of the grid
 /// and has to determine if these nodes have a edge in the graph
 pub fn build_graph4<T>(
-    grid: &DenseGrid<T>,
+    grid: &impl Grid<T>,
     curr_to_neighbor_comparison: impl Fn(&T, &T) -> bool,
 ) -> Vec<Vec<NodeIndex>>
 where
@@ -12,9 +13,14 @@ where
     let mut vec = Vec::with_capacity(grid.len());
     for i in 0..grid.len() {
         let x = grid
-            .neighbours4_with_index(i)
-            .iter()
-            .filter(|(_, val)| curr_to_neighbor_comparison(&grid[i], val))
+            .get_neigbors4(i)
+            .filter(|(_, val)| {
+                curr_to_neighbor_comparison(
+                    grid.get(i)
+                        .expect("cant fail. Is checked to exist by get_neigbors4"),
+                    val,
+                )
+            })
             .map(|(idx, _)| idx.to_flat_index(grid))
             .collect();
         vec.push(x);
@@ -25,7 +31,7 @@ where
 ///  has as arguments the current node and the neighbor node of the grid
 /// and has to determine if these nodes have a edge in the graph
 pub fn build_graph8<T>(
-    grid: &DenseGrid<T>,
+    grid: &impl Grid<T>,
     curr_to_neighbor_comparison: impl Fn(&T, &T) -> bool,
 ) -> Vec<Vec<NodeIndex>>
 where
@@ -34,9 +40,14 @@ where
     let mut vec = Vec::with_capacity(grid.len());
     for i in 0..grid.len() {
         let x = grid
-            .neighbours8_with_index(i)
-            .iter()
-            .filter(|(_, val)| curr_to_neighbor_comparison(&grid[i], val))
+            .get_neigbors8(i)
+            .filter(|(_, val)| {
+                curr_to_neighbor_comparison(
+                    grid.get(i)
+                        .expect("cant fail. Is checked to exist by get_neigbors4"),
+                    val,
+                )
+            })
             .map(|(idx, _)| idx.to_flat_index(grid))
             .collect();
         vec.push(x);
