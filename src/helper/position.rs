@@ -1,6 +1,6 @@
 use std::{
     fmt::Debug,
-    ops::{Add, Mul, Sub},
+    ops::{Add, AddAssign, Mul, Sub},
     str::FromStr,
 };
 
@@ -8,6 +8,17 @@ use std::{
 pub struct Position<T> {
     pub x: T,
     pub y: T,
+}
+impl<T> Position<T>
+where
+    T: Clone,
+{
+    pub fn as_xy_tuple(&self) -> (T, T) {
+        (self.x.clone(), self.y.clone())
+    }
+    pub fn as_yx_tuple(&self) -> (T, T) {
+        (self.y.clone(), self.x.clone())
+    }
 }
 impl<T> Sub for Position<T>
 where
@@ -33,6 +44,15 @@ where
             x: self.x + rhs.x,
             y: self.y + rhs.y,
         }
+    }
+}
+impl<T> AddAssign<T> for Position<T>
+where
+    T: AddAssign + Clone,
+{
+    fn add_assign(&mut self, rhs: T) {
+        self.x += rhs.clone();
+        self.y += rhs;
     }
 }
 impl<T> Mul<T> for Position<T>

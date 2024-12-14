@@ -17,6 +17,26 @@ where
         })
     }
 }
+pub fn triple<'a, P1, P2, P3, R1, R2, R3>(
+    parser1: P1,
+    parser2: P2,
+    parser3: P3,
+) -> impl Parser<'a, (R1, R2, R3)>
+where
+    P1: Parser<'a, R1>,
+    P2: Parser<'a, R2>,
+    P3: Parser<'a, R3>,
+{
+    move |input| {
+        parser1.parse(input).and_then(|(next_input, result1)| {
+            parser2.parse(next_input).and_then(|(next_input, result2)| {
+                parser3
+                    .parse(next_input)
+                    .map(|(last_input, result3)| (last_input, (result1, result2, result3)))
+            })
+        })
+    }
+}
 /// Matches two Parsers and only returns the result of the left one
 pub fn left<'a, P1, P2, R1, R2>(parser1: P1, parser2: P2) -> impl Parser<'a, R1>
 where
