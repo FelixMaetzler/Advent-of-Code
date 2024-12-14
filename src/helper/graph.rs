@@ -1,9 +1,9 @@
-use super::grid::{Grid, OwnIndex};
+use super::dense_grid::{DenseGrid, OwnIndex};
 /// `curr_to_neighbor_comparison` is a function that
 ///  has as arguments the current node and the neighbor node of the grid
 /// and has to determine if these nodes have a edge in the graph
 pub fn build_graph4<T>(
-    grid: &Grid<T>,
+    grid: &DenseGrid<T>,
     curr_to_neighbor_comparison: impl Fn(&T, &T) -> bool,
 ) -> Vec<Vec<NodeIndex>>
 where
@@ -25,7 +25,7 @@ where
 ///  has as arguments the current node and the neighbor node of the grid
 /// and has to determine if these nodes have a edge in the graph
 pub fn build_graph8<T>(
-    grid: &Grid<T>,
+    grid: &DenseGrid<T>,
     curr_to_neighbor_comparison: impl Fn(&T, &T) -> bool,
 ) -> Vec<Vec<NodeIndex>>
 where

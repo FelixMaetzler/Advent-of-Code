@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use all_aoc::helper::{grid::Grid, position::Direction4};
+use all_aoc::helper::{dense_grid::DenseGrid, position::Direction4};
 
 all_aoc::solution!(6, 2024);
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -47,7 +47,7 @@ pub fn part_two(input: &str) -> Option<usize> {
             .count(),
     )
 }
-fn extract_guard_pos(grid: &mut Grid<Tile>) -> (usize, Direction4) {
+fn extract_guard_pos(grid: &mut DenseGrid<Tile>) -> (usize, Direction4) {
     let (pos, tile) = grid
         .iter()
         .enumerate()
@@ -60,7 +60,11 @@ fn extract_guard_pos(grid: &mut Grid<Tile>) -> (usize, Direction4) {
     grid[pos] = Tile::Air;
     (pos, dir)
 }
-fn get_all_locations_visited(grid: &Grid<Tile>, pos: usize, dir: Direction4) -> HashSet<usize> {
+fn get_all_locations_visited(
+    grid: &DenseGrid<Tile>,
+    pos: usize,
+    dir: Direction4,
+) -> HashSet<usize> {
     let mut set = HashSet::new();
     set.insert(pos);
     let mut pos = pos;
@@ -77,7 +81,7 @@ fn get_all_locations_visited(grid: &Grid<Tile>, pos: usize, dir: Direction4) -> 
     }
     set
 }
-fn check_if_loop(grid: &Grid<Tile>, pos: usize, dir: Direction4) -> bool {
+fn check_if_loop(grid: &DenseGrid<Tile>, pos: usize, dir: Direction4) -> bool {
     let mut set = HashSet::new();
     set.insert((pos, dir));
     let mut pos = pos;
@@ -96,8 +100,8 @@ fn check_if_loop(grid: &Grid<Tile>, pos: usize, dir: Direction4) -> bool {
     }
     false
 }
-fn parse(input: &str) -> Grid<Tile> {
-    Grid::from_iter_iter(input.lines().map(|line| line.chars().map(Tile::from)))
+fn parse(input: &str) -> DenseGrid<Tile> {
+    DenseGrid::from_iter_iter(input.lines().map(|line| line.chars().map(Tile::from)))
 }
 #[cfg(test)]
 mod tests {

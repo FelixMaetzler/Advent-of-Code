@@ -11,38 +11,38 @@ pub trait OwnIndex<T>
 where
     Self: Copy + Eq + PartialEq + Hash,
 {
-    fn to_flat_index(&self, grid: &Grid<T>) -> usize;
-    fn to_2d_index(&self, grid: &Grid<T>) -> (usize, usize);
+    fn to_flat_index(&self, grid: &DenseGrid<T>) -> usize;
+    fn to_2d_index(&self, grid: &DenseGrid<T>) -> (usize, usize);
 }
 impl<T> OwnIndex<T> for usize {
     #[inline(always)]
-    fn to_flat_index(&self, _: &Grid<T>) -> usize {
+    fn to_flat_index(&self, _: &DenseGrid<T>) -> usize {
         *self
     }
     #[inline(always)]
-    fn to_2d_index(&self, grid: &Grid<T>) -> (usize, usize) {
+    fn to_2d_index(&self, grid: &DenseGrid<T>) -> (usize, usize) {
         (self / grid.cols, self % grid.cols)
     }
 }
 impl<T> OwnIndex<T> for (usize, usize) {
     #[inline(always)]
-    fn to_flat_index(&self, grid: &Grid<T>) -> usize {
+    fn to_flat_index(&self, grid: &DenseGrid<T>) -> usize {
         debug_assert!(self.0 < grid.height());
         debug_assert!(self.1 < grid.width());
         self.0 * grid.cols + self.1
     }
     #[inline(always)]
-    fn to_2d_index(&self, _: &Grid<T>) -> (usize, usize) {
+    fn to_2d_index(&self, _: &DenseGrid<T>) -> (usize, usize) {
         *self
     }
 }
 #[derive(Clone, Eq, PartialEq, Hash)]
-pub struct Grid<T> {
+pub struct DenseGrid<T> {
     data: Vec<T>,
     rows: usize,
     cols: usize,
 }
-impl<T> Grid<T> {
+impl<T> DenseGrid<T> {
     pub fn from_iter(it: impl Iterator<Item = T>, cols: usize) -> Self {
         let data: Vec<_> = it.collect();
         let rows = data.len() / cols;
@@ -335,32 +335,32 @@ impl<T> Grid<T> {
         }
     }
 }
-impl<T> Index<(usize, usize)> for Grid<T> {
+impl<T> Index<(usize, usize)> for DenseGrid<T> {
     type Output = T;
 
     fn index(&self, index: (usize, usize)) -> &Self::Output {
         &self.data[index.to_flat_index(self)]
     }
 }
-impl<T> IndexMut<(usize, usize)> for Grid<T> {
+impl<T> IndexMut<(usize, usize)> for DenseGrid<T> {
     fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
         let index = index.to_flat_index(self);
         &mut self.data[index]
     }
 }
-impl<T> Index<usize> for Grid<T> {
+impl<T> Index<usize> for DenseGrid<T> {
     type Output = T;
 
     fn index(&self, index: usize) -> &Self::Output {
         &self.data[index]
     }
 }
-impl<T> IndexMut<usize> for Grid<T> {
+impl<T> IndexMut<usize> for DenseGrid<T> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         &mut self.data[index]
     }
 }
-impl<T> Debug for Grid<T>
+impl<T> Debug for DenseGrid<T>
 where
     T: Debug,
 {
@@ -379,7 +379,7 @@ where
         write!(f, "{s}")
     }
 }
-impl<T> IntoIterator for Grid<T> {
+impl<T> IntoIterator for DenseGrid<T> {
     type Item = T;
 
     type IntoIter = <Vec<T> as IntoIterator>::IntoIter;
@@ -388,7 +388,7 @@ impl<T> IntoIterator for Grid<T> {
         self.data.into_iter()
     }
 }
-impl<T> Deref for Grid<T> {
+impl<T> Deref for DenseGrid<T> {
     type Target = [T];
 
     fn deref(&self) -> &Self::Target {
@@ -396,12 +396,12 @@ impl<T> Deref for Grid<T> {
     }
 }
 
-impl<T> DerefMut for Grid<T> {
+impl<T> DerefMut for DenseGrid<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.data[..]
     }
 }
-impl<T> std::ops::Sub for Grid<T>
+impl<T> std::ops::Sub for DenseGrid<T>
 where
     T: std::ops::Sub<Output = T>,
 {
@@ -409,10 +409,10 @@ where
 
     fn sub(self, rhs: Self) -> Self::Output {
         let n = self.width();
-        Grid::from_iter(self.into_iter().zip(rhs).map(|(l, r)| l - r), n)
+        DenseGrid::from_iter(self.into_iter().zip(rhs).map(|(l, r)| l - r), n)
     }
 }
-impl<T> std::ops::Add for Grid<T>
+impl<T> std::ops::Add for DenseGrid<T>
 where
     T: std::ops::Add<Output = T>,
 {
@@ -420,10 +420,10 @@ where
 
     fn add(self, rhs: Self) -> Self::Output {
         let n = self.width();
-        Grid::from_iter(self.into_iter().zip(rhs).map(|(l, r)| l + r), n)
+        DenseGrid::from_iter(self.into_iter().zip(rhs).map(|(l, r)| l + r), n)
     }
 }
-impl<T> std::ops::Neg for Grid<T>
+impl<T> std::ops::Neg for DenseGrid<T>
 where
     T: std::ops::Neg<Output = T>,
 {
@@ -431,6 +431,6 @@ where
 
     fn neg(self) -> Self::Output {
         let n = self.width();
-        Grid::from_iter(self.into_iter().map(|v| -v), n)
+        DenseGrid::from_iter(self.into_iter().map(|v| -v), n)
     }
 }

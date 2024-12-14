@@ -1,8 +1,8 @@
 use std::collections::HashSet;
 
 use all_aoc::helper::{
+    dense_grid::DenseGrid,
     graph::{build_graph4, Graph},
-    grid::Grid,
 };
 
 all_aoc::solution!(10, 2024);
@@ -33,7 +33,7 @@ pub fn part_two(input: &str) -> Option<usize> {
     Some(zeros.map(|i| traversal_part_2(i, &graph, &grid)).sum())
 }
 
-fn all_9s_reachable(start: usize, graph: &[Vec<usize>], grid: &Grid<u32>) -> HashSet<usize> {
+fn all_9s_reachable(start: usize, graph: &[Vec<usize>], grid: &DenseGrid<u32>) -> HashSet<usize> {
     let mut queue = vec![start];
     let mut set = HashSet::new();
     while let Some(i) = queue.pop() {
@@ -46,7 +46,7 @@ fn all_9s_reachable(start: usize, graph: &[Vec<usize>], grid: &Grid<u32>) -> Has
     }
     set
 }
-fn traversal_part_2(start: usize, graph: &[Vec<usize>], grid: &Grid<u32>) -> usize {
+fn traversal_part_2(start: usize, graph: &[Vec<usize>], grid: &DenseGrid<u32>) -> usize {
     let reachable = all_9s_reachable(start, graph, grid);
     reachable
         .into_iter()
@@ -54,8 +54,8 @@ fn traversal_part_2(start: usize, graph: &[Vec<usize>], grid: &Grid<u32>) -> usi
         .sum()
 }
 
-fn parse(input: &str) -> Grid<u32> {
-    Grid::from_iter_iter(
+fn parse(input: &str) -> DenseGrid<u32> {
+    DenseGrid::from_iter_iter(
         input
             .lines()
             .map(|l| l.chars().map(|c| c.to_digit(10).unwrap())),

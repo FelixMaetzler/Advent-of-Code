@@ -1,4 +1,4 @@
-use all_aoc::helper::grid::Grid;
+use all_aoc::helper::dense_grid::DenseGrid;
 use std::fmt::Debug;
 all_aoc::solution!(18, 2015);
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -86,7 +86,7 @@ fn solve_part_2(input: &str, iterations: u32) -> Option<usize> {
     }
     Some(grid.into_iter().filter(|s| *s == State::On).count())
 }
-fn set_edges_to_on(grid: &mut Grid<State>) {
+fn set_edges_to_on(grid: &mut DenseGrid<State>) {
     let height = grid.height();
     let width = grid.width();
     grid[(0, 0)] = State::On;
@@ -94,8 +94,8 @@ fn set_edges_to_on(grid: &mut Grid<State>) {
     grid[(0, width - 1)] = State::On;
     grid[(height - 1, width - 1)] = State::On;
 }
-fn parse(input: &str) -> Grid<State> {
-    Grid::from_iter_iter(input.lines().map(|l| {
+fn parse(input: &str) -> DenseGrid<State> {
+    DenseGrid::from_iter_iter(input.lines().map(|l| {
         l.chars().map(|c| match c {
             '#' => State::On,
             '.' => State::Off,

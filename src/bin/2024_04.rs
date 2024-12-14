@@ -1,5 +1,5 @@
 use all_aoc::helper::{
-    grid::{Grid, OwnIndex},
+    dense_grid::{DenseGrid, OwnIndex},
     position::Direction8,
 };
 
@@ -26,7 +26,7 @@ pub fn part_two(input: &str) -> Option<usize> {
             .count(),
     )
 }
-fn check_part1(grid: &Grid<char>, idx: impl OwnIndex<char>, dir: Direction8) -> bool {
+fn check_part1(grid: &DenseGrid<char>, idx: impl OwnIndex<char>, dir: Direction8) -> bool {
     let mut index = idx.to_flat_index(grid);
     if grid.get(index).is_none_or(|c| *c != 'X') {
         return false;
@@ -41,7 +41,7 @@ fn check_part1(grid: &Grid<char>, idx: impl OwnIndex<char>, dir: Direction8) -> 
     }
     matches!(grid.get_dir8(index, dir), Some((_, 'S')))
 }
-fn check_part2(grid: &Grid<char>, index: impl OwnIndex<char>) -> bool {
+fn check_part2(grid: &DenseGrid<char>, index: impl OwnIndex<char>) -> bool {
     if grid.get(index).is_none_or(|c| *c != 'A') {
         return false;
     };
@@ -61,8 +61,8 @@ fn check_part2(grid: &Grid<char>, index: impl OwnIndex<char>) -> bool {
         (Some((_, 'M')), Some((_, 'S'))) | (Some((_, 'S')), Some((_, 'M')))
     )
 }
-fn parse(input: &str) -> Grid<char> {
-    Grid::from_iter_iter(input.lines().map(|l| l.chars()))
+fn parse(input: &str) -> DenseGrid<char> {
+    DenseGrid::from_iter_iter(input.lines().map(|l| l.chars()))
 }
 #[cfg(test)]
 mod tests {

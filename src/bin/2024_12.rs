@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use all_aoc::helper::{
-    grid::{Grid, OwnIndex},
+    dense_grid::{DenseGrid, OwnIndex},
     position::Direction8,
 };
 
@@ -15,7 +15,7 @@ impl Region {
     fn area(&self) -> usize {
         self.members.len()
     }
-    fn perimeter(&self, grid: &Grid<char>) -> usize {
+    fn perimeter(&self, grid: &DenseGrid<char>) -> usize {
         self.members
             .iter()
             .map(|i| {
@@ -27,13 +27,13 @@ impl Region {
             })
             .sum()
     }
-    fn sides(&self, grid: &Grid<char>) -> usize {
+    fn sides(&self, grid: &DenseGrid<char>) -> usize {
         self.members
             .iter()
             .map(|i| self.is_part_of_edges(grid, *i))
             .sum()
     }
-    fn is_part_of_edges(&self, grid: &Grid<char>, index: usize) -> usize {
+    fn is_part_of_edges(&self, grid: &DenseGrid<char>, index: usize) -> usize {
         use Direction8::*;
         let mut count = 0;
         let outside_edges = [(North, East), (North, West), (South, East), (South, West)];
@@ -88,7 +88,7 @@ pub fn part_two(input: &str) -> Option<usize> {
     let regions = collect_regions(&grid);
     Some(regions.into_iter().map(|r| r.area() * r.sides(&grid)).sum())
 }
-fn collect_regions(grid: &Grid<char>) -> Vec<Region> {
+fn collect_regions(grid: &DenseGrid<char>) -> Vec<Region> {
     let mut indices = HashSet::with_capacity(grid.len());
     let mut regions = vec![];
     for i in 0..grid.len() {
@@ -101,7 +101,7 @@ fn collect_regions(grid: &Grid<char>) -> Vec<Region> {
     }
     regions
 }
-fn collect_region(start: usize, grid: &Grid<char>) -> Region {
+fn collect_region(start: usize, grid: &DenseGrid<char>) -> Region {
     let name = *grid.get(start).unwrap();
     let mut stack = vec![start];
     let mut members = HashSet::new();
@@ -119,8 +119,8 @@ fn collect_region(start: usize, grid: &Grid<char>) -> Region {
     }
     Region { name, members }
 }
-fn parse(input: &str) -> Grid<char> {
-    Grid::from_iter_iter(input.lines().map(|l| l.chars()))
+fn parse(input: &str) -> DenseGrid<char> {
+    DenseGrid::from_iter_iter(input.lines().map(|l| l.chars()))
 }
 #[cfg(test)]
 mod tests {
