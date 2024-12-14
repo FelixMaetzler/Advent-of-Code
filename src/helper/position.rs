@@ -1,6 +1,6 @@
 use std::{
     fmt::Debug,
-    ops::{Add, AddAssign, Mul, Sub},
+    ops::{Add, AddAssign, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub},
     str::FromStr,
 };
 
@@ -53,6 +53,55 @@ where
     fn add_assign(&mut self, rhs: T) {
         self.x += rhs.clone();
         self.y += rhs;
+    }
+}
+impl<T> AddAssign for Position<T>
+where
+    T: AddAssign,
+{
+    fn add_assign(&mut self, rhs: Self) {
+        self.x += rhs.x;
+        self.y += rhs.y;
+    }
+}
+impl<T> MulAssign<T> for Position<T>
+where
+    T: MulAssign + Clone,
+{
+    fn mul_assign(&mut self, rhs: T) {
+        self.x *= rhs.clone();
+        self.y *= rhs;
+    }
+}
+impl<T> DivAssign<T> for Position<T>
+where
+    T: DivAssign + Clone,
+{
+    fn div_assign(&mut self, rhs: T) {
+        self.x /= rhs.clone();
+        self.y /= rhs;
+    }
+}
+impl<T> RemAssign for Position<T>
+where
+    T: RemAssign,
+{
+    fn rem_assign(&mut self, rhs: Self) {
+        self.x %= rhs.x;
+        self.y %= rhs.y;
+    }
+}
+impl<T> Rem for Position<T>
+where
+    T: Rem<Output = T>,
+{
+    type Output = Self;
+
+    fn rem(self, rhs: Self) -> Self::Output {
+        Self {
+            x: self.x % rhs.x,
+            y: self.y % rhs.y,
+        }
     }
 }
 impl<T> Mul<T> for Position<T>
