@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use all_aoc::helper::{
     graph::{build_graph4, Graph},
-    grid::dense_grid::DenseGrid,
+    grid::{dense_grid::DenseGrid, Grid},
 };
 
 all_aoc::solution!(10, 2024);

@@ -1,6 +1,7 @@
 pub mod dense_grid;
 pub mod grid_index;
-use std::ops::{Deref, DerefMut, Index, IndexMut};
+pub mod sparse_grid;
+use std::ops::{Index, IndexMut};
 
 use grid_index::GridIndex;
 
@@ -13,9 +14,7 @@ where
         + Index<(usize, usize)>
         + IndexMut<(usize, usize)>
         + IntoIterator
-        + Clone
-        + Deref
-        + DerefMut,
+        + Clone,
 {
     fn width(&self) -> usize;
     fn height(&self) -> usize;
@@ -23,6 +22,9 @@ where
     fn is_empty(&self) -> bool;
     fn get(&self, index: impl GridIndex<T>) -> Option<&T>;
     fn set(&mut self, index: impl GridIndex<T>, val: T) -> bool;
+    fn iter<'a>(&'a self) -> impl Iterator<Item = &'a T>
+    where
+        T: 'a;
     /// returns the neigbors (if they exist) counterclockwise starting from the North
     fn get_neigbors4<'a>(
         &'a self,

@@ -1,4 +1,4 @@
-use std::ops::{Deref, DerefMut, Index, IndexMut};
+use std::ops::{Index, IndexMut};
 
 use super::{grid_index::GridIndex, Grid};
 #[derive(Clone)]
@@ -36,6 +36,13 @@ where
         } else {
             false
         }
+    }
+
+    fn iter<'a>(&'a self) -> impl Iterator<Item = &'a T>
+    where
+        T: 'a,
+    {
+        self.data.iter()
     }
 }
 impl<T> DenseGrid<T> {
@@ -107,18 +114,5 @@ impl<T> IntoIterator for DenseGrid<T> {
 
     fn into_iter(self) -> Self::IntoIter {
         self.data.into_iter()
-    }
-}
-impl<T> Deref for DenseGrid<T> {
-    type Target = [T];
-
-    fn deref(&self) -> &Self::Target {
-        &self.data[..]
-    }
-}
-
-impl<T> DerefMut for DenseGrid<T> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.data[..]
     }
 }
