@@ -1,4 +1,4 @@
-use all_aoc::helper::permutations::generate_combinations;
+use all_aoc::helper::permutations::IteratorCombinator;
 
 all_aoc::solution!(17, 2015);
 
@@ -7,9 +7,9 @@ pub fn part_one(input: &str) -> Option<usize> {
 }
 fn solve_part_1(input: &str, sum: u32) -> Option<usize> {
     let vec = parse(input);
-    let comb = generate_combinations(&vec);
     Some(
-        comb.into_iter()
+        vec.into_iter()
+            .powerset()
             .filter(|c| c.iter().sum::<u32>() == sum)
             .count(),
     )
@@ -19,9 +19,9 @@ pub fn part_two(input: &str) -> Option<usize> {
 }
 fn solve_part_2(input: &str, sum: u32) -> Option<usize> {
     let vec = parse(input);
-    let comb = generate_combinations(&vec);
-    let comb = comb
+    let comb = vec
         .into_iter()
+        .powerset()
         .filter(|c| c.iter().sum::<u32>() == sum)
         .collect::<Vec<_>>();
     let min = comb.iter().map(|v| v.len()).min().unwrap_or(0);

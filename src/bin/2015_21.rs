@@ -4,7 +4,8 @@ use std::{
     ops::{Add, AddAssign},
 };
 
-use all_aoc::helper::permutations::generate_combinations_until;
+use all_aoc::helper::permutations::IteratorCombinator;
+
 enum Win {
     BossWin(u32),
     PlayerWin(u32),
@@ -76,7 +77,7 @@ fn setup_all_player_combs() -> HashSet<Entitiy> {
     let all_armor_combs = iter::once(None)
         .chain(ARMORS.into_iter().map(Some))
         .collect::<Vec<_>>();
-    let all_ring_combs = generate_combinations_until(&RINGS, 2);
+    let all_ring_combs = RINGS.into_iter().combinations_until(2).collect::<Vec<_>>();
     let len = all_armor_combs.len() * all_weapon_combs.len() * all_ring_combs.len();
     let mut players = HashSet::with_capacity(len);
     for rings in all_ring_combs {
