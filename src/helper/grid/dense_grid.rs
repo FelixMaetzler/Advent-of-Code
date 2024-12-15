@@ -1,6 +1,9 @@
-use std::ops::{Index, IndexMut};
-
 use super::{grid_index::GridIndex, Grid};
+use std::fmt::Write;
+use std::{
+    fmt::Debug,
+    ops::{Index, IndexMut},
+};
 #[derive(Clone)]
 pub struct DenseGrid<T> {
     data: Vec<T>,
@@ -9,7 +12,7 @@ pub struct DenseGrid<T> {
 }
 impl<T> Grid<T> for DenseGrid<T>
 where
-    T: Clone,
+    T: Clone + Debug,
 {
     fn width(&self) -> usize {
         self.width
@@ -90,7 +93,7 @@ impl<T> IndexMut<usize> for DenseGrid<T> {
 }
 impl<T> Index<(usize, usize)> for DenseGrid<T>
 where
-    T: Clone,
+    T: Clone + Debug,
 {
     type Output = T;
 
@@ -100,7 +103,7 @@ where
 }
 impl<T> IndexMut<(usize, usize)> for DenseGrid<T>
 where
-    T: Clone,
+    T: Clone + Debug,
 {
     fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
         let index = index.to_flat_index(self);
@@ -114,5 +117,27 @@ impl<T> IntoIterator for DenseGrid<T> {
 
     fn into_iter(self) -> Self::IntoIter {
         self.data.into_iter()
+    }
+}
+
+impl<T> Debug for DenseGrid<T>
+where
+    T: Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let s = self
+            .data
+            .chunks(self.width)
+            .map(|c| {
+                c.iter().fold(String::new(), |mut output, x| {
+                    let _ = write!(output, "{x:?}");
+                    output
+                })
+            })
+            .fold(String::new(), |mut output, s| {
+                let _ = writeln!(output, "{s}");
+                output
+            });
+        f.write_fmt(format_args!("\n{s}"))
     }
 }

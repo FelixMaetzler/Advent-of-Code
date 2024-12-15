@@ -1,7 +1,10 @@
 pub mod dense_grid;
 pub mod grid_index;
 pub mod sparse_grid;
-use std::ops::{Index, IndexMut};
+use std::{
+    fmt::Debug,
+    ops::{Index, IndexMut},
+};
 
 use grid_index::GridIndex;
 
@@ -14,7 +17,8 @@ where
         + Index<(usize, usize)>
         + IndexMut<(usize, usize)>
         + IntoIterator
-        + Clone,
+        + Clone
+        + Debug,
 {
     fn width(&self) -> usize;
     fn height(&self) -> usize;
@@ -65,11 +69,7 @@ where
         .into_iter()
         .flatten()
     }
-    fn get_dir8(
-        &self,
-        index: impl GridIndex<T>,
-        dir: Direction8,
-    ) -> Option<(impl GridIndex<T>, &T)> {
+    fn get_dir8(&self, index: impl GridIndex<T>, dir: Direction8) -> Option<((usize, usize), &T)> {
         match dir {
             Direction8::North => get_north(self, index),
             Direction8::NorthEast => get_north_east(self, index),

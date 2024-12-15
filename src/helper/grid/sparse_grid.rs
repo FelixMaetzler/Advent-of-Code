@@ -1,5 +1,6 @@
 use std::{
     collections::HashMap,
+    fmt::Debug,
     ops::{Index, IndexMut},
 };
 
@@ -92,5 +93,10 @@ impl<T> IntoIterator for SparseGrid<T> {
 
     fn into_iter(self) -> Self::IntoIter {
         self.data.into_values()
+    }
+}
+impl<T> Debug for SparseGrid<T> {
+    fn fmt(&self, _f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        todo!()
     }
 }
