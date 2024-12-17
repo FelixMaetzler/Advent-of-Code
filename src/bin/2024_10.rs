@@ -46,7 +46,7 @@ fn all_9s_reachable(start: usize, graph: &[Vec<usize>], grid: &DenseGrid<u32>) -
     }
     set
 }
-fn traversal_part_2(start: usize, graph: &[Vec<usize>], grid: &DenseGrid<u32>) -> usize {
+fn traversal_part_2(start: usize, graph: &Vec<Vec<usize>>, grid: &DenseGrid<u32>) -> usize {
     let reachable = all_9s_reachable(start, graph, grid);
     reachable
         .into_iter()

@@ -210,6 +210,26 @@ impl Direction4 {
             Direction4::South => Self::West,
         }
     }
+    pub fn turn_left(&self) -> Direction4 {
+        match self {
+            Direction4::North => Self::West,
+            Direction4::East => Self::North,
+            Direction4::West => Self::South,
+            Direction4::South => Self::East,
+        }
+    }
+    pub fn opposite(&self) -> Direction4 {
+        match self {
+            Direction4::North => Self::South,
+            Direction4::East => Self::West,
+            Direction4::West => Self::East,
+            Direction4::South => Self::North,
+        }
+    }
+    pub fn all_dirs() -> [Direction4; 4] {
+        use Direction4::*;
+        [North, East, South, West]
+    }
 }
 impl From<Direction4> for Direction8 {
     fn from(val: Direction4) -> Self {
