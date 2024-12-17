@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use all_aoc::helper::permutations::generate_permutations;
+use all_aoc::helper::permutations::IteratorPermutator;
 
 all_aoc::solution!(9, 2015);
 
@@ -24,7 +24,7 @@ fn setup(input: &str) -> SetupResult {
         .into_iter()
         .cloned()
         .collect::<Vec<_>>();
-    let perm = generate_permutations(&vec);
+    let perm = vec.into_iter().permutation().collect();
     SetupResult(map, perm)
 }
 fn parse(input: &str) -> HashMap<(String, String), u32> {

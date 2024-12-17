@@ -1,21 +1,100 @@
-fn generate_permutations_recursive<T: Clone>(vec: &[T], start: usize, result: &mut Vec<Vec<T>>) {
-    let mut vec = vec.to_vec();
-
-    if start == vec.len() {
-        result.push(vec);
-        return;
+pub trait IteratorPermutator: Iterator {
+    fn permutations(self, k: usize) -> Permutator<<Self as Iterator>::Item>
+    where
+        Self: Sized,
+        <Self as std::iter::Iterator>::Item: Clone,
+    {
+        let collect = self.collect::<Vec<_>>();
+        Permutator::new(collect, k)
     }
 
-    for i in start..vec.len() {
-        vec.swap(start, i);
-        generate_permutations_recursive(&vec, start + 1, result);
+    fn permutations_until(self, k: usize) -> impl Iterator<Item = Vec<<Self as Iterator>::Item>>
+    where
+        Self: Sized,
+        <Self as std::iter::Iterator>::Item: Clone,
+    {
+        let collect = self.collect::<Vec<_>>();
+        (0..=k).flat_map(move |size| Permutator::new(collect.clone(), size))
+    }
+    fn permutation(self) -> Permutator<<Self as Iterator>::Item>
+    where
+        Self: Sized,
+        <Self as std::iter::Iterator>::Item: Clone,
+    {
+        let collect = self.collect::<Vec<_>>();
+        let len = collect.len();
+        Permutator::new(collect, len)
     }
 }
-/// Given a Slice, this function returns all possible permutations of it
-pub fn generate_permutations<T: Clone>(vec: &[T]) -> Vec<Vec<T>> {
-    let mut ret = Vec::new();
-    generate_permutations_recursive(vec, 0, &mut ret);
-    ret
+
+// Implement the trait for all iterators
+impl<T> IteratorPermutator for T where T: Iterator {}
+
+/// Permutator struct to handle permutations
+#[derive(Clone)]
+pub struct Permutator<T> {
+    items: Vec<T>,
+    indices: Vec<usize>,
+    cycles: Vec<usize>,
+    started: bool,
+}
+
+impl<T> Permutator<T> {
+    pub fn new(items: Vec<T>, k: usize) -> Self {
+        let n = items.len();
+        let cycles = if k > n {
+            (0..k).collect()
+        } else {
+            (0..k).map(|i| n - i).collect()
+        };
+        Permutator {
+            items,
+            indices: (0..n).collect(),
+            cycles,
+            started: false,
+        }
+    }
+}
+
+impl<T: Clone> Iterator for Permutator<T> {
+    type Item = Vec<T>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let k = self.cycles.len();
+
+        if k > self.items.len() {
+            return None;
+        }
+
+        if !self.started {
+            self.started = true;
+            return Some(
+                self.indices[..k]
+                    .iter()
+                    .map(|&i| self.items[i].clone())
+                    .collect(),
+            );
+        }
+
+        for i in (0..k).rev() {
+            self.cycles[i] -= 1;
+
+            if self.cycles[i] == 0 {
+                self.indices[i..].rotate_left(1);
+                self.cycles[i] = self.items.len() - i;
+            } else {
+                self.indices.swap(i, self.items.len() - self.cycles[i]);
+                return Some(
+                    self.indices[..k]
+                        .iter()
+                        .map(|&i| self.items[i].clone())
+                        .collect(),
+                );
+            }
+        }
+
+        None
+    }
 }
 
 pub struct Combinator<T>
@@ -94,25 +173,7 @@ impl Iterator for Counter {
         Some(self.state.clone())
     }
 }
-pub fn powerset<T>(input: &[T]) -> impl Iterator<Item = Vec<T>> + use<'_, T>
-where
-    T: Clone,
-{
-    (0..1 << input.len()).map(move |bitmask| {
-        input
-            .iter()
-            .enumerate()
-            .filter_map(move |(i, item)| {
-                if bitmask & (1 << i) != 0 {
-                    Some(item)
-                } else {
-                    None
-                }
-            })
-            .cloned()
-            .collect()
-    })
-} // Define the extension trait
+
 pub trait IteratorCombinator: Iterator {
     fn combinations(self, k: usize) -> Combinator<<Self as Iterator>::Item>
     where
@@ -147,17 +208,17 @@ pub trait IteratorCombinator: Iterator {
     }
 }
 
-// Implement the trait for all iterators
 impl<T> IteratorCombinator for T where T: Iterator {}
 #[cfg(test)]
 mod tests {
-    use crate::helper::permutations::powerset;
+
+    use crate::helper::permutations::IteratorPermutator;
 
     use super::{Counter, IteratorCombinator};
 
     #[test]
     fn powerset_test() {
-        let gen = powerset(&[1, 2]).collect::<Vec<_>>();
+        let gen = [1, 2].into_iter().powerset().collect::<Vec<_>>();
         assert_eq!(gen.len(), 4);
         assert!(gen.contains(&vec![]));
         assert!(gen.contains(&vec![1]));
@@ -220,7 +281,7 @@ mod tests {
         }
     }
     #[test]
-    fn test_counter_all_iterator() {
+    fn test_combinator_all_iterator() {
         for n in 0..20 {
             for k in 0..20 {
                 let vec = (0..n).combinations(k).collect::<Vec<_>>();
@@ -232,7 +293,16 @@ mod tests {
         }
     }
     #[test]
-    fn test_counter_all_until_iterator() {
+    fn test_permutator_all_iterator() {
+        for n in 0..10 {
+            for k in 0..=10 {
+                let vec = (0..n).permutations(k).collect::<Vec<_>>();
+                assert_eq!(vec.len(), n_permute_k(n, k), "n: {n}, k: {k}");
+            }
+        }
+    }
+    #[test]
+    fn test_combinator_all_until_iterator() {
         for n in 0..15 {
             for k in 0..15 {
                 let vec = (0..n).combinations_until(k).collect::<Vec<_>>();
@@ -260,7 +330,26 @@ mod tests {
             (k + 1..=n).product::<usize>() / fakultaet(n - k)
         }
     }
+    fn n_permute_k(n: usize, k: usize) -> usize {
+        if k > n {
+            0
+        } else {
+            ((n - k + 1)..=n).product()
+        }
+    }
     fn fakultaet(i: usize) -> usize {
         (1..=i).product()
+    }
+    #[test]
+    fn test_n_k() {
+        for n in 0..20 {
+            for k in 0..=n {
+                assert_eq!(
+                    n_choose_k(n, k),
+                    fakultaet(n) / (fakultaet(n - k) * fakultaet(k))
+                );
+                assert_eq!(n_permute_k(n, k), fakultaet(n) / (fakultaet(n - k)));
+            }
+        }
     }
 }

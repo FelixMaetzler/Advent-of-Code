@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use all_aoc::helper::permutations::generate_permutations;
+use all_aoc::helper::permutations::IteratorPermutator;
 
 all_aoc::solution!(13, 2015);
 
@@ -8,9 +8,8 @@ pub fn part_one(input: &str) -> Option<i32> {
     let map = parse(input);
     let set: HashSet<_> = map.keys().flat_map(|(k1, k2)| [k1, k2]).cloned().collect();
     let vec: Vec<_> = set.into_iter().collect();
-    let perms = generate_permutations(&vec);
-    perms
-        .into_iter()
+    vec.into_iter()
+        .permutation()
         .map(|order| calc_change(&order, &map))
         .max()
 }
@@ -27,9 +26,8 @@ pub fn part_two(input: &str) -> Option<i32> {
     vec.push(me);
     let vec = vec;
     let map = map;
-    let perms = generate_permutations(&vec);
-    perms
-        .into_iter()
+    vec.into_iter()
+        .permutation()
         .map(|order| calc_change(&order, &map))
         .max()
 }
