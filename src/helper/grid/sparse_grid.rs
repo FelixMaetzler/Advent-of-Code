@@ -50,8 +50,20 @@ where
     {
         self.data.values()
     }
-}
 
+    fn all_indices(&self) -> impl Iterator<Item = impl GridIndex<T>> {
+        self.data.keys().cloned()
+    }
+}
+impl<T> SparseGrid<T> {
+    pub fn new(width: usize, height: usize) -> Self {
+        Self {
+            data: HashMap::new(),
+            width,
+            height,
+        }
+    }
+}
 impl<T> Index<usize> for SparseGrid<T> {
     type Output = T;
 

@@ -47,6 +47,10 @@ where
     {
         self.data.iter()
     }
+
+    fn all_indices(&self) -> impl Iterator<Item = impl GridIndex<T>> {
+        0..self.len()
+    }
 }
 impl<T> DenseGrid<T> {
     pub fn from_iter(it: impl Iterator<Item = T>, width: usize) -> Self {
@@ -74,6 +78,16 @@ impl<T> DenseGrid<T> {
         debug_assert_eq!(height * width, data.len());
         Self {
             data,
+            height,
+            width,
+        }
+    }
+    pub fn new(width: usize, height: usize, default: T) -> Self
+    where
+        T: Clone,
+    {
+        Self {
+            data: vec![default; height * width],
             height,
             width,
         }

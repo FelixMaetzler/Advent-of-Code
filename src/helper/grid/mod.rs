@@ -26,6 +26,7 @@ where
     fn is_empty(&self) -> bool;
     fn get(&self, index: impl GridIndex<T>) -> Option<&T>;
     fn set(&mut self, index: impl GridIndex<T>, val: T) -> bool;
+    fn all_indices(&self) -> impl Iterator<Item = impl GridIndex<T>>;
     fn iter<'a>(&'a self) -> impl Iterator<Item = &'a T>
     where
         T: 'a;
