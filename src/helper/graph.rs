@@ -16,7 +16,7 @@ where
     T: Clone,
 {
     let mut vec = Vec::with_capacity(grid.len());
-    for i in 0..grid.len() {
+    for i in grid.all_indices() {
         let x = grid
             .get_neigbors4(i)
             .filter(|(_, val)| {
@@ -43,7 +43,7 @@ where
     T: Clone,
 {
     let mut vec = Vec::with_capacity(grid.len());
-    for i in 0..grid.len() {
+    for i in grid.all_indices() {
         let x = grid
             .get_neigbors8(i)
             .filter(|(_, val)| {
@@ -98,7 +98,7 @@ where
             if !visited.insert(position) {
                 continue;
             }
-            for &v in self.outgoing(position) {
+            for v in self.outgoing(position) {
                 let u = position;
                 let weight = *self.weight(u, v).unwrap();
                 let next = State {
@@ -146,7 +146,10 @@ where
 }
 pub trait Graph {
     fn new() -> Self;
-    fn outgoing(&self, index: NodeIndex) -> impl Iterator<Item = &NodeIndex>;
+    fn incoming(&self, index: NodeIndex) -> impl Iterator<Item = NodeIndex>;
+    fn outgoing(&self, index: NodeIndex) -> impl Iterator<Item = NodeIndex>;
+    fn nodes(&self) -> usize;
+    fn edges(&self) -> usize;
     fn all_paths(&self, start: NodeIndex, end: NodeIndex) -> Vec<Vec<NodeIndex>>
     where
         Self: Sized,
@@ -170,7 +173,7 @@ fn dfs(
     if current == end {
         result.push(path.clone());
     } else {
-        for &neighbor in graph.outgoing(current) {
+        for neighbor in graph.outgoing(current) {
             if !path.contains(&neighbor) {
                 dfs(graph, neighbor, end, path, result);
             }
@@ -191,14 +194,60 @@ impl Graph for Vec<Vec<NodeIndex>> {
         vec![vec![]]
     }
 
-    fn outgoing(&self, index: NodeIndex) -> impl Iterator<Item = &NodeIndex> {
-        self[index].iter()
+    fn outgoing(&self, index: NodeIndex) -> impl Iterator<Item = NodeIndex> {
+        self[index].iter().copied()
+    }
+    fn incoming(&self, index: NodeIndex) -> impl Iterator<Item = NodeIndex> {
+        self.iter()
+            .enumerate()
+            .filter(move |(_, v)| v.contains(&index))
+            .map(|(i, _)| i)
+    }
+
+    fn nodes(&self) -> usize {
+        let set = self.iter().flat_map(|v| v.iter()).collect::<HashSet<_>>();
+        set.len()
+    }
+
+    fn edges(&self) -> usize {
+        self.iter().map(|v| v.len()).sum()
     }
 }
 
 pub struct SpecialGraph<T> {
     adj_matrix: HashMap<NodeIndex, HashSet<NodeIndex>>,
     edges: HashMap<(NodeIndex, NodeIndex), T>,
+}
+impl<T> SpecialGraph<T> {
+    pub fn remove_node(&mut self, index: NodeIndex) -> bool {
+        let incoming = self.incoming(index).collect::<Vec<_>>();
+        let outgoing = self.outgoing(index).collect::<Vec<_>>();
+        for incom in incoming {
+            let x = self.edges.remove(&(incom, index));
+            debug_assert!(x.is_some());
+            let x = self.adj_matrix.get_mut(&incom).unwrap().remove(&index);
+            debug_assert!(x);
+        }
+        for out in outgoing {
+            let x = self.edges.remove(&(index, out));
+            debug_assert!(x.is_some());
+        }
+        self.adj_matrix.remove(&index).is_some()
+    }
+    pub fn remove_edge(&mut self, from: NodeIndex, to: NodeIndex) -> bool {
+        if self.edges.remove(&(from, to)).is_some() {
+            let x = self.adj_matrix.get_mut(&from).unwrap().remove(&to);
+            debug_assert!(x);
+            true
+        } else {
+            debug_assert!(if let Some(x) = self.adj_matrix.get(&from) {
+                !x.contains(&to)
+            } else {
+                true
+            });
+            false
+        }
+    }
 }
 impl<T> Graph for SpecialGraph<T> {
     fn new() -> Self {
@@ -207,13 +256,33 @@ impl<T> Graph for SpecialGraph<T> {
             edges: HashMap::new(),
         }
     }
+    fn outgoing(&self, index: NodeIndex) -> impl Iterator<Item = NodeIndex> {
+        self.adj_matrix
+            .get(&index)
+            .map(|x| x.iter().copied())
+            .into_iter()
+            .flatten()
+    }
 
-    fn outgoing(&self, index: NodeIndex) -> impl Iterator<Item = &NodeIndex> {
-        if let Some(x) = self.adj_matrix.get(&index) {
-            x.iter()
-        } else {
-            panic!("This Node doesn't exist")
-        }
+    fn incoming(&self, index: NodeIndex) -> impl Iterator<Item = NodeIndex> {
+        self.adj_matrix
+            .iter()
+            .filter(move |(_, v)| v.contains(&index))
+            .map(|(i, _)| i)
+            .cloned()
+    }
+
+    fn nodes(&self) -> usize {
+        let set = self
+            .adj_matrix
+            .iter()
+            .flat_map(|(_, v)| v.iter())
+            .collect::<HashSet<_>>();
+        set.len()
+    }
+
+    fn edges(&self) -> usize {
+        self.edges.len()
     }
 }
 impl<T> GraphWithWeights<T> for SpecialGraph<T> {
