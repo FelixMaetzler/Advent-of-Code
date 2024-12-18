@@ -20,6 +20,26 @@ where
         (self.y.clone(), self.x.clone())
     }
 }
+impl<T> Position<T> {
+    pub fn from_yx<E>(s: &str) -> Result<Self, E>
+    where
+        T: FromStr<Err = E>,
+    {
+        let (y, x) = s.split_once(",").unwrap();
+        let y = y.parse()?;
+        let x = x.parse()?;
+        Ok(Self { x, y })
+    }
+    pub fn from_xy<E>(s: &str) -> Result<Self, E>
+    where
+        T: FromStr<Err = E>,
+    {
+        let (x, y) = s.split_once(",").unwrap();
+        let y = y.parse()?;
+        let x = x.parse()?;
+        Ok(Self { x, y })
+    }
+}
 impl<T> Sub for Position<T>
 where
     T: Sub<Output = T>,
