@@ -36,11 +36,11 @@ where
             .collect::<Vec<_>>()
             .join(";");
 
-        format!("{},{},{},{}", day, part, result, durations)
+        format!("{};;{};;{};;{}", day, part, result, durations)
     }
 
     pub fn deserialize(input: &str) -> Result<Self, String> {
-        let parts: Vec<&str> = input.split(',').collect();
+        let parts: Vec<&str> = input.split(";;").collect();
         if parts.len() != 4 {
             return Err(format!(
                 "Invalid input format. Got {} but expected 4. Parts: {:?}",
