@@ -1,42 +1,17 @@
 use std::collections::HashSet;
 
-use all_aoc::helper::permutations::Combinator;
+use all_aoc::helper::permutations::{Combinator, IteratorCombinator};
 
 all_aoc::solution!(24, 2015);
 
-fn find_combinations(nums: &[u64], target: u64) -> Vec<Vec<u64>> {
-    let mut result = Vec::new();
-    let mut current_combination = Vec::new();
-    find_combinations_helper(nums, target, 0, &mut current_combination, &mut result);
-    result
-}
-
-fn find_combinations_helper(
-    nums: &[u64],
-    target: u64,
-    start: usize,
-    current_combination: &mut Vec<u64>,
-    result: &mut Vec<Vec<u64>>,
-) {
-    if target == 0 {
-        result.push(current_combination.clone());
-        return;
-    }
-
-    for i in start..nums.len() {
-        if nums[i] > target {
-            break;
-        }
-
-        current_combination.push(nums[i]);
-        find_combinations_helper(nums, target - nums[i], i + 1, current_combination, result);
-        current_combination.pop();
-    }
-}
 fn execute(input: &str, count: usize) -> Option<u64> {
     let input = parse(input);
     let group_weight = input.iter().sum::<u64>() / count as u64;
-    let mut combs = find_combinations(&input, group_weight as u64);
+    let mut combs = input
+        .into_iter()
+        .powerset()
+        .filter(|v| v.iter().sum::<u64>() == group_weight)
+        .collect::<Vec<_>>();
 
     while let Some(x) = combs
         .iter()
@@ -80,7 +55,7 @@ mod tests {
         let result = part_one(&all_aoc::cli::read_examples_file(DAY));
         assert_eq!(result, Some(99));
     }
-
+    #[cfg(feature = "expensive")]
     #[test]
     fn test_part_one_actual() {
         let result = part_one(&all_aoc::cli::read_inputs_file(DAY));
