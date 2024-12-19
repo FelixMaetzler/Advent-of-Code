@@ -34,6 +34,28 @@ where
 }
 /// `curr_to_neighbor_comparison` is a function that
 ///  has as arguments the current node and the neighbor node of the grid
+/// and has to determine if these nodes have a edge in the graph and the weight
+pub fn build_graph4_special<T, W>(
+    grid: &impl Grid<T>,
+    curr_to_neighbor_comparison: impl Fn(&T, &T) -> Option<W> + Copy,
+) -> SpecialGraph<W>
+where
+    T: Clone,
+    W: Copy,
+{
+    SpecialGraph::from_edges(grid.all_indices().flat_map(|from| {
+        grid.get_neigbors4(from).flat_map(move |(to_ind, to_val)| {
+            curr_to_neighbor_comparison(
+                grid.get(from).expect("all_indices already checked that"),
+                to_val,
+            )
+            .map(|w| (from.to_flat_index(grid), to_ind.to_flat_index(grid), w))
+        })
+    }))
+}
+
+/// `curr_to_neighbor_comparison` is a function that
+///  has as arguments the current node and the neighbor node of the grid
 /// and has to determine if these nodes have a edge in the graph
 pub fn build_graph8<T>(
     grid: &impl Grid<T>,
@@ -74,37 +96,53 @@ where
 pub trait GraphWithWeights<T>
 where
     Self: Graph + Sized,
+    T: Copy,
 {
-    fn weight(&self, from: NodeIndex, to: NodeIndex) -> Option<&T>;
+    fn weight(&self, from: NodeIndex, to: NodeIndex) -> Option<T>;
     fn add_edge(&mut self, from: NodeIndex, to: NodeIndex, weight: T);
     fn from_edges(it: impl Iterator<Item = (NodeIndex, NodeIndex, T)>) -> Self {
         let mut g = Self::new();
         it.for_each(|(from, to, weight)| g.add_edge(from, to, weight));
         g
     }
-    fn dijkstra(&self, start: NodeIndex) -> HashMap<NodeIndex, T>
+    fn dijkstra_distances(
+        &self,
+        start: NodeIndex,
+        end: Option<NodeIndex>, // Optional early stopping criterion
+    ) -> HashMap<NodeIndex, T>
     where
         T: Add<Output = T> + Default + Ord + Copy,
     {
         let mut dist = HashMap::new();
         let mut heap = BinaryHeap::new();
         let mut visited = HashSet::new();
+
         dist.insert(start, T::default());
         heap.push(State {
             cost: T::default(),
             position: start,
         });
+
         while let Some(State { cost, position }) = heap.pop() {
             if !visited.insert(position) {
                 continue;
             }
+
+            // Stop early if the target node is reached
+            if let Some(target) = end {
+                if position == target {
+                    break;
+                }
+            }
+
             for v in self.outgoing(position) {
                 let u = position;
-                let weight = *self.weight(u, v).unwrap();
+                let weight = self.weight(u, v).unwrap();
                 let next = State {
                     cost: cost + weight,
                     position: v,
                 };
+
                 match dist.get(&v) {
                     Some(&current_cost) => {
                         if next.cost < current_cost {
@@ -121,6 +159,76 @@ where
         }
 
         dist
+    }
+
+    fn dijkstra_shortest_path(
+        &self,
+        start: NodeIndex,
+        end: NodeIndex, // Required ending node
+    ) -> (HashMap<NodeIndex, T>, Vec<NodeIndex>)
+    where
+        T: Add<Output = T> + Default + Ord + Copy,
+    {
+        let mut dist = HashMap::new();
+        let mut paths = HashMap::new();
+        let mut heap = BinaryHeap::new();
+        let mut visited = HashSet::new();
+
+        dist.insert(start, T::default());
+        paths.insert(start, vec![start]); // Initialize the path for the start node
+        heap.push(State {
+            cost: T::default(),
+            position: start,
+        });
+
+        while let Some(State { cost, position }) = heap.pop() {
+            if !visited.insert(position) {
+                continue;
+            }
+
+            // Stop when the target node is reached
+            if position == end {
+                break;
+            }
+
+            for v in self.outgoing(position) {
+                let u = position;
+                let weight = self.weight(u, v).unwrap();
+                let next = State {
+                    cost: cost + weight,
+                    position: v,
+                };
+
+                match dist.get(&v) {
+                    Some(&current_cost) => {
+                        if next.cost < current_cost {
+                            dist.insert(v, next.cost);
+                            heap.push(next);
+
+                            // Update the path to this node
+                            let mut new_path = paths[&u].clone();
+                            new_path.push(v);
+                            paths.insert(v, new_path);
+                        }
+                    }
+                    None => {
+                        dist.insert(v, next.cost);
+                        heap.push(next);
+
+                        // Create the path to this node
+                        let mut new_path = paths[&u].clone();
+                        new_path.push(v);
+                        paths.insert(v, new_path);
+                    }
+                }
+            }
+        }
+
+        // Return the distance map and the shortest path to the target node
+        (
+            dist,
+            paths.get(&end).cloned().unwrap_or_else(Vec::new), // Return an empty path if unreachable
+        )
     }
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -285,9 +393,12 @@ impl<T> Graph for SpecialGraph<T> {
         self.edges.len()
     }
 }
-impl<T> GraphWithWeights<T> for SpecialGraph<T> {
-    fn weight(&self, from: NodeIndex, to: NodeIndex) -> Option<&T> {
-        self.edges.get(&(from, to))
+impl<T> GraphWithWeights<T> for SpecialGraph<T>
+where
+    T: Copy,
+{
+    fn weight(&self, from: NodeIndex, to: NodeIndex) -> Option<T> {
+        self.edges.get(&(from, to)).copied()
     }
 
     fn add_edge(&mut self, from: NodeIndex, to: NodeIndex, weight: T) {

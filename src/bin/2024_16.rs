@@ -64,7 +64,7 @@ fn start_end(grid: &DenseGrid<Tile>) -> (usize, usize) {
 fn solve(graph: &SpecialGraph<u32>, grid: &DenseGrid<Tile>) -> u32 {
     let (start_grid, end_grid) = start_end(grid);
     let start_graph = map(&(start_grid, Direction4::East));
-    let from_start = graph.dijkstra(start_graph);
+    let from_start = graph.dijkstra_distances(start_graph, None);
     *Direction4::all_dirs()
         .into_iter()
         .map(|d| map(&(end_grid, d)))
@@ -84,8 +84,9 @@ pub fn part_two(input: &str) -> Option<usize> {
     let ret = solve(&graph, &grid);
     let (start_grid, end_grid) = start_end(&grid);
     let start_graph = map(&(start_grid, Direction4::East));
-    let from_start = graph.dijkstra(start_graph);
-    let from_ends = Direction4::all_dirs().map(|dir| graph.dijkstra(map(&(end_grid, dir))));
+    let from_start = graph.dijkstra_distances(start_graph, None);
+    let from_ends =
+        Direction4::all_dirs().map(|dir| graph.dijkstra_distances(map(&(end_grid, dir)), None));
     let mut from_end = HashMap::new();
     from_ends.into_iter().flatten().for_each(|(k, v)| {
         from_end

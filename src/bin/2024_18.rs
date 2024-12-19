@@ -1,5 +1,5 @@
 use all_aoc::helper::{
-    graph::{build_graph4, GraphWithWeights, SpecialGraph},
+    graph::{build_graph4_special, GraphWithWeights},
     grid::{dense_grid::DenseGrid, grid_index::GridIndex, Grid},
     position::Position,
 };
@@ -17,40 +17,35 @@ fn solve_part_1(input: &str, size: usize, bytes: usize) -> Option<u32> {
     let vec = parse(input);
     let mut grid = DenseGrid::new(size, size, Tile::Empty);
     vec.into_iter().take(bytes).for_each(|p| {
-        grid.set(p.as_yx_tuple(), Tile::Corrupted);
+        grid[p.as_yx_tuple()] = Tile::Corrupted;
     });
-    let grid = grid;
-    let graph = build_graph4(&grid, |curr, nei| {
-        *curr == Tile::Empty && *nei == Tile::Empty
+    let graph = build_graph4_special(&grid, |curr, neig| {
+        if *neig == Tile::Empty && *curr == Tile::Empty {
+            Some(1)
+        } else {
+            None
+        }
     });
-    let graph = SpecialGraph::from_edges(
-        graph
-            .into_iter()
-            .enumerate()
-            .flat_map(|(from, tos)| tos.into_iter().map(move |to| (from, to, 1_u32))),
-    );
     let end = grid.len() - 1;
-    let erg = graph.dijkstra(0);
+    let erg = graph.dijkstra_distances(0, Some(end));
     Some(*erg.get(&end).unwrap())
 }
 fn solve_part_2(input: &str, size: usize) -> Option<String> {
     let vec = parse(input);
     let grid = DenseGrid::new(size, size, Tile::Empty);
-    let graph = build_graph4(&grid, |curr, nei| {
-        *curr == Tile::Empty && *nei == Tile::Empty
-    });
-    let mut graph = SpecialGraph::from_edges(
-        graph
-            .into_iter()
-            .enumerate()
-            .flat_map(|(from, tos)| tos.into_iter().map(move |to| (from, to, 1_u32))),
-    );
+    let mut graph = build_graph4_special(&grid, |_, _| Some(1));
+
     let end = grid.len() - 1;
+    let (_, mut path) = graph.dijkstra_shortest_path(0, end);
     for p in vec {
         let i = p.as_yx_tuple().to_flat_index(&grid);
         let x = graph.remove_node(i);
         debug_assert!(x);
-        let erg = graph.dijkstra(0);
+        if !path.contains(&i) {
+            continue;
+        }
+        let (erg, pa) = graph.dijkstra_shortest_path(0, end);
+        path = pa;
         if !erg.contains_key(&end) {
             return format!("{},{}", p.x, p.y).into();
         }
