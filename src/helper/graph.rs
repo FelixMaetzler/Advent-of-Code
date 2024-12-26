@@ -259,6 +259,7 @@ pub trait Graph {
     fn nodes_count(&self) -> usize;
     fn nodes(&self) -> impl Iterator<Item = NodeIndex>;
     fn edges_count(&self) -> usize;
+    fn remove_edge(&mut self, from: NodeIndex, to: NodeIndex) -> bool;
     fn all_paths(&self, start: NodeIndex, end: NodeIndex) -> Vec<Vec<NodeIndex>>
     where
         Self: Sized,
@@ -269,26 +270,56 @@ pub trait Graph {
         dfs(self, start, end, &mut path, &mut result);
         result
     }
-    fn to_dot(&self) -> String {
-        let mut dot = String::from("graph G {\n");
 
-        // Add nodes
-        for node in 0..self.nodes_count() {
-            dot.push_str(&format!("    {};\n", node));
+    fn to_dot<F, G>(
+        &self,
+        undirected: bool,
+        node_label_fn: Option<F>,
+        edge_label_fn: Option<G>,
+    ) -> String
+    where
+        F: Fn(usize) -> String,
+        G: Fn(usize, usize) -> String,
+    {
+        let mut dot = if undirected {
+            String::from("graph G {\n")
+        } else {
+            String::from("digraph G {\n")
+        };
+
+        // Add nodes with labels
+        for node in self.nodes() {
+            let label = node_label_fn
+                .as_ref()
+                .map_or_else(|| node.to_string(), |f| f(node));
+            dot.push_str(&format!("    {} [label=\"{}\"];\n", node, label));
         }
 
-        // Add edges
-        let mut edges = std::collections::HashSet::new();
-        for node in 0..self.nodes_count() {
+        // Add edges with labels
+        let mut edges = HashSet::new();
+        for node in self.nodes() {
             for neighbor in self.outgoing(node) {
                 // Add edges only once (undirected graph)
-                let edge = if node < neighbor {
-                    (node, neighbor)
+                let edge = if undirected {
+                    if node < neighbor {
+                        (node, neighbor)
+                    } else {
+                        (neighbor, node)
+                    }
                 } else {
-                    (neighbor, node)
+                    (node, neighbor)
                 };
                 if edges.insert(edge) {
-                    dot.push_str(&format!("    {} -- {};\n", edge.0, edge.1));
+                    let label = edge_label_fn
+                        .as_ref()
+                        .map_or_else(String::new, |f| f(edge.0, edge.1));
+                    dot.push_str(&format!(
+                        "    {} {} {} [label=\"{}\"];\n",
+                        edge.0,
+                        if undirected { "--" } else { "->" },
+                        edge.1,
+                        label
+                    ));
                 }
             }
         }
@@ -296,6 +327,7 @@ pub trait Graph {
         dot.push_str("}\n");
         dot
     }
+
     fn bron_kerbosch1(&self) -> Vec<HashSet<NodeIndex>>
     where
         Self: Sized,
@@ -350,6 +382,31 @@ pub trait Graph {
 
         bron_kerbosch1_recursive(self, &r, &mut p, &mut x, &mut all_cliques);
         all_cliques
+    }
+    fn topologocal_order(&self) -> Vec<usize>
+    where
+        Self: Clone,
+    {
+        let mut graph = self.clone();
+        let mut s = graph
+            .nodes()
+            .filter(|n| graph.incoming(*n).count() == 0)
+            .collect::<Vec<_>>();
+        let mut l = Vec::with_capacity(graph.nodes_count());
+        while let Some(n) = s.pop() {
+            l.push(n);
+            let o = graph.outgoing(n).collect::<Vec<_>>();
+            for m in o {
+                graph.remove_edge(n, m);
+                if graph.incoming(m).count() == 0 {
+                    s.push(m);
+                }
+            }
+        }
+        if graph.edges_count() != 0 {
+            panic!("Graph has a cycle");
+        }
+        l
     }
 }
 fn dfs(
@@ -410,8 +467,21 @@ impl Graph for Vec<Vec<NodeIndex>> {
         vec.sort();
         vec.into_iter().cloned()
     }
-}
 
+    fn remove_edge(&mut self, from: NodeIndex, to: NodeIndex) -> bool {
+        match self.get_mut(from) {
+            Some(v) => match v.iter().enumerate().find(|(_, x)| **x == to) {
+                Some((i, _)) => {
+                    v.remove(i);
+                    true
+                }
+                None => false,
+            },
+            None => false,
+        }
+    }
+}
+#[derive(Clone)]
 pub struct SpecialGraph<T> {
     adj_matrix: HashMap<NodeIndex, HashSet<NodeIndex>>,
     edges: HashMap<(NodeIndex, NodeIndex), T>,
@@ -488,10 +558,18 @@ impl<T> Graph for SpecialGraph<T> {
             .adj_matrix
             .iter()
             .flat_map(|(_, v)| v.iter())
+            .chain(self.adj_matrix.keys())
             .collect::<HashSet<_>>();
         let mut vec = set.into_iter().collect::<Vec<_>>();
         vec.sort();
         vec.into_iter().cloned()
+    }
+
+    fn remove_edge(&mut self, from: NodeIndex, to: NodeIndex) -> bool {
+        self.adj_matrix.entry(from).and_modify(|s| {
+            s.remove(&to);
+        });
+        self.edges.remove(&(from, to)).is_some()
     }
 }
 impl<T> GraphWithWeights<T> for SpecialGraph<T>
