@@ -39,6 +39,24 @@ impl<T> Position<T> {
         let x = x.parse()?;
         Ok(Self { x, y })
     }
+    pub fn manhattan_distance(&self, other: &Self) -> T
+    where
+        T: Add<Output = T> + Sub<Output = T> + Copy + Ord,
+    {
+        let x_diff = if self.x > other.x {
+            self.x - other.x
+        } else {
+            other.x - self.x
+        };
+
+        let y_diff = if self.y > other.y {
+            self.y - other.y
+        } else {
+            other.y - self.y
+        };
+
+        x_diff + y_diff
+    }
 }
 impl<T> Sub for Position<T>
 where
@@ -202,7 +220,14 @@ call_macro_with_types!(
     impl_mul_for_type,
     [u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64]
 );
-
+impl From<(usize, usize)> for Position<usize> {
+    fn from(value: (usize, usize)) -> Self {
+        Self {
+            x: value.1,
+            y: value.0,
+        }
+    }
+}
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Direction4 {
     North,
@@ -219,6 +244,15 @@ impl Direction4 {
             '<' => Ok(Direction4::West),
             'v' => Ok(Direction4::South),
             c => Err(c),
+        }
+    }
+    /// Converts Direction into ^, <, v, >
+    pub fn to_hat(&self) -> char {
+        match self {
+            Direction4::North => '^',
+            Direction4::East => '>',
+            Direction4::West => '<',
+            Direction4::South => 'v',
         }
     }
 
