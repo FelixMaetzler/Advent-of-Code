@@ -256,8 +256,9 @@ pub trait Graph {
     fn new() -> Self;
     fn incoming(&self, index: NodeIndex) -> impl Iterator<Item = NodeIndex>;
     fn outgoing(&self, index: NodeIndex) -> impl Iterator<Item = NodeIndex>;
-    fn nodes(&self) -> usize;
-    fn edges(&self) -> usize;
+    fn nodes_count(&self) -> usize;
+    fn nodes(&self) -> impl Iterator<Item = NodeIndex>;
+    fn edges_count(&self) -> usize;
     fn all_paths(&self, start: NodeIndex, end: NodeIndex) -> Vec<Vec<NodeIndex>>
     where
         Self: Sized,
@@ -267,6 +268,88 @@ pub trait Graph {
 
         dfs(self, start, end, &mut path, &mut result);
         result
+    }
+    fn to_dot(&self) -> String {
+        let mut dot = String::from("graph G {\n");
+
+        // Add nodes
+        for node in 0..self.nodes_count() {
+            dot.push_str(&format!("    {};\n", node));
+        }
+
+        // Add edges
+        let mut edges = std::collections::HashSet::new();
+        for node in 0..self.nodes_count() {
+            for neighbor in self.outgoing(node) {
+                // Add edges only once (undirected graph)
+                let edge = if node < neighbor {
+                    (node, neighbor)
+                } else {
+                    (neighbor, node)
+                };
+                if edges.insert(edge) {
+                    dot.push_str(&format!("    {} -- {};\n", edge.0, edge.1));
+                }
+            }
+        }
+
+        dot.push_str("}\n");
+        dot
+    }
+    fn bron_kerbosch1(&self) -> Vec<HashSet<NodeIndex>>
+    where
+        Self: Sized,
+    {
+        let mut all_cliques = Vec::new();
+        let r = HashSet::new(); // Current clique
+        let mut p: HashSet<NodeIndex> = self.nodes().collect(); // Potential candidates
+        let mut x = HashSet::new(); // Already processed nodes
+
+        // Recursive function
+        fn bron_kerbosch1_recursive<G: Graph>(
+            graph: &G,
+            r: &HashSet<NodeIndex>,
+            p: &mut HashSet<NodeIndex>,
+            x: &mut HashSet<NodeIndex>,
+            all_cliques: &mut Vec<HashSet<NodeIndex>>,
+        ) {
+            if p.is_empty() && x.is_empty() {
+                // Report R as a maximal clique
+                all_cliques.push(r.iter().cloned().collect());
+                return;
+            }
+
+            // Iterate over a copy of P to allow mutation of P during iteration
+            for &v in p.clone().iter() {
+                // R ⋃ {v}
+                let mut new_r = r.clone();
+                new_r.insert(v);
+
+                // P ⋂ N(v)
+                let mut new_p: HashSet<_> = graph
+                    .outgoing(v)
+                    .filter(|&neighbor| p.contains(&neighbor))
+                    .collect();
+
+                // X ⋂ N(v)
+                let mut new_x: HashSet<_> = graph
+                    .outgoing(v)
+                    .filter(|&neighbor| x.contains(&neighbor))
+                    .collect();
+
+                // Recursive call
+                bron_kerbosch1_recursive(graph, &new_r, &mut new_p, &mut new_x, all_cliques);
+
+                // P := P \ {v}
+                p.remove(&v);
+
+                // X := X ⋃ {v}
+                x.insert(v);
+            }
+        }
+
+        bron_kerbosch1_recursive(self, &r, &mut p, &mut x, &mut all_cliques);
+        all_cliques
     }
 }
 fn dfs(
@@ -312,13 +395,20 @@ impl Graph for Vec<Vec<NodeIndex>> {
             .map(|(i, _)| i)
     }
 
-    fn nodes(&self) -> usize {
+    fn nodes_count(&self) -> usize {
         let set = self.iter().flat_map(|v| v.iter()).collect::<HashSet<_>>();
         set.len()
     }
 
-    fn edges(&self) -> usize {
+    fn edges_count(&self) -> usize {
         self.iter().map(|v| v.len()).sum()
+    }
+
+    fn nodes(&self) -> impl Iterator<Item = NodeIndex> {
+        let set = self.iter().flat_map(|v| v.iter()).collect::<HashSet<_>>();
+        let mut vec = set.into_iter().collect::<Vec<_>>();
+        vec.sort();
+        vec.into_iter().cloned()
     }
 }
 
@@ -380,7 +470,7 @@ impl<T> Graph for SpecialGraph<T> {
             .cloned()
     }
 
-    fn nodes(&self) -> usize {
+    fn nodes_count(&self) -> usize {
         let set = self
             .adj_matrix
             .iter()
@@ -389,8 +479,19 @@ impl<T> Graph for SpecialGraph<T> {
         set.len()
     }
 
-    fn edges(&self) -> usize {
+    fn edges_count(&self) -> usize {
         self.edges.len()
+    }
+
+    fn nodes(&self) -> impl Iterator<Item = NodeIndex> {
+        let set = self
+            .adj_matrix
+            .iter()
+            .flat_map(|(_, v)| v.iter())
+            .collect::<HashSet<_>>();
+        let mut vec = set.into_iter().collect::<Vec<_>>();
+        vec.sort();
+        vec.into_iter().cloned()
     }
 }
 impl<T> GraphWithWeights<T> for SpecialGraph<T>
