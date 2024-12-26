@@ -1,5 +1,5 @@
 use std::{
-    collections::HashMap,
+    collections::{hash_map::Iter, HashMap},
     fmt::Debug,
     ops::{Index, IndexMut},
 };
@@ -63,7 +63,23 @@ impl<T> SparseGrid<T> {
             height,
         }
     }
+    pub fn from_it(it: impl Iterator<Item = ((usize, usize), T)> + Clone) -> Self
+    where
+        T: Clone,
+    {
+        let width = it.clone().map(|((_, y), _)| y).max().unwrap() + 1;
+        let height = it.clone().map(|((x, _), _)| x).max().unwrap() + 1;
+        let mut g = Self::new(width, height);
+        it.for_each(|(k, v)| {
+            g.set(k, v);
+        });
+        g
+    }
+    pub fn iter_all(&self) -> Iter<'_, usize, T> {
+        self.data.iter()
+    }
 }
+
 impl<T> Index<usize> for SparseGrid<T> {
     type Output = T;
 
