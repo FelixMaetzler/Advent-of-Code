@@ -1,5 +1,6 @@
 pub mod graph;
 pub mod grid;
+pub mod intcode;
 pub mod md5;
 pub mod misc;
 pub mod modulo;
