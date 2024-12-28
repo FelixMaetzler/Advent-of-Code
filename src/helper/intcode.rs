@@ -6,6 +6,7 @@ use std::{
 enum Mode {
     Position,
     Immediate,
+    Relative,
 }
 impl TryFrom<IntInteger> for Mode {
     type Error = IntInteger;
@@ -14,6 +15,7 @@ impl TryFrom<IntInteger> for Mode {
         match value {
             0 => Ok(Self::Position),
             1 => Ok(Self::Immediate),
+            2 => Ok(Self::Relative),
             x => Err(x),
         }
     }
@@ -25,16 +27,24 @@ pub struct Intcode {
     input: VecDeque<IntInteger>,
     output: Vec<IntInteger>,
     mode: [Mode; 3],
+    realtive_base: IntInteger,
 }
 impl Index<usize> for Intcode {
     type Output = IntInteger;
 
     fn index(&self, index: usize) -> &Self::Output {
-        &self.program[index]
+        if index >= self.program.len() {
+            &0
+        } else {
+            &self.program[index]
+        }
     }
 }
 impl IndexMut<usize> for Intcode {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.program.len() {
+            self.program.resize(index + 1, 0);
+        }
         &mut self.program[index]
     }
 }
@@ -46,6 +56,7 @@ impl Intcode {
             input: VecDeque::new(),
             output: vec![],
             mode: [Mode::Position; 3],
+            realtive_base: 0,
         }
     }
     pub fn execute(&mut self) {
@@ -64,6 +75,7 @@ impl Intcode {
                 6 => self.jump_if_false(),
                 7 => self.less_than(),
                 8 => self.equals(),
+                9 => self.adjusts_relative_base(),
                 99 => return,
                 x => panic!("Not a valid Opcode: {x}"),
             }
@@ -80,6 +92,7 @@ impl Intcode {
         match self.mode[0] {
             Mode::Position => self[self[self.pointer + 1] as usize],
             Mode::Immediate => self[self.pointer + 1],
+            Mode::Relative => self[(self[self.pointer + 1] + self.realtive_base) as usize],
         }
     }
     #[inline(always)]
@@ -87,12 +100,17 @@ impl Intcode {
         match self.mode[1] {
             Mode::Position => self[self[self.pointer + 2] as usize],
             Mode::Immediate => self[self.pointer + 2],
+            Mode::Relative => self[(self[self.pointer + 2] + self.realtive_base) as usize],
         }
     }
     #[inline(always)]
     fn set(&mut self, val: IntInteger) {
-        debug_assert_eq!(self.mode[2], Mode::Position);
-        let idx = self[self.pointer + 3];
+        let idx = self[self.pointer + 3]
+            + match self.mode[2] {
+                Mode::Position => 0,
+                Mode::Immediate => panic!("Not valid"),
+                Mode::Relative => self.realtive_base,
+            };
         self[idx as usize] = val;
     }
     #[inline(always)]
@@ -111,8 +129,12 @@ impl Intcode {
     }
     #[inline(always)]
     fn input(&mut self) {
-        debug_assert!(self.mode.iter().all(|m| *m == Mode::Position));
-        let pos = self[self.pointer + 1];
+        let pos = self[self.pointer + 1]
+            + match self.mode[0] {
+                Mode::Position => 0,
+                Mode::Immediate => panic!("Not valid"),
+                Mode::Relative => self.realtive_base,
+            };
         self[pos as usize] = self.input.pop_front().expect("Nothing to input");
         self.inc_ptr(2);
     }
@@ -157,6 +179,10 @@ impl Intcode {
         self.set(s);
         self.inc_ptr(4);
     }
+    fn adjusts_relative_base(&mut self) {
+        self.realtive_base += self.get_first_parameter();
+        self.inc_ptr(2);
+    }
 }
 
 #[cfg(test)]
@@ -176,6 +202,29 @@ mod tests {
     #[test]
     fn test_day_05() {
         assert!(equal(vec![1101, 100, -1, 4, 0], vec![1101, 100, -1, 4, 99]));
+    }
+    #[test]
+    fn test_day_09() {
+        let v = vec![
+            109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99,
+        ];
+        let mut m = Intcode::new(v.clone());
+        m.execute();
+        assert_eq!(m.get_outputs(), v);
+        // ---
+        let v = vec![1102, 34915192, 34915192, 7, 4, 7, 99, 0];
+        let mut m = Intcode::new(v);
+        m.execute();
+        let o = m.get_outputs();
+        assert_eq!(o.len(), 1);
+        assert_eq!(o.first().unwrap().to_string().chars().count(), 16);
+        // ---
+        let v = vec![104, 1_125_899_906_842_624, 99];
+        let mut m = Intcode::new(v);
+        m.execute();
+        let o = m.get_outputs();
+
+        assert_eq!(*o.first().unwrap(), 1_125_899_906_842_624);
     }
     fn equal(input: Vec<IntInteger>, output: Vec<IntInteger>) -> bool {
         let mut m = Intcode::new(input);
