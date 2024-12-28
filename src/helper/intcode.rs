@@ -23,16 +23,21 @@ impl TryFrom<IntInteger> for Mode {
 pub type IntInteger = isize;
 pub struct Intcode {
     program: Vec<IntInteger>,
-    pointer: usize,
+    pointer: isize,
     input: VecDeque<IntInteger>,
     output: Vec<IntInteger>,
     mode: [Mode; 3],
     realtive_base: IntInteger,
 }
-impl Index<usize> for Intcode {
+impl Index<isize> for Intcode {
     type Output = IntInteger;
 
-    fn index(&self, index: usize) -> &Self::Output {
+    fn index(&self, index: isize) -> &Self::Output {
+        let index = if index < 0 {
+            panic!("Index out of bounds")
+        } else {
+            index as usize
+        };
         if index >= self.program.len() {
             &0
         } else {
@@ -40,8 +45,13 @@ impl Index<usize> for Intcode {
         }
     }
 }
-impl IndexMut<usize> for Intcode {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+impl IndexMut<isize> for Intcode {
+    fn index_mut(&mut self, index: isize) -> &mut Self::Output {
+        let index = if index < 0 {
+            panic!("Index out of bounds")
+        } else {
+            index as usize
+        };
         if index >= self.program.len() {
             self.program.resize(index + 1, 0);
         }
@@ -60,7 +70,7 @@ impl Intcode {
         }
     }
     pub fn execute(&mut self) {
-        while self.pointer < self.program.len() {
+        loop {
             let pointer = self.pointer;
             let val = self[pointer];
             self.mode[0] = Mode::try_from((val / 100) % 10).unwrap();
@@ -90,17 +100,17 @@ impl Intcode {
     #[inline(always)]
     fn get_first_parameter(&self) -> IntInteger {
         match self.mode[0] {
-            Mode::Position => self[self[self.pointer + 1] as usize],
+            Mode::Position => self[self[self.pointer + 1]],
             Mode::Immediate => self[self.pointer + 1],
-            Mode::Relative => self[(self[self.pointer + 1] + self.realtive_base) as usize],
+            Mode::Relative => self[self[self.pointer + 1] + self.realtive_base],
         }
     }
     #[inline(always)]
     fn get_second_parameter(&self) -> IntInteger {
         match self.mode[1] {
-            Mode::Position => self[self[self.pointer + 2] as usize],
+            Mode::Position => self[self[self.pointer + 2]],
             Mode::Immediate => self[self.pointer + 2],
-            Mode::Relative => self[(self[self.pointer + 2] + self.realtive_base) as usize],
+            Mode::Relative => self[self[self.pointer + 2] + self.realtive_base],
         }
     }
     #[inline(always)]
@@ -111,10 +121,10 @@ impl Intcode {
                 Mode::Immediate => panic!("Not valid"),
                 Mode::Relative => self.realtive_base,
             };
-        self[idx as usize] = val;
+        self[idx] = val;
     }
     #[inline(always)]
-    fn inc_ptr(&mut self, x: usize) {
+    fn inc_ptr(&mut self, x: isize) {
         self.pointer += x;
     }
     #[inline(always)]
@@ -135,7 +145,7 @@ impl Intcode {
                 Mode::Immediate => panic!("Not valid"),
                 Mode::Relative => self.realtive_base,
             };
-        self[pos as usize] = self.input.pop_front().expect("Nothing to input");
+        self[pos] = self.input.pop_front().expect("Nothing to input");
         self.inc_ptr(2);
     }
     #[inline(always)]
@@ -146,7 +156,7 @@ impl Intcode {
     #[inline(always)]
     fn jump_if_true(&mut self) {
         if self.get_first_parameter() != 0 {
-            self.pointer = self.get_second_parameter() as usize;
+            self.pointer = self.get_second_parameter();
         } else {
             self.inc_ptr(3);
         }
@@ -154,7 +164,7 @@ impl Intcode {
     #[inline(always)]
     fn jump_if_false(&mut self) {
         if self.get_first_parameter() == 0 {
-            self.pointer = self.get_second_parameter() as usize;
+            self.pointer = self.get_second_parameter();
         } else {
             self.inc_ptr(3);
         }
