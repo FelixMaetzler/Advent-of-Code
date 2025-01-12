@@ -7,4 +7,5 @@ pub mod modulo;
 pub mod parser;
 pub mod permutations;
 pub mod position;
+pub mod position3d;
 pub mod rand;
