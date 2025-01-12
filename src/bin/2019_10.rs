@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use all_aoc::helper::{
     grid::{dense_grid::DenseGrid, grid_index::GridIndex, Grid},
+    misc::gcd,
     position::Position,
 };
 
@@ -151,18 +152,6 @@ fn shrink(pos: Position<i32>) -> Position<i32> {
         x: x / gcd,
         y: y / gcd,
     }
-}
-fn gcd(a: i32, b: i32) -> i32 {
-    let mut a = a.abs();
-    let mut b = b.abs();
-
-    while b != 0 {
-        let temp = b;
-        b = a % b;
-        a = temp;
-    }
-
-    a
 }
 
 fn parse(input: &str) -> DenseGrid<Tile> {

@@ -29,6 +29,18 @@ where
         result
     }
 }
+pub fn gcd(a: i32, b: i32) -> i32 {
+    let mut a = a.abs();
+    let mut b = b.abs();
+
+    while b != 0 {
+        let temp = b;
+        b = a % b;
+        a = temp;
+    }
+
+    a
+}
 #[cfg(test)]
 mod tests {
     use super::*;
