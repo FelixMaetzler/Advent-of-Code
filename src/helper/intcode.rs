@@ -2,9 +2,15 @@ use std::{
     collections::VecDeque,
     ops::{Index, IndexMut},
 };
+#[derive(Debug, PartialEq, Eq)]
 pub enum Return {
     Finished,
     NewOutput,
+}
+#[derive(Debug, PartialEq, Eq)]
+pub enum InputMode {
+    Extend,
+    Replace,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Mode {
@@ -104,9 +110,11 @@ impl Intcode {
             }
         }
     }
-    pub fn set_inputs(&mut self, x: impl Iterator<Item = IntInteger>) {
-        //self.input = x.collect();
-        self.input.extend(x);
+    pub fn set_inputs(&mut self, x: impl Iterator<Item = IntInteger>, mode: InputMode) {
+        match mode {
+            InputMode::Extend => self.input.extend(x),
+            InputMode::Replace => self.input = x.collect(),
+        }
     }
     pub fn get_outputs(&self) -> Vec<IntInteger> {
         self.output.clone()

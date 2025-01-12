@@ -4,7 +4,7 @@ use std::{
 };
 
 use all_aoc::helper::{
-    intcode::{Intcode, Return},
+    intcode::{InputMode, Intcode, Return},
     misc::Joinable,
     position::{Direction4, Position},
 };
@@ -47,7 +47,10 @@ fn run(computer: Intcode, start: isize) -> (HashMap<Position<i32>, isize>, HashS
     let mut set = HashSet::new();
     computer.halt_at_output(true);
     loop {
-        computer.set_inputs(iter::once(*grid.get(&pos).unwrap_or(&0)));
+        computer.set_inputs(
+            iter::once(*grid.get(&pos).unwrap_or(&0)),
+            InputMode::Replace,
+        );
         let paint = match computer.execute() {
             Return::Finished => break,
             Return::NewOutput => *computer.get_outputs().last().expect("There has to be one"),

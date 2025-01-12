@@ -1,10 +1,10 @@
-use all_aoc::helper::intcode::{IntInteger, Intcode};
+use all_aoc::helper::intcode::{InputMode, IntInteger, Intcode};
 
 all_aoc::solution!(9, 2019);
 fn execute(input: &str, x: isize) -> Option<isize> {
     let vec = parse(input);
     let mut m = Intcode::new(vec);
-    m.set_inputs([x].into_iter());
+    m.set_inputs([x].into_iter(), InputMode::Replace);
     m.execute();
     let o = m.get_outputs();
     debug_assert_eq!(o.len(), 1);

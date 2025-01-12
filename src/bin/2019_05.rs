@@ -1,11 +1,11 @@
-use all_aoc::helper::intcode::{IntInteger, Intcode};
+use all_aoc::helper::intcode::{InputMode, IntInteger, Intcode};
 
 all_aoc::solution!(5, 2019);
 
 pub fn part_one(input: &str) -> Option<IntInteger> {
     let vec = parse(input);
     let mut m = Intcode::new(vec);
-    m.set_inputs([1].into_iter());
+    m.set_inputs([1].into_iter(), InputMode::Replace);
     m.execute();
     let mut o = m.get_outputs();
     let code = o.pop().unwrap();
@@ -16,7 +16,7 @@ pub fn part_one(input: &str) -> Option<IntInteger> {
 pub fn part_two(input: &str) -> Option<IntInteger> {
     let vec = parse(input);
     let mut m = Intcode::new(vec);
-    m.set_inputs([5].into_iter());
+    m.set_inputs([5].into_iter(), InputMode::Replace);
     m.execute();
     let mut o = m.get_outputs();
     let code = o.pop().unwrap();
