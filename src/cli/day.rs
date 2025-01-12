@@ -72,8 +72,8 @@ impl Day {
 
         let output = String::from_utf8_lossy(&output.stdout);
         (
-            PartDayResult::deserialize(output.lines().nth(0).unwrap()).unwrap(),
-            PartDayResult::deserialize(output.lines().nth(1).unwrap()).unwrap(),
+            PartDayResult::deserialize(output.split("%%%%\n").nth(0).unwrap()).unwrap(),
+            PartDayResult::deserialize(output.split("%%%%\n").nth(1).unwrap()).unwrap(),
         )
     }
 }
