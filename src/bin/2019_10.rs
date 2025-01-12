@@ -147,7 +147,7 @@ fn calc(mut set: HashSet<Position<i32>>, pos: Position<i32>, width: i32, height:
 }
 fn shrink(pos: Position<i32>) -> Position<i32> {
     let Position { x, y } = pos;
-    let gcd = gcd(x, y);
+    let gcd = gcd(x.unsigned_abs(), y.unsigned_abs()) as i32;
     Position {
         x: x / gcd,
         y: y / gcd,
