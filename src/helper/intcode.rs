@@ -2,6 +2,10 @@ use std::{
     collections::VecDeque,
     ops::{Index, IndexMut},
 };
+pub enum Return {
+    Finished,
+    NewOutput,
+}
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Mode {
     Position,
@@ -21,6 +25,7 @@ impl TryFrom<IntInteger> for Mode {
     }
 }
 pub type IntInteger = isize;
+#[derive(Clone)]
 pub struct Intcode {
     program: Vec<IntInteger>,
     pointer: isize,
@@ -28,6 +33,7 @@ pub struct Intcode {
     output: Vec<IntInteger>,
     mode: [Mode; 3],
     realtive_base: IntInteger,
+    halt_at_output: bool,
 }
 impl Index<isize> for Intcode {
     type Output = IntInteger;
@@ -67,35 +73,46 @@ impl Intcode {
             output: vec![],
             mode: [Mode::Position; 3],
             realtive_base: 0,
+            halt_at_output: false,
         }
     }
-    pub fn execute(&mut self) {
+    pub fn execute(&mut self) -> Return {
         loop {
             let pointer = self.pointer;
             let val = self[pointer];
             self.mode[0] = Mode::try_from((val / 100) % 10).unwrap();
             self.mode[1] = Mode::try_from((val / 1_000) % 10).unwrap();
             self.mode[2] = Mode::try_from((val / 10_000) % 10).unwrap();
-            match val % 100 {
+            let ins = val % 100;
+            match ins {
                 1 => self.add(),
                 2 => self.multiply(),
                 3 => self.input(),
-                4 => self.output(),
+                4 => {
+                    self.output();
+                    if self.halt_at_output {
+                        return Return::NewOutput;
+                    }
+                }
                 5 => self.jump_if_true(),
                 6 => self.jump_if_false(),
                 7 => self.less_than(),
                 8 => self.equals(),
                 9 => self.adjusts_relative_base(),
-                99 => return,
+                99 => return Return::Finished,
                 x => panic!("Not a valid Opcode: {x}"),
             }
         }
     }
     pub fn set_inputs(&mut self, x: impl Iterator<Item = IntInteger>) {
-        self.input = x.collect()
+        //self.input = x.collect();
+        self.input.extend(x);
     }
     pub fn get_outputs(&self) -> Vec<IntInteger> {
         self.output.clone()
+    }
+    pub fn halt_at_output(&mut self, b: bool) {
+        self.halt_at_output = b
     }
     #[inline(always)]
     fn get_first_parameter(&self) -> IntInteger {
