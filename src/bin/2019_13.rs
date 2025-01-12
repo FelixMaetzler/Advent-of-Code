@@ -67,9 +67,7 @@ pub fn part_two(input: &str) -> Option<isize> {
         .map(|((x, y), _)| Position { x: *x, y: *y })
         .unwrap();
     let mut input = 0;
-    let mut cnt = 0;
     loop {
-        cnt += 1;
         computer.set_inputs(iter::once(input), InputMode::Replace);
         if computer.execute() == Return::Finished {
             break;
@@ -106,7 +104,6 @@ pub fn part_two(input: &str) -> Option<isize> {
             }
         }
     }
-    dbg!(cnt);
     score
 }
 fn parse(input: &str) -> Intcode {
