@@ -4,6 +4,31 @@ pub fn number_to_digit_count(x: u64) -> u8 {
         None => 1,
     }
 }
+pub trait Joinable<T> {
+    fn join(self, separator: &str) -> String;
+}
+
+impl<I, T> Joinable<T> for I
+where
+    I: Iterator<Item = T>,
+    T: ToString,
+{
+    fn join(self, separator: &str) -> String {
+        let mut iter = self.peekable();
+        let mut result = String::new();
+
+        if let Some(first) = iter.next() {
+            result.push_str(&first.to_string());
+        }
+
+        for item in iter {
+            result.push_str(separator);
+            result.push_str(&item.to_string());
+        }
+
+        result
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;
