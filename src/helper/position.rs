@@ -1,6 +1,6 @@
 use std::{
     fmt::Debug,
-    ops::{Add, AddAssign, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub},
+    ops::{Add, AddAssign, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign},
     str::FromStr,
 };
 
@@ -69,6 +69,15 @@ where
             x: self.x - rhs.x,
             y: self.y - rhs.y,
         }
+    }
+}
+impl<T> SubAssign for Position<T>
+where
+    T: SubAssign,
+{
+    fn sub_assign(&mut self, rhs: Self) {
+        self.x -= rhs.x;
+        self.y -= rhs.y;
     }
 }
 impl<T> Add for Position<T>
