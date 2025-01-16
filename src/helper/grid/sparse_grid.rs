@@ -5,7 +5,7 @@ use std::{
 };
 
 use super::{grid_index::GridIndex, Grid};
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct SparseGrid<T> {
     data: HashMap<usize, T>,
     width: usize,
@@ -13,7 +13,7 @@ pub struct SparseGrid<T> {
 }
 impl<T> Grid<T> for SparseGrid<T>
 where
-    T: Clone,
+    T: Clone + Debug,
 {
     fn width(&self) -> usize {
         self.width
@@ -55,7 +55,10 @@ where
         self.data.keys().cloned()
     }
 }
-impl<T> SparseGrid<T> {
+impl<T> SparseGrid<T>
+where
+    T: Debug,
+{
     pub fn new(width: usize, height: usize) -> Self {
         Self {
             data: HashMap::new(),
@@ -67,8 +70,8 @@ impl<T> SparseGrid<T> {
     where
         T: Clone,
     {
-        let width = it.clone().map(|((_, y), _)| y).max().unwrap() + 1;
-        let height = it.clone().map(|((x, _), _)| x).max().unwrap() + 1;
+        let width = it.clone().map(|((_, x), _)| x).max().unwrap() + 1;
+        let height = it.clone().map(|((y, _), _)| y).max().unwrap() + 1;
         let mut g = Self::new(width, height);
         it.for_each(|(k, v)| {
             g.set(k, v);
@@ -95,7 +98,7 @@ impl<T> IndexMut<usize> for SparseGrid<T> {
 }
 impl<T> Index<(usize, usize)> for SparseGrid<T>
 where
-    T: Clone,
+    T: Clone + Debug,
 {
     type Output = T;
 
@@ -107,7 +110,7 @@ where
 }
 impl<T> IndexMut<(usize, usize)> for SparseGrid<T>
 where
-    T: Clone,
+    T: Clone + Debug,
 {
     fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
         self.data
@@ -123,8 +126,21 @@ impl<T> IntoIterator for SparseGrid<T> {
         self.data.into_values()
     }
 }
-impl<T> Debug for SparseGrid<T> {
-    fn fmt(&self, _f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
+impl<T> Debug for SparseGrid<T>
+where
+    T: Clone + Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut s = String::new();
+        for y in 0..self.height {
+            for x in 0..self.width {
+                match self.get((y, x)) {
+                    Some(x) => s.extend(format!("{:?}", x.clone()).chars()),
+                    None => s.push(' '),
+                }
+            }
+            s.push('\n');
+        }
+        f.write_str(&s)
     }
 }
