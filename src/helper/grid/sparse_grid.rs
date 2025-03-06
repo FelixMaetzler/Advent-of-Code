@@ -1,10 +1,10 @@
 use std::{
-    collections::{hash_map::Iter, HashMap},
+    collections::{HashMap, hash_map::Iter},
     fmt::Debug,
     ops::{Index, IndexMut},
 };
 
-use super::{grid_index::GridIndex, Grid};
+use super::{Grid, grid_index::GridIndex};
 #[derive(Clone, PartialEq, Eq)]
 pub struct SparseGrid<T> {
     data: HashMap<usize, T>,

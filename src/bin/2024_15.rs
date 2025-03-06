@@ -4,7 +4,7 @@ use std::{
 };
 
 use all_aoc::helper::{
-    grid::{dense_grid::DenseGrid, grid_index::GridIndex, Grid},
+    grid::{Grid, dense_grid::DenseGrid, grid_index::GridIndex},
     position::{Direction4, Direction8},
 };
 

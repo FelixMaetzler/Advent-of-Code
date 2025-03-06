@@ -1,7 +1,7 @@
 use super::{
+    Parser,
     character::{multispace0, tag},
     combinator::map,
-    Parser,
 };
 
 pub fn pair<'a, P1, P2, R1, R2>(parser1: P1, parser2: P2) -> impl Parser<'a, (R1, R2)>

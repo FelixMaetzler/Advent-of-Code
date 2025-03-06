@@ -3,7 +3,7 @@ use std::{
     ops::Add,
 };
 
-use super::grid::{grid_index::GridIndex, Grid};
+use super::grid::{Grid, grid_index::GridIndex};
 
 /// `curr_to_neighbor_comparison` is a function that
 ///  has as arguments the current node and the neighbor node of the grid

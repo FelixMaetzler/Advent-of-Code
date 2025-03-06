@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use all_aoc::helper::{
-    grid::{dense_grid::DenseGrid, grid_index::GridIndex, Grid},
+    grid::{Grid, dense_grid::DenseGrid, grid_index::GridIndex},
     intcode::{InputMode, IntInteger, Intcode, Return},
     misc::Joinable,
     position::Direction4,

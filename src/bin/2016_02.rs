@@ -1,5 +1,5 @@
 use all_aoc::helper::{
-    grid::{dense_grid::DenseGrid, Grid},
+    grid::{Grid, dense_grid::DenseGrid},
     position::Direction4,
 };
 

@@ -71,7 +71,7 @@ impl Command {
                         }
                     }
                     Days::Year(_) if submit.is_some() => {
-                        return Err("Sumbit Flag with multiple Days is not supported".to_string())
+                        return Err("Sumbit Flag with multiple Days is not supported".to_string());
                     }
                     days @ Days::Year(_) => {
                         solve_year(days.to_vec(), *release, *time);

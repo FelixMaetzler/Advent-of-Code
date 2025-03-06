@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use all_aoc::helper::{
-    grid::{grid_index::GridIndex, sparse_grid::SparseGrid, Grid},
+    grid::{Grid, grid_index::GridIndex, sparse_grid::SparseGrid},
     permutations::IteratorPermutator,
     position::{Direction4, Position},
 };

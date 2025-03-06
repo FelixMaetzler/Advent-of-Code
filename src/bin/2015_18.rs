@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use all_aoc::helper::grid::{dense_grid::DenseGrid, Grid};
+use all_aoc::helper::grid::{Grid, dense_grid::DenseGrid};
 all_aoc::solution!(18, 2015);
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum State {
@@ -17,11 +17,7 @@ impl Debug for State {
 }
 impl From<bool> for State {
     fn from(value: bool) -> Self {
-        if value {
-            Self::On
-        } else {
-            Self::Off
-        }
+        if value { Self::On } else { Self::Off }
     }
 }
 pub fn part_one(input: &str) -> Option<usize> {

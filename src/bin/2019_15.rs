@@ -5,8 +5,8 @@ use std::{
 };
 
 use all_aoc::helper::{
-    graph::{build_graph4_special, GraphWithWeights},
-    grid::{grid_index::GridIndex, sparse_grid::SparseGrid, Grid},
+    graph::{GraphWithWeights, build_graph4_special},
+    grid::{Grid, grid_index::GridIndex, sparse_grid::SparseGrid},
     intcode::{InputMode, IntInteger, Intcode, Return},
     position::{Direction4, Position},
 };

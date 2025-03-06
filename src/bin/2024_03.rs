@@ -1,9 +1,9 @@
 use std::{ops::Mul, str::FromStr};
 
 use all_aoc::helper::parser::{
+    Parser,
     character::{tag, unsigned_integer},
     sequence::{delimited, right, separated_pair},
-    Parser,
 };
 
 all_aoc::solution!(3, 2024);

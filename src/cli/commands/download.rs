@@ -1,7 +1,7 @@
 use std::{fs, path::Path, process::Output};
 
 use crate::cli::{
-    aoc_cli::{build_args, call_aoc_cli, AOCCommands, AOCError},
+    aoc_cli::{AOCCommands, AOCError, build_args, call_aoc_cli},
     day::Day,
 };
 

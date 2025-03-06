@@ -87,10 +87,9 @@ where
                 0 => unreachable!(),
                 1 => format!(
                     "Part {}: {ANSI_BOLD}{}{ANSI_RESET} ({:.02?})",
-                    self.part,
-                    x,
-                    avg,
-                ), 2..25 => format!(
+                    self.part, x, avg,
+                ),
+                2..25 => format!(
                     "Part {}: {ANSI_BOLD}{}{ANSI_RESET} ({:.02?} @ {} samples)",
                     self.part,
                     x,
@@ -211,7 +210,9 @@ fn submit_result<T: Display>(result: T, day: Day, part: u8) {
 }
 fn submit(day: Day, part: u8, answer: String) {
     if !check() {
-        eprintln!("command \"aoc\" not found or not callable. Try running \"cargo install aoc-cli\" to install it.");
+        eprintln!(
+            "command \"aoc\" not found or not callable. Try running \"cargo install aoc-cli\" to install it."
+        );
         process::exit(1);
     }
     //println!("Submitting result via aoc-cli...");

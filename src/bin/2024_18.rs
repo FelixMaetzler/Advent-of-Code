@@ -1,6 +1,6 @@
 use all_aoc::helper::{
-    graph::{build_graph4_special, GraphWithWeights},
-    grid::{dense_grid::DenseGrid, grid_index::GridIndex, Grid},
+    graph::{GraphWithWeights, build_graph4_special},
+    grid::{Grid, dense_grid::DenseGrid, grid_index::GridIndex},
     position::Position,
 };
 

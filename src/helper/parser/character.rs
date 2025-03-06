@@ -1,8 +1,9 @@
 use std::str::FromStr;
 
 use super::{
+    ParseResult, Parser,
     multi::{many0, many1},
-    pred, ParseResult, Parser,
+    pred,
 };
 pub fn char(input: &str) -> ParseResult<char> {
     match input.chars().next() {
