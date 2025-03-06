@@ -1,7 +1,7 @@
 [package]
 name = "all_aoc"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 default-run = "all_aoc"
 
 [features]

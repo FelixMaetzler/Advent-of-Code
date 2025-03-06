@@ -218,12 +218,12 @@ mod tests {
 
     #[test]
     fn powerset_test() {
-        let gen = [1, 2].into_iter().powerset().collect::<Vec<_>>();
-        assert_eq!(gen.len(), 4);
-        assert!(gen.contains(&vec![]));
-        assert!(gen.contains(&vec![1]));
-        assert!(gen.contains(&vec![2]));
-        assert!(gen.contains(&vec![1, 2]));
+        let g = [1, 2].into_iter().powerset().collect::<Vec<_>>();
+        assert_eq!(g.len(), 4);
+        assert!(g.contains(&vec![]));
+        assert!(g.contains(&vec![1]));
+        assert!(g.contains(&vec![2]));
+        assert!(g.contains(&vec![1, 2]));
     }
     #[test]
     fn test_counter_normal() {

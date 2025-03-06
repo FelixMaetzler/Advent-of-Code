@@ -85,7 +85,7 @@ fn make_move_part_1(
     grid: &mut DenseGrid<TilePart1>,
     pos: usize,
     dir: Direction4,
-) -> impl GridIndex<TilePart1> {
+) -> impl GridIndex<TilePart1> + use<> {
     debug_assert_eq!(grid.get(pos), Some(&TilePart1::Robot));
     if let Some((mut next_pos, next_tile)) = grid.get_dir8(pos, dir.into()) {
         let first = next_pos.to_flat_index(grid);
@@ -122,7 +122,7 @@ fn make_move_part_2(
     grid: &mut DenseGrid<TilePart2>,
     pos: usize,
     dir: Direction4,
-) -> impl GridIndex<TilePart2> {
+) -> impl GridIndex<TilePart2> + use<> {
     debug_assert_eq!(grid.get(pos), Some(&TilePart2::Robot));
     if let Some((next_pos, next_tile)) = grid.get_dir8(pos, dir.into()) {
         let first = next_pos.to_flat_index(grid);
