@@ -118,7 +118,7 @@ fn collect_region(start: usize, grid: &DenseGrid<char>) -> Region {
     Region { name, members }
 }
 fn parse(input: &str) -> DenseGrid<char> {
-    DenseGrid::from_iter_iter(input.lines().map(|l| l.chars()))
+    DenseGrid::from_string(input)
 }
 #[cfg(test)]
 mod tests {

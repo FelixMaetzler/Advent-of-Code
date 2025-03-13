@@ -12,6 +12,21 @@ enum Tile {
     Scaffolding,
     Robot(Direction4),
 }
+impl TryFrom<char> for Tile {
+    type Error = char;
+
+    fn try_from(value: char) -> Result<Self, Self::Error> {
+        match value {
+            '.' => Ok(Tile::Space),
+            '#' => Ok(Tile::Scaffolding),
+            '^' => Ok(Tile::Robot(Direction4::North)),
+            '>' => Ok(Tile::Robot(Direction4::East)),
+            '<' => Ok(Tile::Robot(Direction4::West)),
+            'v' => Ok(Tile::Robot(Direction4::South)),
+            x => Err(x),
+        }
+    }
+}
 #[derive(PartialEq, Eq)]
 enum Turn {
     Left,
@@ -57,17 +72,7 @@ fn get_grid(mut computer: Intcode) -> DenseGrid<Tile> {
         .iter()
         .map(|&i| char::from_u32(i as u32).unwrap())
         .join("");
-    DenseGrid::from_iter_iter(s.lines().map(|l| {
-        l.chars().map(|c| match c {
-            '.' => Tile::Space,
-            '#' => Tile::Scaffolding,
-            '^' => Tile::Robot(Direction4::North),
-            '>' => Tile::Robot(Direction4::East),
-            '<' => Tile::Robot(Direction4::West),
-            'v' => Tile::Robot(Direction4::South),
-            x => unreachable!("wrong char: {x}"),
-        })
-    }))
+    DenseGrid::from_string(&s)
 }
 pub fn part_one(input: &str) -> Option<usize> {
     let computer = parse(input);

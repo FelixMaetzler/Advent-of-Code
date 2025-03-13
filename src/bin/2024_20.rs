@@ -14,6 +14,19 @@ enum Tile {
     Track,
     Wall,
 }
+impl TryFrom<char> for Tile {
+    type Error = char;
+
+    fn try_from(value: char) -> Result<Self, Self::Error> {
+        match value {
+            '.' => Ok(Tile::Track),
+            '#' => Ok(Tile::Wall),
+            'S' => Ok(Tile::Start),
+            'E' => Ok(Tile::End),
+            x => Err(x),
+        }
+    }
+}
 pub fn part_one(input: &str) -> Option<u32> {
     execute(input, 100, 2)
 }
@@ -88,15 +101,7 @@ fn start_end(grid: &DenseGrid<Tile>) -> (usize, usize) {
     (start, end)
 }
 fn parse(input: &str) -> DenseGrid<Tile> {
-    DenseGrid::from_iter_iter(input.lines().map(|l| {
-        l.chars().map(|c| match c {
-            '.' => Tile::Track,
-            '#' => Tile::Wall,
-            'S' => Tile::Start,
-            'E' => Tile::End,
-            x => unreachable!("wrong char: {x}"),
-        })
-    }))
+    DenseGrid::from_string(input)
 }
 #[cfg(test)]
 mod tests {

@@ -12,6 +12,17 @@ enum Tile {
     Empty,
     Asteroid,
 }
+impl TryFrom<char> for Tile {
+    type Error = char;
+
+    fn try_from(value: char) -> Result<Self, Self::Error> {
+        match value {
+            '.' => Ok(Tile::Empty),
+            '#' => Ok(Tile::Asteroid),
+            x => Err(x),
+        }
+    }
+}
 struct Asteroid {
     pos: Position<i32>,
     angle: f64,
@@ -155,13 +166,7 @@ fn shrink(pos: Position<i32>) -> Position<i32> {
 }
 
 fn parse(input: &str) -> DenseGrid<Tile> {
-    DenseGrid::from_iter_iter(input.lines().map(|l| {
-        l.chars().map(|c| match c {
-            '.' => Tile::Empty,
-            '#' => Tile::Asteroid,
-            x => unreachable!("wrong char: {x}"),
-        })
-    }))
+    DenseGrid::from_string(input)
 }
 #[cfg(test)]
 mod tests {

@@ -16,6 +16,19 @@ enum TilePart1 {
     Box,
     Empty,
 }
+impl TryFrom<char> for TilePart1 {
+    type Error = char;
+
+    fn try_from(value: char) -> Result<Self, Self::Error> {
+        match value {
+            '@' => Ok(TilePart1::Robot),
+            '#' => Ok(TilePart1::Wall),
+            'O' => Ok(TilePart1::Box),
+            '.' => Ok(TilePart1::Empty),
+            x => Err(x),
+        }
+    }
+}
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum TilePart2 {
     Robot,
@@ -199,15 +212,7 @@ fn is_free(
 }
 fn parse_part_1(input: &str) -> (DenseGrid<TilePart1>, Vec<Direction4>) {
     let (grid, dirs) = input.split_once("\n\n").unwrap();
-    let grid = DenseGrid::from_iter_iter(grid.lines().map(|l| {
-        l.chars().map(|c| match c {
-            '@' => TilePart1::Robot,
-            '#' => TilePart1::Wall,
-            'O' => TilePart1::Box,
-            '.' => TilePart1::Empty,
-            x => unreachable!("worng char: {x}"),
-        })
-    }));
+    let grid = DenseGrid::from_string(grid);
     let vec = dirs
         .lines()
         .flat_map(|l| l.chars().map(|c| Direction4::from_hat(c).unwrap()))

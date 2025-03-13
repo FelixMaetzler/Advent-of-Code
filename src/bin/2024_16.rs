@@ -14,6 +14,19 @@ enum Tile {
     Wall,
     Empty,
 }
+impl TryFrom<char> for Tile {
+    type Error = char;
+
+    fn try_from(value: char) -> Result<Self, Self::Error> {
+        match value {
+            '.' => Ok(Tile::Empty),
+            '#' => Ok(Tile::Wall),
+            'S' => Ok(Tile::Start),
+            'E' => Ok(Tile::End),
+            x => Err(x),
+        }
+    }
+}
 fn map(node: &(usize, Direction4)) -> usize {
     4 * node.0
         + match node.1 {
@@ -111,15 +124,7 @@ pub fn part_two(input: &str) -> Option<usize> {
     Some(set.len())
 }
 fn parse(input: &str) -> DenseGrid<Tile> {
-    DenseGrid::from_iter_iter(input.lines().map(|l| {
-        l.chars().map(|c| match c {
-            '.' => Tile::Empty,
-            '#' => Tile::Wall,
-            'S' => Tile::Start,
-            'E' => Tile::End,
-            x => unreachable!("wrong char: {x}"),
-        })
-    }))
+    DenseGrid::from_string(input)
 }
 #[cfg(test)]
 mod tests {

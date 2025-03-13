@@ -12,16 +12,17 @@ enum Tile {
     Air,
     Guard(Direction4),
 }
-impl From<char> for Tile {
-    fn from(value: char) -> Self {
+impl TryFrom<char> for Tile {
+    type Error = char;
+    fn try_from(value: char) -> Result<Self, Self::Error> {
         match value {
-            '.' => Self::Air,
-            '#' => Self::Obstruction,
-            'v' => Self::Guard(Direction4::South),
-            '^' => Self::Guard(Direction4::North),
-            '<' => Self::Guard(Direction4::West),
-            '>' => Self::Guard(Direction4::East),
-            x => unreachable!("invalid char: {x}"),
+            '.' => Ok(Self::Air),
+            '#' => Ok(Self::Obstruction),
+            'v' => Ok(Self::Guard(Direction4::South)),
+            '^' => Ok(Self::Guard(Direction4::North)),
+            '<' => Ok(Self::Guard(Direction4::West)),
+            '>' => Ok(Self::Guard(Direction4::East)),
+            x => Err(x),
         }
     }
 }
@@ -104,7 +105,7 @@ fn check_if_loop(grid: &DenseGrid<Tile>, pos: usize, dir: Direction4) -> bool {
     false
 }
 fn parse(input: &str) -> DenseGrid<Tile> {
-    DenseGrid::from_iter_iter(input.lines().map(|line| line.chars().map(Tile::from)))
+    DenseGrid::from_string(input)
 }
 #[cfg(test)]
 mod tests {

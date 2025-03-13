@@ -62,7 +62,7 @@ fn check_part2(grid: &DenseGrid<char>, index: impl GridIndex<char>) -> bool {
     )
 }
 fn parse(input: &str) -> DenseGrid<char> {
-    DenseGrid::from_iter_iter(input.lines().map(|l| l.chars()))
+    DenseGrid::from_string(input)
 }
 #[cfg(test)]
 mod tests {

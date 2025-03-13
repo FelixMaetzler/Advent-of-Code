@@ -7,6 +7,17 @@ enum State {
     On,
     Off,
 }
+impl TryFrom<char> for State {
+    type Error = char;
+
+    fn try_from(value: char) -> Result<Self, Self::Error> {
+        match value {
+            '#' => Ok(State::On),
+            '.' => Ok(State::Off),
+            x => Err(x),
+        }
+    }
+}
 impl Debug for State {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -92,13 +103,7 @@ fn set_edges_to_on(grid: &mut DenseGrid<State>) {
     grid[(height - 1, width - 1)] = State::On;
 }
 fn parse(input: &str) -> DenseGrid<State> {
-    DenseGrid::from_iter_iter(input.lines().map(|l| {
-        l.chars().map(|c| match c {
-            '#' => State::On,
-            '.' => State::Off,
-            x => unreachable!("{x}"),
-        })
-    }))
+    DenseGrid::from_string(input)
 }
 #[cfg(test)]
 mod tests {

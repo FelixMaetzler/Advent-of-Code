@@ -82,6 +82,16 @@ impl<T> DenseGrid<T> {
             width,
         }
     }
+    pub fn from_string(s: &str) -> Self
+    where
+        T: TryFrom<char>,
+        T::Error: Debug,
+    {
+        Self::from_iter_iter(
+            s.lines()
+                .map(|l| l.chars().map(|c| T::try_from(c).unwrap())),
+        )
+    }
     pub fn new(width: usize, height: usize, default: T) -> Self
     where
         T: Clone,
