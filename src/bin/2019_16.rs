@@ -46,7 +46,7 @@ fn phase(vec: &[i32]) -> Vec<i32> {
 
 fn genereate_iter(i: usize) -> impl Iterator<Item = i32> {
     let it = [0, 1, 0, -1].into_iter();
-    let repeated = it.flat_map(move |n| std::iter::repeat(n).take(i + 1));
+    let repeated = it.flat_map(move |n| std::iter::repeat_n(n, i + 1));
     repeated.cycle().skip(1)
 }
 fn folding_to_number(input: &[i32]) -> i32 {
