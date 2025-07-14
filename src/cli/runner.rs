@@ -36,7 +36,7 @@ where
             .collect::<Vec<_>>()
             .join(";");
 
-        format!("{};;{};;{};;{}%%%%", day, part, result, durations)
+        format!("{day};;{part};;{result};;{durations}%%%%")
     }
 
     pub fn deserialize(input: &str) -> Result<Self, String> {

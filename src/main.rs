@@ -154,16 +154,16 @@ fn parse_day(arg: &str) -> Result<Days, String> {
         let (day, year) = arg.split_once('.').expect("checked above");
         let day = day
             .parse::<u8>()
-            .map_err(|_| format!("Day is not a number between 1 and 25: {}", day))?;
+            .map_err(|_| format!("Day is not a number between 1 and 25: {day}"))?;
         let mut year = year
             .parse::<u16>()
-            .map_err(|_| format!("Year is not a number greater than 2015: {}", year))?;
+            .map_err(|_| format!("Year is not a number greater than 2015: {year}"))?;
         if !(1..=25).contains(&day) {
-            return Err(format!("Day is not a number between 1 and 25: {}", day));
+            return Err(format!("Day is not a number between 1 and 25: {day}"));
         }
         if year < 2015 {
             if year < 15 {
-                return Err(format!("Year is not a number greater than 2015: {}", year));
+                return Err(format!("Year is not a number greater than 2015: {year}"));
             } else {
                 year += 2000;
             }

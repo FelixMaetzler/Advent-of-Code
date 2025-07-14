@@ -1,4 +1,8 @@
-use std::ops::{AddAssign, Div, Mul, Rem, SubAssign};
+use std::hash::Hash;
+use std::{
+    collections::HashMap,
+    ops::{AddAssign, Div, Mul, Rem, SubAssign},
+};
 
 pub fn number_to_digit_count(x: u64) -> u8 {
     match x.checked_ilog10() {
@@ -30,7 +34,20 @@ where
 
         result
     }
-} // Define the Zero trait
+}
+// Counter
+pub fn count_occurrences<T, I>(iterable: I) -> HashMap<T, usize>
+where
+    T: Eq + Hash,
+    I: IntoIterator<Item = T>,
+{
+    let mut counts = HashMap::new();
+    for item in iterable {
+        *counts.entry(item).or_insert(0) += 1;
+    }
+    counts
+}
+// Define the Zero trait
 pub trait Zero {
     fn zero() -> Self;
 }
@@ -49,7 +66,30 @@ macro_rules! impl_zero_for_types {
     };
 }
 
-impl_zero_for_types!(i8, i16, i32, i64, i128, u8, u16, u32, u64, u128, f32, f64);
+impl_zero_for_types!(
+    i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64
+); // Define the Zero trait
+pub trait One {
+    fn one() -> Self;
+}
+
+// Implement One for different types using a macro
+macro_rules! impl_one_for_types {
+    ($($t:ty),*) => {
+        $(
+            impl One for $t {
+                fn one() -> Self {
+                    // Return one for each type
+                    1 as $t
+                }
+            }
+        )*
+    };
+}
+
+impl_one_for_types!(
+    i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, f32, f64
+);
 
 pub trait Unsigned {}
 

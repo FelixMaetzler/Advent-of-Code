@@ -90,7 +90,7 @@ pub fn md5(message: &str) -> String {
     hash.iter()
         .flat_map(|h| h.to_le_bytes())
         .fold(String::new(), |mut output, b| {
-            let _ = write!(output, "{:02x}", b);
+            let _ = write!(output, "{b:02x}");
             output
         })
 }

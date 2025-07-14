@@ -27,7 +27,7 @@ pub enum AOCError {
 }
 impl Display for AOCError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 pub fn call_aoc_cli(args: &[String]) -> Result<Output, AOCError> {

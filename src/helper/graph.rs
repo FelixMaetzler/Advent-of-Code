@@ -292,7 +292,7 @@ pub trait Graph {
             let label = node_label_fn
                 .as_ref()
                 .map_or_else(|| node.to_string(), |f| f(node));
-            dot.push_str(&format!("    {} [label=\"{}\"];\n", node, label));
+            dot.push_str(&format!("    {node} [label=\"{label}\"];\n"));
         }
 
         // Add edges with labels
