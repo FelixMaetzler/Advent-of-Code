@@ -4,7 +4,7 @@ use std::{
 };
 
 use all_aoc::helper::{
-    grid::{Grid, dense_grid::DenseGrid, grid_index::GridIndex},
+    grid::{Grid, dense::DenseGrid, index::GridIndex},
     position::{Direction4, Direction8},
 };
 
@@ -21,10 +21,10 @@ impl TryFrom<char> for TilePart1 {
 
     fn try_from(value: char) -> Result<Self, Self::Error> {
         match value {
-            '@' => Ok(TilePart1::Robot),
-            '#' => Ok(TilePart1::Wall),
-            'O' => Ok(TilePart1::Box),
-            '.' => Ok(TilePart1::Empty),
+            '@' => Ok(Self::Robot),
+            '#' => Ok(Self::Wall),
+            'O' => Ok(Self::Box),
+            '.' => Ok(Self::Empty),
             x => Err(x),
         }
     }
@@ -40,11 +40,11 @@ enum TilePart2 {
 impl Debug for TilePart2 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_char(match self {
-            TilePart2::Robot => '@',
-            TilePart2::Wall => '#',
-            TilePart2::BoxLeft => '[',
-            TilePart2::BoxRight => ']',
-            TilePart2::Empty => '.',
+            Self::Robot => '@',
+            Self::Wall => '#',
+            Self::BoxLeft => '[',
+            Self::BoxRight => ']',
+            Self::Empty => '.',
         })
     }
 }
@@ -189,7 +189,6 @@ fn is_free(
         match grid.get(pos).expect("Should exisit") {
             TilePart2::Robot => unreachable!(),
             TilePart2::Wall => return None,
-            TilePart2::Empty => continue,
             TilePart2::BoxLeft => {
                 from.push(pos);
                 to.push((pos.dir(dir.into(), grid).unwrap(), TilePart2::BoxLeft));
@@ -206,6 +205,7 @@ fn is_free(
                 stack.push(left);
                 stack.push(new_dir);
             }
+            TilePart2::Empty => {}
         }
     }
     Some((from, to))

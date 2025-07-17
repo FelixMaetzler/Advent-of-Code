@@ -5,8 +5,8 @@ use std::{
 };
 
 use all_aoc::helper::{
-    graph::{GraphWithWeights, build_graph4_special},
-    grid::{Grid, grid_index::GridIndex, sparse_grid::SparseGrid},
+    graph::{WithWeights, build_graph4_special},
+    grid::{Grid, index::GridIndex, sparse::SparseGrid},
     intcode::{InputMode, IntInteger, Intcode, Return},
     position::{Direction4, Position},
 };
@@ -23,13 +23,12 @@ impl Debug for Tile {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Air => write!(f, "."),
-            Self::Wall => write!(f, " "),
+            Self::Wall | Self::Unknown => write!(f, " "),
             Self::OygenSystem => write!(f, "O"),
-            Self::Unknown => write!(f, " "),
         }
     }
 }
-fn to_number(dir: Direction4) -> IntInteger {
+const fn to_number(dir: Direction4) -> IntInteger {
     match dir {
         Direction4::North => 1,
         Direction4::East => 4,
@@ -62,7 +61,7 @@ pub fn part_one(input: &str) -> Option<u32> {
         .map(|(i, _)| i)
         .unwrap();
     let erg = graph.dijkstra_distances(start, None);
-    Some(*erg.get(end).unwrap())
+    Some(erg[end])
 }
 
 fn generate_maze(mut computer: Intcode) -> HashMap<Position<i32>, Tile> {
@@ -126,7 +125,7 @@ fn fill_up_with_unknown(map: &mut HashMap<Position<i32>, Tile>) {
         .iter()
         .filter(|(_, v)| matches!(v, Tile::Air | Tile::OygenSystem))
         .map(|(k, _)| k)
-        .cloned()
+        .copied()
         .collect::<Vec<_>>();
     for p in empty {
         for dir in Direction4::all_dirs() {
@@ -137,12 +136,11 @@ fn fill_up_with_unknown(map: &mut HashMap<Position<i32>, Tile>) {
 pub fn part_two(input: &str) -> Option<u32> {
     let maze = generate_maze(parse(input));
     let grid = SparseGrid::from_it(maze.iter().map(|(k, v)| ((k.y as usize, k.x as usize), *v)));
-    let mut grid = SparseGrid::from_it(grid.iter_all().flat_map(|(i, v)| {
+    let mut grid = SparseGrid::from_it(grid.iter_all().filter_map(|(i, v)| {
         match v {
             Tile::Air => Some(false),
-            Tile::Wall => None,
+            Tile::Wall | Tile::Unknown => None,
             Tile::OygenSystem => Some(true),
-            Tile::Unknown => None,
         }
         .map(|x| (i.to_coordinates(&grid), x))
     }));
@@ -156,9 +154,9 @@ pub fn part_two(input: &str) -> Option<u32> {
             .flat_map(|s| grid.get_neigbors4(*s))
             .map(|x| x.0.to_flat_index(&grid))
             .collect::<HashSet<_>>();
-        visit.into_iter().for_each(|i| {
+        for i in visit {
             grid.set(i, true);
-        });
+        }
     }
     Some(cnt)
 }

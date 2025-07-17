@@ -1,4 +1,4 @@
-use std::iter;
+use core::iter;
 
 all_aoc::solution!(9, 2024);
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -42,10 +42,10 @@ fn remove_empty_space_layout(diskmap: &mut Vec<Layout>) {
         if *diskmap.last().unwrap() == Layout::Empty {
             diskmap.pop();
             continue;
-        } else {
-            let j = diskmap.len() - 1;
-            diskmap.swap(pointer, j);
         }
+        let j = diskmap.len() - 1;
+        diskmap.swap(pointer, j);
+
         pointer = diskmap[pointer..]
             .iter()
             .enumerate()
@@ -71,23 +71,22 @@ fn remove_empty_space_file_layout(diskmap: &mut Vec<FileLayout>) {
     while pointer > 0 {
         let min_len = diskmap[pointer].length;
         debug_assert_ne!(diskmap[pointer].layout, Layout::Empty);
-        let i = match diskmap
+        let i = if let Some(x) = diskmap
             .iter()
             .enumerate()
             .filter(|(i, l)| l.layout == Layout::Empty && i < &pointer)
             .find(|(_, l)| l.length >= min_len)
         {
-            Some(x) => x.0,
-            None => {
-                pointer = diskmap[..pointer]
-                    .iter()
-                    .enumerate()
-                    .rev()
-                    .find(|(_, l)| l.layout != Layout::Empty)
-                    .unwrap()
-                    .0;
-                continue;
-            }
+            x.0
+        } else {
+            pointer = diskmap[..pointer]
+                .iter()
+                .enumerate()
+                .rev()
+                .find(|(_, l)| l.layout != Layout::Empty)
+                .unwrap()
+                .0;
+            continue;
         };
         let len = diskmap[i].length;
         diskmap.swap(pointer, i);
@@ -109,7 +108,7 @@ fn remove_empty_space_file_layout(diskmap: &mut Vec<FileLayout>) {
             .find(|(_, l)| l.layout != Layout::Empty)
             .unwrap()
             .0;
-        debug_assert_eq!(constant_length, calc_length(diskmap))
+        debug_assert_eq!(constant_length, calc_length(diskmap));
     }
 }
 fn condense(diskmap: &mut Vec<FileLayout>) {
@@ -130,7 +129,7 @@ fn condense(diskmap: &mut Vec<FileLayout>) {
     }
     let after: u32 = diskmap.iter().map(|l| l.length).sum();
     debug_assert_eq!(before, after);
-    debug_assert!(diskmap.windows(2).all(|l| l[0].layout != l[1].layout))
+    debug_assert!(diskmap.windows(2).all(|l| l[0].layout != l[1].layout));
 }
 fn checksum(diskmap: &[Layout]) -> u64 {
     diskmap

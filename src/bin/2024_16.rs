@@ -1,8 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
 use all_aoc::helper::{
-    graph::{Graph, GraphWithWeights, SpecialGraph},
-    grid::{Grid, dense_grid::DenseGrid, grid_index::GridIndex},
+    graph::{Graph, Special, WithWeights},
+    grid::{Grid, dense::DenseGrid, index::GridIndex},
     position::Direction4,
 };
 
@@ -19,15 +19,15 @@ impl TryFrom<char> for Tile {
 
     fn try_from(value: char) -> Result<Self, Self::Error> {
         match value {
-            '.' => Ok(Tile::Empty),
-            '#' => Ok(Tile::Wall),
-            'S' => Ok(Tile::Start),
-            'E' => Ok(Tile::End),
+            '.' => Ok(Self::Empty),
+            '#' => Ok(Self::Wall),
+            'S' => Ok(Self::Start),
+            'E' => Ok(Self::End),
             x => Err(x),
         }
     }
 }
-fn map(node: &(usize, Direction4)) -> usize {
+const fn map(node: &(usize, Direction4)) -> usize {
     4 * node.0
         + match node.1 {
             Direction4::North => 0,
@@ -36,8 +36,8 @@ fn map(node: &(usize, Direction4)) -> usize {
             Direction4::South => 3,
         }
 }
-fn setup(grid: &DenseGrid<Tile>) -> SpecialGraph<u32> {
-    let mut graph = SpecialGraph::new();
+fn setup(grid: &DenseGrid<Tile>) -> Special<u32> {
+    let mut graph = Special::new();
     for i in 0..grid.len() {
         if *grid.get(i).unwrap() == Tile::Wall {
             continue;
@@ -74,14 +74,14 @@ fn start_end(grid: &DenseGrid<Tile>) -> (usize, usize) {
         .0;
     (start, end)
 }
-fn solve(graph: &SpecialGraph<u32>, grid: &DenseGrid<Tile>) -> u32 {
+fn solve(graph: &Special<u32>, grid: &DenseGrid<Tile>) -> u32 {
     let (start_grid, end_grid) = start_end(grid);
     let start_graph = map(&(start_grid, Direction4::East));
     let from_start = graph.dijkstra_distances(start_graph, None);
     *Direction4::all_dirs()
         .into_iter()
         .map(|d| map(&(end_grid, d)))
-        .map(|i| from_start.get(&i).unwrap())
+        .map(|i| &from_start[&i])
         .min()
         .unwrap()
 }

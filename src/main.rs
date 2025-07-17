@@ -4,7 +4,7 @@ use all_aoc::cli::{
     commands::{
         download::download,
         prepare::prepare,
-        solve::{solve_single_day, solve_year},
+        solve::{single_day, year},
     },
     day::Day,
 };
@@ -31,15 +31,15 @@ enum Days {
 impl Days {
     fn to_vec(&self) -> Vec<Day> {
         match self {
-            Days::Day(day) => vec![*day],
-            Days::Year(year) => (1..=25).map(|day| Day { day, year: *year }).collect(),
+            Self::Day(day) => vec![*day],
+            Self::Year(year) => (1..=25).map(|day| Day { day, year: *year }).collect(),
         }
     }
 }
 impl Command {
     fn execute(&self) -> Result<(), String> {
         match self {
-            Command::Download { days } => {
+            Self::Download { days } => {
                 for day in days.to_vec() {
                     if let Err(e) = download(day) {
                         eprintln!("Error while downloading {}.{}: {e}", day.day, day.year);
@@ -47,7 +47,7 @@ impl Command {
                 }
                 Ok(())
             }
-            Command::Prepare { days } => {
+            Self::Prepare { days } => {
                 for day in days.to_vec() {
                     if let Err(e) = prepare(day) {
                         eprintln!("Error while preparing {}.{}: {e}", day.day, day.year);
@@ -56,7 +56,7 @@ impl Command {
                 }
                 Ok(())
             }
-            Command::Solve {
+            Self::Solve {
                 days,
                 submit,
                 release,
@@ -65,16 +65,16 @@ impl Command {
                 match days {
                     Days::Day(day) => {
                         if day.exists() {
-                            solve_single_day(*day, *release, *submit, *time)
+                            single_day(*day, *release, *submit, *time);
                         } else {
                             eprintln!("Binary for Day {day} not found");
                         }
                     }
                     Days::Year(_) if submit.is_some() => {
-                        return Err("Sumbit Flag with multiple Days is not supported".to_string());
+                        return Err("Sumbit Flag with multiple Days is not supported".to_owned());
                     }
                     days @ Days::Year(_) => {
-                        solve_year(days.to_vec(), *release, *time);
+                        year(days.to_vec(), *release, *time);
                     }
                 }
 
@@ -88,7 +88,7 @@ fn main() {
     let command = parse(&args);
     match command {
         Ok(c) => match c.execute() {
-            Ok(_) => {}
+            Ok(()) => {}
             Err(e) => eprintln!("{e}"),
         },
         Err(e) => eprintln!("{e}"),
@@ -96,23 +96,23 @@ fn main() {
 }
 
 fn parse(args: &[String]) -> Result<Command, String> {
-    let subcommand = args.get(1).ok_or("Missing Command".to_string())?;
+    let subcommand = args.get(1).ok_or_else(|| "Missing Command".to_owned())?;
     match subcommand.as_str() {
         "download" => {
-            let day = args.get(2).ok_or("Missing Day".to_string())?;
+            let day = args.get(2).ok_or_else(|| "Missing Day".to_owned())?;
             Ok(Command::Download {
                 days: parse_day(day)?,
             })
         }
         "prepare" => {
-            let day = args.get(2).ok_or("Missing Day".to_string())?;
+            let day = args.get(2).ok_or_else(|| "Missing Day".to_owned())?;
             Ok(Command::Prepare {
                 days: parse_day(day)?,
             })
         }
         "solve" => {
             let mut iter = args.iter().skip(2);
-            let day = iter.next().ok_or("Missing Day".to_string())?;
+            let day = iter.next().ok_or_else(|| "Missing Day".to_owned())?;
             let mut release = false;
             let mut time = false;
 
@@ -128,9 +128,9 @@ fn parse(args: &[String]) -> Result<Command, String> {
                                 .ok_or("if --submit flag is set, there has to be a next argument")?
                                 .parse()
                                 .map_err(|e| format!("Has to be a number: {e}"))?,
-                        )
+                        );
                     }
-                    x => Err(format!("This argument is not supported: {x}"))?,
+                    x => return Err(format!("This argument is not supported: {x}")),
                 }
             }
 
@@ -164,9 +164,8 @@ fn parse_day(arg: &str) -> Result<Days, String> {
         if year < 2015 {
             if year < 15 {
                 return Err(format!("Year is not a number greater than 2015: {year}"));
-            } else {
-                year += 2000;
             }
+            year += 2000;
         }
         Ok(Days::Day(Day { day, year }))
     } else {
@@ -178,7 +177,7 @@ fn parse_day(arg: &str) -> Result<Days, String> {
                     Ok(x) => x.parse::<u16>().map_err(|e| e.to_string())?,
                     Err(_) => return Err(
                         "The year is not specified. Please have a look in the .cargo/config.toml"
-                            .to_string(),
+                            .to_owned(),
                     ),
                 },
             }))

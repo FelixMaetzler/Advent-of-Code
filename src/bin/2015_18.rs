@@ -1,6 +1,6 @@
-use std::fmt::Debug;
+use core::fmt::Debug;
 
-use all_aoc::helper::grid::{Grid, dense_grid::DenseGrid};
+use all_aoc::helper::grid::{Grid, dense::DenseGrid};
 all_aoc::solution!(18, 2015);
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum State {
@@ -12,14 +12,14 @@ impl TryFrom<char> for State {
 
     fn try_from(value: char) -> Result<Self, Self::Error> {
         match value {
-            '#' => Ok(State::On),
-            '.' => Ok(State::Off),
+            '#' => Ok(Self::On),
+            '.' => Ok(Self::Off),
             x => Err(x),
         }
     }
 }
 impl Debug for State {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::On => write!(f, "#"),
             Self::Off => write!(f, "."),

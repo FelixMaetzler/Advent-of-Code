@@ -13,55 +13,55 @@ pub struct Day {
     pub year: u16,
 }
 impl Day {
-    pub fn input_path(&self) -> PathBuf {
+    pub fn input_path(self) -> PathBuf {
         PathBuf::from(format!("data/inputs/{}/{:02}.txt", self.year, self.day))
     }
-    pub fn puzzle_path(&self) -> PathBuf {
+    pub fn puzzle_path(self) -> PathBuf {
         PathBuf::from(format!("data/puzzles/{}/{:02}.md", self.year, self.day))
     }
-    pub fn bin_path(&self) -> PathBuf {
+    pub fn bin_path(self) -> PathBuf {
         PathBuf::from(format!("src/bin/{}_{:02}.rs", self.year, self.day))
     }
-    pub fn examples_path(&self) -> PathBuf {
+    pub fn examples_path(self) -> PathBuf {
         PathBuf::from(format!("data/examples/{}/{:02}.txt", self.year, self.day))
     }
-    pub fn bin_name(&self) -> String {
+    pub fn bin_name(self) -> String {
         format!("{}_{:02}", self.year, self.day)
     }
-    pub fn as_args(&self) -> Vec<String> {
+    pub fn as_args(self) -> Vec<String> {
         vec![
-            "--year".to_string(),
+            "--year".to_owned(),
             self.year.to_string(),
-            "--day".to_string(),
+            "--day".to_owned(),
             self.day.to_string(),
         ]
     }
-    pub fn exists(&self) -> bool {
+    pub fn exists(self) -> bool {
         self.bin_path().exists()
     }
     pub fn execute(
-        &self,
+        self,
         release: bool,
         time: bool,
         submit: Option<u8>,
     ) -> (PartDayResult<String>, PartDayResult<String>) {
-        let mut args = vec!["run".to_string()];
+        let mut args = vec!["run".to_owned()];
         if release {
-            args.push("--release".to_string());
+            args.push("--release".to_owned());
         }
 
-        args.push("--bin".to_string());
+        args.push("--bin".to_owned());
         args.push(self.bin_name());
-        args.push("--quiet".to_string());
-        args.push("--".to_string());
+        args.push("--quiet".to_owned());
+        args.push("--".to_owned());
         if time {
-            args.push("--time".to_string());
+            args.push("--time".to_owned());
         }
         if let Some(x) = submit {
-            args.push("--submit".to_string());
+            args.push("--submit".to_owned());
             args.push(x.to_string());
         }
-        args.push("--machine-readable".to_string());
+        args.push("--machine-readable".to_owned());
 
         let output = Command::new("cargo")
             .args(args)
@@ -107,6 +107,6 @@ impl FromStr for Day {
         if year < 2015 {
             return Err(format!("Year has to be greater or equal to 2015: {year}"));
         }
-        Ok(Day { day, year })
+        Ok(Self { day, year })
     }
 }

@@ -30,7 +30,7 @@ pub fn prepare(day: Day) -> Result<(), AOCError> {
     Ok(())
 }
 
-const MODULE_TEMPLATE: &str = r#"
+const MODULE_TEMPLATE: &str = "
 all_aoc::solution!(DAY_NUMBER);
 
 pub fn part_one(input: &str) -> Option<u32> {
@@ -70,4 +70,4 @@ mod tests {
     }
 }
 
-"#;
+";

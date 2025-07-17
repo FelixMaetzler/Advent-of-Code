@@ -1,11 +1,11 @@
-use std::iter::successors;
+use core::iter::successors;
 
 all_aoc::solution!(22, 2024);
-fn next(x: u64) -> u64 {
+const fn next(x: u64) -> u64 {
     let mut x = x;
-    x = ((64 * x) ^ x) % 16_777_216;
-    x = ((x / 32) ^ x) % 16_777_216;
-    x = ((2048 * x) ^ x) % 16_777_216;
+    x = ((64 * x) ^ x) % 0x0100_0000;
+    x = ((x / 32) ^ x) % 0x0100_0000;
+    x = ((2048 * x) ^ x) % 0x0100_0000;
     x
 }
 pub fn part_one(input: &str) -> Option<u64> {
@@ -16,7 +16,7 @@ pub fn part_one(input: &str) -> Option<u64> {
             .sum(),
     )
 }
-fn index(deltas: (i8, i8, i8, i8)) -> usize {
+const fn index(deltas: (i8, i8, i8, i8)) -> usize {
     (deltas.0 + 9) as usize * 19 * 19 * 19
         + (deltas.1 + 9) as usize * 19 * 19
         + (deltas.2 + 9) as usize * 19
@@ -45,7 +45,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                 continue;
             }
             seen[idx] = true;
-            map[idx] += price as i32;
+            map[idx] += i32::from(price);
         }
     }
     Some(map.into_iter().max().unwrap() as u64)

@@ -9,14 +9,8 @@ enum GoesTo {
 impl GoesTo {
     fn from_pair<'a>(v_1: &'a str, v_2: &'a str) -> Result<Self, &'a str> {
         match v_1 {
-            "output" => match v_2.parse() {
-                Ok(x) => Ok(Self::Output(x)),
-                Err(_) => Err(v_2),
-            },
-            "bot" => match v_2.parse() {
-                Ok(x) => Ok(Self::Bot(x)),
-                Err(_) => Err(v_2),
-            },
+            "output" => v_2.parse().map_or(Err(v_2), |x| Ok(Self::Output(x))),
+            "bot" => v_2.parse().map_or(Err(v_2), |x| Ok(Self::Bot(x))),
             x => Err(x),
         }
     }
@@ -37,15 +31,15 @@ impl Bot {
             (Some(y), None) => {
                 if num < y {
                     self.low = Some(num);
-                    self.high = Some(y)
+                    self.high = Some(y);
                 } else {
-                    self.high = Some(num)
+                    self.high = Some(num);
                 }
             }
             (Some(_), Some(_)) => unreachable!("should not happen"),
         }
     }
-    fn is_executable(&self) -> bool {
+    const fn is_executable(&self) -> bool {
         self.low.is_some() && self.high.is_some()
     }
 }
@@ -57,7 +51,7 @@ fn execute(input: &str, part_1: bool) -> Option<u32> {
         going_on = false;
         if let Some(&bot) = map.values().find(|b| b.is_executable()) {
             if part_1 && (Some(17), Some(61)) == (bot.low, bot.high) {
-                return Some(bot.number as u32);
+                return Some(u32::from(bot.number));
             }
             match bot.low_goes_to {
                 GoesTo::Bot(b) => map.get_mut(&b).unwrap().assign(bot.low.unwrap()),
@@ -80,11 +74,7 @@ fn execute(input: &str, part_1: bool) -> Option<u32> {
     if part_1 {
         None
     } else {
-        Some(
-            *output.get(&0).unwrap() as u32
-                * *output.get(&1).unwrap() as u32
-                * *output.get(&2).unwrap() as u32,
-        )
+        Some(u32::from(output[&0]) * u32::from(output[&1]) * u32::from(output[&2]))
     }
 }
 pub fn part_one(input: &str) -> Option<u32> {

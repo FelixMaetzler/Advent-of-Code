@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use core::str::FromStr;
 
 use all_aoc::helper::misc::number_to_digit_count;
 
@@ -14,8 +14,8 @@ impl FromStr for Equation {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (result, rest) = s.split_once(": ").unwrap();
         let result = result.parse().unwrap();
-        let numbers = rest.split(" ").map(|n| n.parse().unwrap()).collect();
-        Ok(Equation { result, numbers })
+        let numbers = rest.split(' ').map(|n| n.parse().unwrap()).collect();
+        Ok(Self { result, numbers })
     }
 }
 impl Equation {
@@ -48,7 +48,7 @@ fn recurse(result: u64, numbers: &[u64]) -> bool {
     };
 
     let next = &numbers[..numbers.len() - 1];
-    let m = 10_u64.pow(number_to_digit_count(last) as u32);
+    let m = 10_u64.pow(u32::from(number_to_digit_count(last)));
     if result % m == last && recurse((result - last) / m, next) {
         return true;
     }
@@ -66,7 +66,7 @@ pub fn part_one(input: &str) -> Option<u64> {
     let eqs = parse(input);
     Some(
         eqs.into_iter()
-            .filter(|eq| eq.test_all_combs_part_1())
+            .filter(Equation::test_all_combs_part_1)
             .map(|eq| eq.result)
             .sum(),
     )
@@ -76,7 +76,7 @@ pub fn part_two(input: &str) -> Option<u64> {
     let eqs = parse(input);
     Some(
         eqs.into_iter()
-            .filter(|eq| eq.test_all_combs_part_2())
+            .filter(Equation::test_all_combs_part_2)
             .map(|eq| eq.result)
             .sum(),
     )

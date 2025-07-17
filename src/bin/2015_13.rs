@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use all_aoc::helper::permutations::IteratorPermutator;
+use all_aoc::helper::permutations::IteratorPermutator as _;
 
 all_aoc::solution!(13, 2015);
 
@@ -16,7 +16,7 @@ pub fn part_one(input: &str) -> Option<i32> {
 
 pub fn part_two(input: &str) -> Option<i32> {
     let mut map = parse(input);
-    let me = "FelixMe".to_string();
+    let me = "FelixMe".to_owned();
     let set: HashSet<_> = map.keys().flat_map(|(k1, k2)| [k1, k2]).cloned().collect();
     let mut vec: Vec<_> = set.into_iter().collect();
     for x in &vec {
@@ -46,8 +46,8 @@ fn parse(input: &str) -> HashMap<(String, String), i32> {
         .lines()
         .map(|line| {
             let vec = line.split(' ').collect::<Vec<_>>();
-            let s1 = vec[0].to_string();
-            let s2 = vec[10].trim_end_matches('.').to_string();
+            let s1 = vec[0].to_owned();
+            let s2 = vec[10].trim_end_matches('.').to_owned();
             let mul = match vec[2] {
                 "gain" => 1,
                 "lose" => -1,

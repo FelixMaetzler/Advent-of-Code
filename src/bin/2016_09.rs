@@ -10,12 +10,12 @@ pub fn part_two(input: &str) -> Option<usize> {
 
 fn decompressd_length_1(line: &str) -> usize {
     let mut i = 0;
-    let mut new_str = "".to_string();
+    let mut new_str = String::new();
     while i < line.len() {
         let ch = line.chars().nth(i).unwrap();
         if ch == '(' {
-            let mut first = "".to_string();
-            let mut second = "".to_string();
+            let mut first = String::new();
+            let mut second = String::new();
             i += 1;
             loop {
                 let ch = line.chars().nth(i).unwrap();
@@ -44,7 +44,7 @@ fn decompressd_length_1(line: &str) -> usize {
             let first: usize = first.parse().unwrap();
             let second: usize = second.parse().unwrap();
             let curr_i = i;
-            let mut substring = "".to_string();
+            let mut substring = String::new();
             while i < curr_i + first {
                 let ch = line.chars().nth(i).unwrap();
                 substring.push(ch);
@@ -70,8 +70,8 @@ fn decompressd_length_2(line: &str) -> usize {
             counter += 1;
             i += 1;
         } else if ch == '(' {
-            let mut first = "".to_string();
-            let mut second = "".to_string();
+            let mut first = String::new();
+            let mut second = String::new();
             i += 1;
             loop {
                 let ch = line.chars().nth(i).unwrap();

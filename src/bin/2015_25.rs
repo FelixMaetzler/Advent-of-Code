@@ -5,24 +5,24 @@ pub fn part_one(input: &str) -> Option<u64> {
     Some(index_to_number(index_to_index(input)))
 }
 
-pub fn part_two(_: &str) -> Option<u32> {
+pub const fn part_two(_: &str) -> Option<u32> {
     None
 }
 
 fn index_to_index(input: (u64, u64)) -> u64 {
     let mut i = 1;
     for add in 0..input.0 {
-        i += add
+        i += add;
     }
     for add in 1..input.1 {
-        i += add + input.0
+        i += add + input.0;
     }
     i
 }
 fn index_to_number(input: u64) -> u64 {
-    let mut curr = 20151125;
+    let mut curr = 20_151_125;
     for _ in 1..input {
-        curr = curr * 252533 % 33554393;
+        curr = curr * 252_533 % 33_554_393;
     }
     curr
 }

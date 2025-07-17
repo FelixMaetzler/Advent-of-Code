@@ -16,11 +16,11 @@ enum Expression {
 impl Expression {
     fn eval(&self) -> u64 {
         match self {
-            Expression::Binary { left, op, right } => match op {
+            Self::Binary { left, op, right } => match op {
                 Op::Add => left.eval() + right.eval(),
                 Op::Mul => left.eval() * right.eval(),
             },
-            Expression::Const(x) => *x,
+            Self::Const(x) => *x,
         }
     }
 }
@@ -138,9 +138,7 @@ fn parse_number(input: &mut &str) -> Expression {
     while end < input.len() && input.as_bytes()[end].is_ascii_digit() {
         end += 1;
     }
-    if end == 0 {
-        panic!("Expected number at '{input}'");
-    }
+    assert!((end != 0), "Expected number at '{input}'");
 
     let (number_str, rest) = input.split_at(end);
     *input = rest;

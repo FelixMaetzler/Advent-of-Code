@@ -23,7 +23,7 @@ impl FromStr for Instruction {
             'D' => Direction4::South,
             x => return Err(x),
         };
-        Ok(Instruction { dir, len })
+        Ok(Self { dir, len })
     }
 }
 pub fn part_one(input: &str) -> Option<i32> {
@@ -46,7 +46,7 @@ pub fn part_two(input: &str) -> Option<u32> {
     Some(
         map_one
             .into_iter()
-            .flat_map(|(k, v)| map_two.get(&k).map(|s| s + v))
+            .filter_map(|(k, v)| map_two.get(&k).map(|s| s + v))
             .min()
             .unwrap(),
     )

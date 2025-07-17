@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use all_aoc::helper::{
-    grid::{Grid, grid_index::GridIndex, sparse_grid::SparseGrid},
-    permutations::IteratorPermutator,
+    grid::{Grid as _, index::GridIndex as _, sparse::SparseGrid},
+    permutations::IteratorPermutator as _,
     position::{Direction4, Position},
 };
 type Pos = Position<usize>;
@@ -104,19 +104,22 @@ impl Solution {
         } else {
             moves.extend([Direction4::North].repeat(from.y - to.y));
         }
-
+        let len = moves.len();
         let result = moves
-            .iter()
-            .permutations(moves.len())
+            .into_iter()
+            .permutations(len)
             .filter_map(|moves| {
                 let mut p = from;
 
-                for &&d in &moves {
+                for &d in &moves {
                     p = keypad.map.get_dir8(p, d.into())?.0.to_position(&keypad.map);
                 }
-                let v = ['A']
-                    .into_iter()
-                    .chain(moves.into_iter().map(|d| d.to_hat()))
+                let v = core::iter::once('A')
+                    .chain(
+                        moves
+                            .into_iter()
+                            .map(all_aoc::helper::position::Direction4::to_hat),
+                    )
                     .chain(['A'])
                     .collect::<Vec<_>>();
                 Some(
@@ -139,7 +142,7 @@ impl Solution {
             self.targets
                 .iter()
                 .map(|(number, seq)| {
-                    let v = ['A'].iter().chain(seq.iter()).collect::<Vec<_>>();
+                    let v = core::iter::once(&'A').chain(seq.iter()).collect::<Vec<_>>();
 
                     number
                         * v.windows(2)

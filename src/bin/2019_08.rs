@@ -1,6 +1,6 @@
-use std::fmt::Display;
+use core::fmt::Display;
 
-use all_aoc::helper::misc::Joinable;
+use all_aoc::helper::misc::Joinable as _;
 all_aoc::solution!(8, 2019);
 
 #[derive(Clone, Copy)]
@@ -20,11 +20,10 @@ impl From<u32> for Color {
     }
 }
 impl Display for Color {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            Self::Black => write!(f, " "),
             Self::White => write!(f, "#"),
-            Self::Transparent => write!(f, " "),
+            Self::Transparent | Self::Black => write!(f, " "),
         }
     }
 }
@@ -57,12 +56,12 @@ fn part_two_runner(input: &str, ratio: (usize, usize)) -> Option<String> {
     let erg: Vec<_> = ret.iter().map(|v| resolve(v)).collect();
     let s = erg
         .chunks(ratio.0)
-        .map(|l| l.iter().map(|c| c.to_string()).join(""))
+        .map(|l| l.iter().map(std::string::ToString::to_string).join(""))
         .join("\n");
 
     Some(s)
 }
-fn mapping(back: Color, front: Color) -> Color {
+const fn mapping(back: Color, front: Color) -> Color {
     match (back, front) {
         (_, Color::Black) => Color::Black,
         (_, Color::White) => Color::White,
@@ -98,6 +97,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two_runner(&all_aoc::cli::read_examples_file(DAY), (2, 2));
-        assert_eq!(result, Some(" #\n# ".to_string()));
+        assert_eq!(result, Some(" #\n# ".to_owned()));
     }
 }

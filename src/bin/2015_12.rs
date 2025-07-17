@@ -11,26 +11,26 @@ enum JsonObject {
 impl JsonObject {
     fn sum(&self) -> i32 {
         match self {
-            JsonObject::Number(x) => *x,
-            JsonObject::String(_) => 0,
-            JsonObject::Array(vec) => vec.iter().map(|o| o.sum()).sum(),
-            JsonObject::Dict(hash_map) => hash_map.values().map(|o| o.sum()).sum(),
+            Self::Number(x) => *x,
+            Self::String(_) => 0,
+            Self::Array(vec) => vec.iter().map(Self::sum).sum(),
+            Self::Dict(hash_map) => hash_map.values().map(Self::sum).sum(),
         }
     }
     fn sum_without_red(&self) -> i32 {
         match self {
-            JsonObject::Number(x) => *x,
-            JsonObject::String(_) => 0,
-            JsonObject::Array(vec) => vec.iter().map(|o| o.sum_without_red()).sum(),
-            JsonObject::Dict(hash_map) => {
+            Self::Number(x) => *x,
+            Self::String(_) => 0,
+            Self::Array(vec) => vec.iter().map(Self::sum_without_red).sum(),
+            Self::Dict(hash_map) => {
                 if hash_map.contains_key("red")
                     || hash_map
                         .values()
-                        .any(|v| matches!(v,JsonObject::String(x)if x=="red"))
+                        .any(|v| matches!(v,Self::String(x)if x=="red"))
                 {
                     0
                 } else {
-                    hash_map.values().map(|o| o.sum_without_red()).sum()
+                    hash_map.values().map(Self::sum_without_red).sum()
                 }
             }
         }
@@ -167,12 +167,12 @@ mod tests {
     fn parse_dict_test() {
         let (x, y) = parse_recursive(&"{\"a\":5}".chars().collect::<Vec<_>>(), 0);
         let mut dict = HashMap::new();
-        dict.insert("a".to_string(), JsonObject::Number(5));
+        dict.insert("a".to_owned(), JsonObject::Number(5));
         assert_eq!(x, JsonObject::Dict(dict.clone()));
         assert_eq!(y, 7);
 
         let (x, y) = parse_recursive(&"{\"a\":5,\"b\":7}".chars().collect::<Vec<_>>(), 0);
-        dict.insert("b".to_string(), JsonObject::Number(7));
+        dict.insert("b".to_owned(), JsonObject::Number(7));
         assert_eq!(x, JsonObject::Dict(dict));
         assert_eq!(y, 13);
     }

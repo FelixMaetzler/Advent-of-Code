@@ -47,7 +47,7 @@ impl<T> Permutator<T> {
         } else {
             (0..k).map(|i| n - i).collect()
         };
-        Permutator {
+        Self {
             items,
             indices: (0..n).collect(),
             cycles,
@@ -184,27 +184,27 @@ pub trait IteratorCombinator: Iterator {
         let c = Combinator::new(collect, k);
         c.into_iter()
     }
-    fn combinations_until(self, k: usize) -> impl Iterator<Item = Vec<<Self as Iterator>::Item>>
+    fn combinations_until<'a>(self, k: usize) -> impl Iterator<Item = Vec<<Self as Iterator>::Item>>
     where
         Self: Sized,
-        <Self as std::iter::Iterator>::Item: Clone,
+        <Self as std::iter::Iterator>::Item: Clone + 'a,
     {
         let collect = self.collect::<Vec<_>>();
-        let combinators = (0..=k)
-            .map(|k| Combinator::new(collect.clone(), k))
-            .collect::<Vec<_>>();
-        combinators.into_iter().flat_map(|c| c.into_iter())
+
+        (0..=k)
+            .map(move |k| Combinator::new(collect.clone(), k))
+            .flat_map(std::iter::IntoIterator::into_iter)
     }
-    fn powerset(self) -> impl Iterator<Item = Vec<<Self as Iterator>::Item>>
+    fn powerset<'a>(self) -> impl Iterator<Item = Vec<<Self as Iterator>::Item>>
     where
         Self: Sized,
-        <Self as std::iter::Iterator>::Item: Clone,
+        <Self as std::iter::Iterator>::Item: Clone + 'a,
     {
         let collect = self.collect::<Vec<_>>();
-        let combinators = (0..=collect.len())
-            .map(|k| Combinator::new(collect.clone(), k))
-            .collect::<Vec<_>>();
-        combinators.into_iter().flat_map(|c| c.into_iter())
+
+        (0..=collect.len())
+            .map(move |k| Combinator::new(collect.clone(), k))
+            .flat_map(std::iter::IntoIterator::into_iter)
     }
 }
 
@@ -233,7 +233,7 @@ mod tests {
                 let vec = c.into_iter().collect::<Vec<_>>();
                 assert_eq!(vec.len(), n_choose_k(n, k));
                 for v in &vec {
-                    assert!(v.windows(2).all(|w| w[0] < w[1]))
+                    assert!(v.windows(2).all(|w| w[0] < w[1]));
                 }
             }
         }
@@ -262,8 +262,7 @@ mod tests {
         for k in 1..100 {
             for n in 0..k {
                 let c = Counter::new(n, k);
-                let vec = c.into_iter().collect::<Vec<_>>();
-                assert_eq!(vec.len(), 0);
+                assert_eq!(c.into_iter().count(), 0);
             }
         }
     }
@@ -275,7 +274,7 @@ mod tests {
                 let vec = c.into_iter().collect::<Vec<_>>();
                 assert_eq!(vec.len(), n_choose_k(n, k));
                 for v in &vec {
-                    assert!(v.windows(2).all(|w| w[0] < w[1]))
+                    assert!(v.windows(2).all(|w| w[0] < w[1]));
                 }
             }
         }
@@ -287,7 +286,7 @@ mod tests {
                 let vec = (0..n).combinations(k).collect::<Vec<_>>();
                 assert_eq!(vec.len(), n_choose_k(n, k));
                 for v in &vec {
-                    assert!(v.windows(2).all(|w| w[0] < w[1]))
+                    assert!(v.windows(2).all(|w| w[0] < w[1]));
                 }
             }
         }
@@ -296,8 +295,11 @@ mod tests {
     fn test_permutator_all_iterator() {
         for n in 0..10 {
             for k in 0..=10 {
-                let vec = (0..n).permutations(k).collect::<Vec<_>>();
-                assert_eq!(vec.len(), n_permute_k(n, k), "n: {n}, k: {k}");
+                assert_eq!(
+                    (0..n).permutations(k).count(),
+                    n_permute_k(n, k),
+                    "n: {n}, k: {k}"
+                );
             }
         }
     }
@@ -308,7 +310,7 @@ mod tests {
                 let vec = (0..n).combinations_until(k).collect::<Vec<_>>();
                 assert_eq!(vec.len(), (0..=k).map(|i| n_choose_k(n, i)).sum());
                 for v in &vec {
-                    assert!(v.windows(2).all(|w| w[0] < w[1]))
+                    assert!(v.windows(2).all(|w| w[0] < w[1]));
                 }
             }
         }
@@ -319,7 +321,7 @@ mod tests {
             let vec = (0..n).powerset().collect::<Vec<_>>();
             assert_eq!(vec.len(), 2_usize.pow(n));
             for v in &vec {
-                assert!(v.windows(2).all(|w| w[0] < w[1]))
+                assert!(v.windows(2).all(|w| w[0] < w[1]));
             }
         }
     }

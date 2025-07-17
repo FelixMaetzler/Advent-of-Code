@@ -85,7 +85,7 @@ pub fn part_two(input: &str) -> Option<u32> {
             }
         }
     }
-    Some(grid.values().cloned().sum())
+    Some(grid.values().copied().sum())
 }
 
 fn parse(input: &str) -> Vec<Instruction> {

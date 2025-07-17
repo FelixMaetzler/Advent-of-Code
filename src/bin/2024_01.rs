@@ -4,8 +4,8 @@ all_aoc::solution!(1, 2024);
 
 pub fn part_one(input: &str) -> Option<u32> {
     let (mut v1, mut v2) = parse(input);
-    v1.sort();
-    v2.sort();
+    v1.sort_unstable();
+    v2.sort_unstable();
     let (v1, v2) = (v1, v2);
     Some(v1.into_iter().zip(v2).map(|(x1, x2)| x1.abs_diff(x2)).sum())
 }
@@ -13,18 +13,13 @@ pub fn part_one(input: &str) -> Option<u32> {
 pub fn part_two(input: &str) -> Option<u32> {
     let (v1, v2) = parse(input);
     let mut map = HashMap::new();
-    v2.iter().for_each(|v| {
+    for v in &v2 {
         map.entry(v).and_modify(|x| *x += 1).or_insert(1);
-    });
+    }
     let map = map;
     Some(
         v1.into_iter()
-            .map(|x| {
-                x * match map.get(&x) {
-                    Some(y) => *y,
-                    None => 0,
-                }
-            })
+            .map(|x| x * map.get(&x).map_or(0, |y| *y))
             .sum(),
     )
 }

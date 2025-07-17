@@ -19,11 +19,7 @@ fn number_spoken(vec: Vec<u32>, x: u32) -> u32 {
     let mut map = HashMap::new();
     for i in 1..=x {
         let curr = vec[i as usize - 1];
-        let next = if let Some(e) = map.insert(curr, i) {
-            i - e
-        } else {
-            0
-        };
+        let next = map.insert(curr, i).map_or(0, |e| i - e);
 
         if i as usize >= len {
             vec.push(next);

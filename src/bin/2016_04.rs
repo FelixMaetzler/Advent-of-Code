@@ -27,7 +27,7 @@ impl Room {
             .iter()
             .map(|n| {
                 n.chars()
-                    .map(|c| ((((c as u8 - b'a') as u32 + self.id) % 26) as u8 + b'a') as char)
+                    .map(|c| (((u32::from(c as u8 - b'a') + self.id) % 26) as u8 + b'a') as char)
                     .collect::<String>()
             })
             .join(" ")
@@ -39,7 +39,10 @@ impl FromStr for Room {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (a, b) = s.split_once('[').unwrap();
         let checksum = b[0..b.len() - 1].to_string();
-        let mut encrypted_name = a.split('-').map(|s| s.to_string()).collect::<Vec<_>>();
+        let mut encrypted_name = a
+            .split('-')
+            .map(std::string::ToString::to_string)
+            .collect::<Vec<_>>();
         let id = encrypted_name.pop().unwrap().parse().unwrap();
         Ok(Self {
             encrypted_name,
@@ -52,7 +55,7 @@ pub fn part_one(input: &str) -> Option<u32> {
     Some(
         parse(input)
             .into_iter()
-            .filter(|r| r.is_real())
+            .filter(Room::is_real)
             .map(|r| r.id)
             .sum(),
     )

@@ -19,16 +19,16 @@ impl FromStr for Item {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "children" => Ok(Item::Children),
-            "cats" => Ok(Item::Cats),
-            "samoyeds" => Ok(Item::Samoyeds),
-            "pomeranians" => Ok(Item::Pomeranians),
-            "akitas" => Ok(Item::Akitas),
-            "vizslas" => Ok(Item::Vizslas),
-            "goldfish" => Ok(Item::Goldfish),
-            "trees" => Ok(Item::Trees),
-            "cars" => Ok(Item::Cars),
-            "perfumes" => Ok(Item::Perfumes),
+            "children" => Ok(Self::Children),
+            "cats" => Ok(Self::Cats),
+            "samoyeds" => Ok(Self::Samoyeds),
+            "pomeranians" => Ok(Self::Pomeranians),
+            "akitas" => Ok(Self::Akitas),
+            "vizslas" => Ok(Self::Vizslas),
+            "goldfish" => Ok(Self::Goldfish),
+            "trees" => Ok(Self::Trees),
+            "cars" => Ok(Self::Cars),
+            "perfumes" => Ok(Self::Perfumes),
             x => unreachable!("{x}"),
         }
     }
@@ -59,7 +59,7 @@ pub fn part_one(input: &str) -> Option<u32> {
         sues.retain(|s| match s.items.get(&item.0) {
             Some(x) => *x == item.1,
             None => true,
-        })
+        });
     }
     assert_eq!(sues.len(), 1);
     Some(sues.first().unwrap().number)
@@ -74,7 +74,7 @@ pub fn part_two(input: &str) -> Option<u32> {
             Some(x) if search == Item::Pomeranians || search == Item::Goldfish => *x < goal_val,
             Some(x) => *x == goal_val,
             None => true,
-        })
+        });
     }
     assert_eq!(sues.len(), 1);
     Some(sues.first().unwrap().number)

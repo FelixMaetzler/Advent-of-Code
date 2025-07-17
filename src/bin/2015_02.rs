@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use core::str::FromStr;
 
 all_aoc::solution!(2, 2015);
 struct Present {
@@ -18,7 +18,7 @@ impl Present {
             .min(self.length * self.height)
             .min(self.width * self.height)
     }
-    fn bow(&self) -> u32 {
+    const fn bow(&self) -> u32 {
         self.length * self.width * self.height
     }
     fn ribbon(&self) -> u32 {
@@ -36,12 +36,15 @@ impl FromStr for Present {
         let length = it.next().unwrap().parse().unwrap();
         let width = it.next().unwrap().parse().unwrap();
         let height = it.next().unwrap().parse().unwrap();
-        assert!(it.next().is_none());
-        Ok(Self {
-            length,
-            width,
-            height,
-        })
+        if it.next().is_some() {
+            Err(())
+        } else {
+            Ok(Self {
+                length,
+                width,
+                height,
+            })
+        }
     }
 }
 pub fn part_one(input: &str) -> Option<u32> {

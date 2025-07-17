@@ -6,10 +6,10 @@ use super::{
     pred,
 };
 pub fn char(input: &str) -> ParseResult<char> {
-    match input.chars().next() {
-        Some(next) => Ok((&input[next.len_utf8()..], next)),
-        _ => Err(input),
-    }
+    input
+        .chars()
+        .next()
+        .map_or(Err(input), |next| Ok((&input[next.len_utf8()..], next)))
 }
 fn whitespace_char<'a>() -> impl Parser<'a, char> {
     pred(char, |c| c.is_whitespace())
@@ -41,10 +41,9 @@ where
         }
     }
 
-    match input[..counter].parse::<T>() {
-        Ok(x) => Ok((&input[counter..], x)),
-        Err(_) => Err(input),
-    }
+    input[..counter]
+        .parse()
+        .map_or_else(|_| Err(input), |x| Ok((&input[counter..], x)))
 }
 #[cfg(test)]
 mod tests {

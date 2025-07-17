@@ -35,14 +35,14 @@ impl FromStr for Operation {
 pub fn part_one(input: &str) -> Option<u32> {
     let vec = parse(input);
     let map = HashMap::from_iter(vec![('a', 0), ('b', 0)]);
-    execute(vec, map)
+    execute(&vec, map)
 }
 pub fn part_two(input: &str) -> Option<u32> {
     let vec = parse(input);
     let map = HashMap::from_iter(vec![('a', 1), ('b', 0)]);
-    execute(vec, map)
+    execute(&vec, map)
 }
-fn execute(vec: Vec<Operation>, map: HashMap<char, u32>) -> Option<u32> {
+fn execute(vec: &[Operation], map: HashMap<char, u32>) -> Option<u32> {
     let mut map = map;
     let mut ptr = 0;
     while ptr < vec.len() {
@@ -63,14 +63,14 @@ fn execute(vec: Vec<Operation>, map: HashMap<char, u32>) -> Option<u32> {
                 ptr = (ptr as i32 + offset) as usize;
             }
             Operation::JumpIfEven(reg, offset) => {
-                if map.get(&reg).unwrap() % 2 == 0 {
+                if &map[&reg] % 2 == 0 {
                     ptr = (ptr as i32 + offset) as usize;
                 } else {
                     ptr += 1;
                 }
             }
             Operation::JumpIfOne(reg, offset) => {
-                if *map.get(&reg).unwrap() == 1 {
+                if map[&reg] == 1 {
                     ptr = (ptr as i32 + offset) as usize;
                 } else {
                     ptr += 1;
@@ -78,7 +78,7 @@ fn execute(vec: Vec<Operation>, map: HashMap<char, u32>) -> Option<u32> {
             }
         }
     }
-    Some(*map.get(&'b').unwrap())
+    Some(map[&'b'])
 }
 
 fn parse(input: &str) -> Vec<Operation> {

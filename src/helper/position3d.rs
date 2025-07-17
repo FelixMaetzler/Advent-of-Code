@@ -113,7 +113,7 @@ impl<T> Mul<T> for Position3d<T>
 where
     T: Mul<Output = T> + Copy,
 {
-    type Output = Position3d<T>;
+    type Output = Self;
 
     fn mul(self, rhs: T) -> Self::Output {
         Self {

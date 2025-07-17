@@ -1,4 +1,4 @@
-use std::{ops::Mul, str::FromStr};
+use core::{ops::Mul, str::FromStr};
 
 use all_aoc::helper::parser::{
     Parser,

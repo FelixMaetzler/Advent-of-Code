@@ -1,6 +1,6 @@
 use all_aoc::helper::{
     intcode::{InputMode, IntInteger, Intcode, Return},
-    permutations::IteratorPermutator,
+    permutations::IteratorPermutator as _,
 };
 
 all_aoc::solution!(7, 2019);
@@ -43,11 +43,11 @@ fn calc_part_2(computer: &Intcode, comb: &[isize]) -> IntInteger {
     let mut continu = 0;
     for i in 0..5 {
         let phase_setting = comb[i];
-        computers[i].set_inputs([phase_setting].into_iter(), InputMode::Extend);
+        computers[i].set_inputs(core::iter::once(phase_setting), InputMode::Extend);
     }
     while continu == 0 {
-        for c in computers.iter_mut() {
-            c.set_inputs([output].into_iter(), InputMode::Extend);
+        for c in &mut computers {
+            c.set_inputs(core::iter::once(output), InputMode::Extend);
             c.halt_at_output(true);
             match c.execute() {
                 Return::Finished => {
@@ -55,7 +55,7 @@ fn calc_part_2(computer: &Intcode, comb: &[isize]) -> IntInteger {
                 }
                 Return::NewOutput => {}
             }
-            output = *c.get_outputs().last().unwrap()
+            output = *c.get_outputs().last().unwrap();
         }
         debug_assert!(continu == 0 || continu == 5);
     }

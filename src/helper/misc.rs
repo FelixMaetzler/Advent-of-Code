@@ -4,7 +4,7 @@ use std::{
     ops::{AddAssign, Div, Mul, Rem, SubAssign},
 };
 
-pub fn number_to_digit_count(x: u64) -> u8 {
+pub const fn number_to_digit_count(x: u64) -> u8 {
     match x.checked_ilog10() {
         Some(x) => (x + 1) as u8,
         None => 1,
@@ -20,7 +20,7 @@ where
     T: ToString,
 {
     fn join(self, separator: &str) -> String {
-        let mut iter = self.peekable();
+        let mut iter = self;
         let mut result = String::new();
 
         if let Some(first) = iter.next() {
@@ -51,12 +51,13 @@ where
 pub trait Zero {
     fn zero() -> Self;
 }
-
 // Implement Zero for different types using a macro
 macro_rules! impl_zero_for_types {
     ($($t:ty),*) => {
         $(
             impl Zero for $t {
+                #[allow(clippy::allow_attributes, reason = "doesnt lint for every type")]
+                #[allow(clippy::cast_lossless, reason = "doesnt lint for every type")]
                 fn zero() -> Self {
                     // Return zero for each type
                     0 as $t
@@ -78,6 +79,8 @@ macro_rules! impl_one_for_types {
     ($($t:ty),*) => {
         $(
             impl One for $t {
+                #[allow(clippy::allow_attributes, reason = "doesnt lint for every type")]
+                #[allow(clippy::cast_lossless, reason = "doesnt lint for every type")]
                 fn one() -> Self {
                     // Return one for each type
                     1 as $t

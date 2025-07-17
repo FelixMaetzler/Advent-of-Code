@@ -15,23 +15,21 @@ where
     fn to_2d_index(&self, grid: &DenseGrid<T>) -> (usize, usize);
 }
 impl<T> OwnIndex<T> for usize {
-    #[inline(always)]
     fn to_flat_index(&self, _: &DenseGrid<T>) -> usize {
         *self
     }
-    #[inline(always)]
+
     fn to_2d_index(&self, grid: &DenseGrid<T>) -> (usize, usize) {
         (self / grid.cols, self % grid.cols)
     }
 }
 impl<T> OwnIndex<T> for (usize, usize) {
-    #[inline(always)]
     fn to_flat_index(&self, grid: &DenseGrid<T>) -> usize {
         debug_assert!(self.0 < grid.height());
         debug_assert!(self.1 < grid.width());
         self.0 * grid.cols + self.1
     }
-    #[inline(always)]
+
     fn to_2d_index(&self, _: &DenseGrid<T>) -> (usize, usize) {
         *self
     }
@@ -269,11 +267,11 @@ impl<T> DenseGrid<T> {
             Direction8::NorthWest => self.get_north_west(index),
         }
     }
-    #[inline(always)]
+
     pub fn height(&self) -> usize {
         self.rows
     }
-    #[inline(always)]
+
     pub fn width(&self) -> usize {
         self.cols
     }

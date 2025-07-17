@@ -37,7 +37,7 @@ fn execute(input: &str, n: usize) -> Option<u64> {
     )
 }
 fn split_number(n: u64) -> (u64, u64) {
-    let m = 10_u64.pow(number_to_digit_count(n) as u32 / 2);
+    let m = 10_u64.pow(u32::from(number_to_digit_count(n)) / 2);
     let n2 = n % m;
     let n1 = (n - n2) / m;
     (n1, n2)

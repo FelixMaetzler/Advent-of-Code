@@ -1,5 +1,5 @@
-use all_aoc::helper::{misc::lcm3, permutations::IteratorCombinator, position3d::Position3d};
-use std::fmt::Debug;
+use all_aoc::helper::{misc::lcm3, permutations::IteratorCombinator as _, position3d::Position3d};
+use core::fmt::Debug;
 all_aoc::solution!(12, 2019);
 #[derive(Hash, PartialEq, Eq, Clone, Copy)]
 struct Moon {
@@ -15,20 +15,20 @@ impl Moon {
         }
     }
     fn update_pos(&mut self) {
-        self.pos += self.vel
+        self.pos += self.vel;
     }
-    fn potential_energy(&self) -> i32 {
+    const fn potential_energy(&self) -> i32 {
         self.pos.x.abs() + self.pos.y.abs() + self.pos.z.abs()
     }
-    fn kinetic_energy(&self) -> i32 {
+    const fn kinetic_energy(&self) -> i32 {
         self.vel.x.abs() + self.vel.y.abs() + self.vel.z.abs()
     }
-    fn total_energy(&self) -> i32 {
+    const fn total_energy(&self) -> i32 {
         self.potential_energy() * self.kinetic_energy()
     }
 }
 impl Debug for Moon {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(
             f,
             "pos=<x={}, y={}, z={}>, vel=<x={}, y={}, z={}>",
@@ -51,7 +51,7 @@ pub fn part_one_wrapper(input: &str, steps: usize) -> Option<i32> {
     for _ in 0..steps {
         step(&mut vec);
     }
-    Some(vec.iter().map(|m| m.total_energy()).sum())
+    Some(vec.iter().map(Moon::total_energy).sum())
 }
 fn solve_part_2(mut vec: [Moon; 4]) -> u64 {
     let mut steps = 0;
@@ -81,10 +81,6 @@ fn solve_part_2(mut vec: [Moon; 4]) -> u64 {
 }
 
 fn step(vec: &mut [Moon]) {
-    for m in (0..vec.len()).combinations(2) {
-        update(m[0], m[1], vec);
-    }
-    vec.iter_mut().for_each(|m| m.update_pos());
     fn update(m1: usize, m2: usize, vec: &mut [Moon]) {
         vec[m1].vel.x += (vec[m2].pos.x - vec[m1].pos.x).signum();
         vec[m2].vel.x += (vec[m1].pos.x - vec[m2].pos.x).signum();
@@ -95,6 +91,10 @@ fn step(vec: &mut [Moon]) {
         vec[m1].vel.z += (vec[m2].pos.z - vec[m1].pos.z).signum();
         vec[m2].vel.z += (vec[m1].pos.z - vec[m2].pos.z).signum();
     }
+    for m in (0..vec.len()).combinations(2) {
+        update(m[0], m[1], vec);
+    }
+    vec.iter_mut().for_each(Moon::update_pos);
 }
 fn parse(input: &str) -> Vec<Moon> {
     // every line looks like this:

@@ -1,5 +1,5 @@
 use all_aoc::helper::{
-    grid::{Grid, dense_grid::DenseGrid},
+    grid::{Grid, dense::DenseGrid},
     position::Direction4,
 };
 
@@ -85,24 +85,24 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(&all_aoc::cli::read_examples_file(DAY));
-        assert_eq!(result, Some("1985".to_string()));
+        assert_eq!(result, Some("1985".to_owned()));
     }
 
     #[test]
     fn test_part_one_actual() {
         let result = part_one(&all_aoc::cli::read_inputs_file(DAY));
-        assert_eq!(result, Some("98575".to_string()));
+        assert_eq!(result, Some("98575".to_owned()));
     }
 
     #[test]
     fn test_part_two() {
         let result = part_two(&all_aoc::cli::read_examples_file(DAY));
-        assert_eq!(result, Some("5DB3".to_string()));
+        assert_eq!(result, Some("5DB3".to_owned()));
     }
 
     #[test]
     fn test_part_two_actual() {
         let result = part_two(&all_aoc::cli::read_inputs_file(DAY));
-        assert_eq!(result, Some("CD8D4".to_string()));
+        assert_eq!(result, Some("CD8D4".to_owned()));
     }
 }

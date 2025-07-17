@@ -10,12 +10,12 @@ pub fn part_two(input: &str) -> Option<u32> {
 fn parse(input: &str) -> impl Iterator<Item = u32> + use<'_> {
     input.lines().map(|s| s.parse::<u32>().unwrap())
 }
-#[inline(always)]
-fn sum_part_one(i: u32) -> u32 {
+
+const fn sum_part_one(i: u32) -> u32 {
     (i / 3) - 2
 }
-#[inline(always)]
-fn sum_part_two(i: u32) -> u32 {
+
+const fn sum_part_two(i: u32) -> u32 {
     let mut remainder = i;
     let mut sum = 0;
     while remainder != 0 {

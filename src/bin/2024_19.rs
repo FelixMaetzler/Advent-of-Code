@@ -33,12 +33,12 @@ fn check(design: &str, towels: &[String], cache: &mut HashMap<String, bool>) -> 
     for t in towels {
         if let Some(x) = design.strip_prefix(t) {
             if check(x, towels, cache) {
-                cache.insert(design.to_string(), true);
+                cache.insert(design.to_owned(), true);
                 return true;
             }
         }
     }
-    cache.insert(design.to_string(), false);
+    cache.insert(design.to_owned(), false);
     false
 }
 fn arrangements(design: &str, towels: &[String], cache: &mut HashMap<String, u64>) -> u64 {
@@ -51,10 +51,10 @@ fn arrangements(design: &str, towels: &[String], cache: &mut HashMap<String, u64
 
     let sum = towels
         .iter()
-        .flat_map(|t| design.strip_prefix(t))
+        .filter_map(|t| design.strip_prefix(t))
         .map(|rest| arrangements(rest, towels, cache))
         .sum();
-    cache.insert(design.to_string(), sum);
+    cache.insert(design.to_owned(), sum);
     sum
 }
 

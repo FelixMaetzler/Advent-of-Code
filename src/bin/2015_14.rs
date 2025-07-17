@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use core::str::FromStr;
 
 all_aoc::solution!(14, 2015);
 struct Reindeer {
@@ -14,7 +14,7 @@ impl FromStr for Reindeer {
         let speed = vec[3].parse().unwrap();
         let fly_time = vec[6].parse().unwrap();
         let rest_time = vec[13].parse().unwrap();
-        Ok(Reindeer {
+        Ok(Self {
             speed,
             fly_time,
             rest_time,

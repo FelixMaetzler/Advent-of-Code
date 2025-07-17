@@ -4,7 +4,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 
-use super::{Grid, grid_index::GridIndex};
+use super::{Grid, index::GridIndex};
 #[derive(Clone, PartialEq, Eq)]
 pub struct SparseGrid<T> {
     data: HashMap<usize, T>,
@@ -52,7 +52,7 @@ where
     }
 
     fn all_indices(&self) -> impl Iterator<Item = impl GridIndex<T>> {
-        self.data.keys().cloned()
+        self.data.keys().copied()
     }
 }
 impl<T> SparseGrid<T>

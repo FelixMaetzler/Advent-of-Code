@@ -3,6 +3,10 @@ all_aoc::solution!(20, 2015);
 pub fn part_one(input: &str) -> Option<u32> {
     let goal = parse(input);
     Some(
+        #[expect(
+            clippy::maybe_infinite_iter,
+            reason = "the problem description says it ends"
+        )]
         (1..)
             .map(|i| (i, present_part_1(i)))
             .find(|(_, present)| present >= &goal)
@@ -10,10 +14,13 @@ pub fn part_one(input: &str) -> Option<u32> {
             .0,
     )
 }
-
 pub fn part_two(input: &str) -> Option<u32> {
     let goal = parse(input);
     Some(
+        #[expect(
+            clippy::maybe_infinite_iter,
+            reason = "the problem description says it ends"
+        )]
         (1..)
             .map(|i| (i, present_part_2(i)))
             .find(|(_, present)| present >= &goal)
@@ -39,7 +46,7 @@ fn present_part_2(house: u32) -> u32 {
 fn divisors(n: u32) -> Vec<u32> {
     let mut divisors = Vec::new();
 
-    for i in 1..=((n as f64).sqrt() as u32) {
+    for i in 1..=(f64::from(n).sqrt() as u32) {
         if n % i == 0 {
             divisors.push(i);
             if i != n / i {

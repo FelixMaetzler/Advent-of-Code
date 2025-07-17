@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use all_aoc::helper::{
-    grid::{Grid, dense_grid::DenseGrid, grid_index::GridIndex},
+    grid::{Grid, dense::DenseGrid, index::GridIndex},
     position::Direction8,
 };
 
@@ -33,7 +33,7 @@ impl Region {
             .sum()
     }
     fn is_part_of_edges(&self, grid: &DenseGrid<char>, index: usize) -> usize {
-        use Direction8::*;
+        use Direction8::{North, East, West, South, SouthEast, SouthWest, NorthEast, NorthWest};
         let mut count = 0;
         let outside_edges = [(North, East), (North, West), (South, East), (South, West)];
         for (dir1, dir2) in outside_edges {
@@ -95,7 +95,7 @@ fn collect_regions(grid: &DenseGrid<char>) -> Vec<Region> {
             continue;
         }
         let r = collect_region(i, grid);
-        indices.extend(r.members.iter().cloned());
+        indices.extend(r.members.iter().copied());
         regions.push(r);
     }
     regions

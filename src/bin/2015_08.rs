@@ -14,7 +14,7 @@ pub fn part_two(input: &str) -> Option<usize> {
     Some(add - sub)
 }
 fn parse(input: &str) -> Vec<String> {
-    input.lines().map(|l| l.into()).collect()
+    input.lines().map(core::convert::Into::into).collect()
 }
 fn count_chars(input: &str) -> usize {
     let vec: Vec<_> = input.chars().collect();
@@ -25,11 +25,10 @@ fn count_chars(input: &str) -> usize {
             '\\' => {
                 i += 1;
                 match vec[i] {
-                    '\\' => sum += 1,
-                    '"' => sum += 1,
+                    '"' | '\\' => sum += 1,
                     'x' => {
                         i += 2;
-                        sum += 1
+                        sum += 1;
                     }
                     _ => unreachable!(),
                 }
@@ -46,11 +45,10 @@ fn encode(input: &str) -> usize {
     let mut i = 0;
     while i < vec.len() {
         match vec[i] {
-            '\\' => sum += 2,
-            '"' => sum += 2,
+            '"' | '\\' => sum += 2,
             _ => sum += 1,
         }
-        i += 1
+        i += 1;
     }
     sum + 2
 }

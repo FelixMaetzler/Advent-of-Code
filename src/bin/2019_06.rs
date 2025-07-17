@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 
-use all_aoc::helper::graph::{Graph, GraphWithWeights, SpecialGraph};
+use all_aoc::helper::graph::{Graph as _, WithWeights as _, Special};
 
 all_aoc::solution!(6, 2019);
 
 pub fn part_one(input: &str) -> Option<usize> {
     let (vec, _) = translate_indexes(input);
-    let mut graph = SpecialGraph::new();
+    let mut graph = Special::new();
     for (x, y) in vec {
         graph.add_edge(y, x, 1);
     }
@@ -14,15 +14,15 @@ pub fn part_one(input: &str) -> Option<usize> {
 }
 pub fn part_two(input: &str) -> Option<u32> {
     let (vec, map) = translate_indexes(input);
-    let mut graph = SpecialGraph::new();
+    let mut graph = Special::new();
     for (x, y) in vec {
         graph.add_edge(x, y, 1);
         graph.add_edge(y, x, 1);
     }
-    let start = *map.get("YOU").unwrap();
-    let end = *map.get("SAN").unwrap();
+    let start = map["YOU"];
+    let end = map["SAN"];
     let dist = graph.dijkstra_distances(start, Some(end));
-    Some(*dist.get(&end).unwrap() - 2)
+    Some(dist[&end] - 2)
 }
 fn translate_indexes(input: &str) -> (Vec<(usize, usize)>, HashMap<&str, usize>) {
     let vec = parse(input);
@@ -38,11 +38,11 @@ fn translate_indexes(input: &str) -> (Vec<(usize, usize)>, HashMap<&str, usize>)
             c += 1;
             c - 1
         });
-        new_vec.push((*map.get(x).unwrap(), *map.get(y).unwrap()));
+        new_vec.push((map[x], map[y]));
     }
     (new_vec, map)
 }
-fn orbits(graph: &SpecialGraph<u8>, node: usize) -> usize {
+fn orbits(graph: &Special<u8>, node: usize) -> usize {
     graph.outgoing(node).map(|i| 1 + orbits(graph, i)).sum()
 }
 

@@ -13,7 +13,7 @@ impl FromStr for Chemical {
         let (left, right) = s.split_once(' ').unwrap();
         Ok(Self {
             amount: left.parse().unwrap(),
-            name: right.to_string(),
+            name: right.to_owned(),
         })
     }
 }
@@ -45,7 +45,7 @@ pub fn part_one(input: &str) -> Option<usize> {
         .into_iter()
         .map(|r| (r.output.name.clone(), r))
         .collect();
-    Some(solve_part_one(1, "FUEL".to_string(), &receips))
+    Some(solve_part_one(1, "FUEL".to_owned(), &receips))
 }
 pub fn part_two(input: &str) -> Option<usize> {
     let vec = parse(input);
@@ -86,6 +86,10 @@ fn solve_part_one(amount: usize, name: String, receips: &HashMap<String, Reactio
     ore
 }
 fn use_leftovers(ingredient: &Chemical, map: &mut HashMap<String, usize>) -> usize {
+    #[expect(
+        clippy::option_if_let_else,
+        reason = "cant refactor becuase of mut borrow"
+    )]
     if let Some(amount) = map.get_mut(&ingredient.name) {
         if ingredient.amount <= *amount {
             *amount -= ingredient.amount;
@@ -101,14 +105,14 @@ fn use_leftovers(ingredient: &Chemical, map: &mut HashMap<String, usize>) -> usi
 }
 
 fn solve_part_2(receips: &HashMap<String, Reaction>, goal: usize) -> Option<usize> {
-    let cost_one = solve_part_one(1, "FUEL".to_string(), receips);
+    let cost_one = solve_part_one(1, "FUEL".to_owned(), receips);
     let mut fuel_l = goal.div_euclid(cost_one);
     let mut fuel_r = fuel_l * 3;
     let mut modified_l = false;
     let mut modified_r = false;
     while fuel_r - fuel_l != 1 {
-        let fuel = (fuel_l + fuel_r) / 2;
-        let cost = solve_part_one(fuel, "FUEL".to_string(), receips);
+        let fuel = fuel_l.midpoint(fuel_r);
+        let cost = solve_part_one(fuel, "FUEL".to_owned(), receips);
 
         if cost < goal {
             fuel_l = fuel;
@@ -118,11 +122,7 @@ fn solve_part_2(receips: &HashMap<String, Reaction>, goal: usize) -> Option<usiz
             modified_r = true;
         }
     }
-    if modified_l && modified_r {
-        Some(fuel_l)
-    } else {
-        None
-    }
+    (modified_l && modified_r).then_some(fuel_l)
 }
 fn parse(input: &str) -> Vec<Reaction> {
     input
@@ -142,8 +142,8 @@ mod tests {
         assert_eq!(part_one(iter.next().unwrap()), Some(31));
         assert_eq!(part_one(iter.next().unwrap()), Some(165));
         assert_eq!(part_one(iter.next().unwrap()), Some(13312));
-        assert_eq!(part_one(iter.next().unwrap()), Some(180697));
-        assert_eq!(part_one(iter.next().unwrap()), Some(2210736));
+        assert_eq!(part_one(iter.next().unwrap()), Some(180_697));
+        assert_eq!(part_one(iter.next().unwrap()), Some(2_210_736));
     }
 
     #[test]
@@ -156,9 +156,9 @@ mod tests {
     fn test_part_two() {
         let input = &all_aoc::cli::read_examples_file(DAY);
         let mut iter = input.split("\n\n").skip(2);
-        assert_eq!(part_two(iter.next().unwrap()), Some(82892753));
-        assert_eq!(part_two(iter.next().unwrap()), Some(5586022));
-        assert_eq!(part_two(iter.next().unwrap()), Some(460664));
+        assert_eq!(part_two(iter.next().unwrap()), Some(82_892_753));
+        assert_eq!(part_two(iter.next().unwrap()), Some(5_586_022));
+        assert_eq!(part_two(iter.next().unwrap()), Some(460_664));
     }
 
     #[test]

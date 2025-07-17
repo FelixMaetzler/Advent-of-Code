@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 all_aoc::solution!(6, 2016);
+#[derive(Clone, Copy)]
 enum Part {
     One,
     Two,
@@ -39,24 +40,24 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(&all_aoc::cli::read_examples_file(DAY));
-        assert_eq!(result, Some("easter".to_string()));
+        assert_eq!(result, Some("easter".to_owned()));
     }
 
     #[test]
     fn test_part_one_actual() {
         let result = part_one(&all_aoc::cli::read_inputs_file(DAY));
-        assert_eq!(result, Some("xdkzukcf".to_string()));
+        assert_eq!(result, Some("xdkzukcf".to_owned()));
     }
 
     #[test]
     fn test_part_two() {
         let result = part_two(&all_aoc::cli::read_examples_file(DAY));
-        assert_eq!(result, Some("advent".to_string()));
+        assert_eq!(result, Some("advent".to_owned()));
     }
 
     #[test]
     fn test_part_two_actual() {
         let result = part_two(&all_aoc::cli::read_inputs_file(DAY));
-        assert_eq!(result, Some("cevsgyvd".to_string()));
+        assert_eq!(result, Some("cevsgyvd".to_owned()));
     }
 }

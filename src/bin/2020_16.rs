@@ -61,7 +61,7 @@ fn check_number(rules: &Rules, x: u64) -> Option<u64> {
             ret = e;
         } else {
             return None;
-        };
+        }
     }
     Some(ret)
 }
@@ -75,7 +75,7 @@ pub fn part_one(input: &str) -> Option<u64> {
             .sum(),
     )
 }
-fn transpose<T: Clone>(matrix: Vec<Vec<T>>) -> Vec<Vec<T>> {
+fn transpose<T: Clone>(matrix: &[Vec<T>]) -> Vec<Vec<T>> {
     if matrix.is_empty() || matrix[0].is_empty() {
         return vec![];
     }
@@ -91,7 +91,7 @@ pub fn part_two(input: &str) -> Option<u64> {
     let (mut rules, my_ticket, mut tickets) = parse(input);
     tickets.retain(|ticket| check_ticket(&rules, ticket).is_none());
     tickets.push(my_ticket.clone());
-    let trans = transpose(tickets);
+    let trans = transpose(&tickets);
     let mut map = HashMap::new();
     for (i, rule) in rules.iter().enumerate() {
         for (j, row) in trans.iter().enumerate() {
@@ -100,7 +100,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                     .and_modify(|e: &mut HashSet<usize>| {
                         e.insert(j);
                     })
-                    .or_insert(HashSet::from_iter([j].into_iter()));
+                    .or_insert_with(|| std::iter::once(j).collect());
             }
         }
     }
@@ -118,9 +118,9 @@ pub fn part_two(input: &str) -> Option<u64> {
                     changed = true;
                 }
             }
-            vec.into_iter().for_each(|v| {
+            for v in vec {
                 map.remove(&v);
-            });
+            }
         }
         {
             let c = count_occurrences(map.values().flatten());
@@ -143,9 +143,9 @@ pub fn part_two(input: &str) -> Option<u64> {
                 rules[*k].pos = Some(*x);
                 changed = true;
             }
-            rem.into_iter().for_each(|v| {
+            for v in rem {
                 map.remove(&v);
-            });
+            }
         }
     }
     rules.retain(|rule| rule.name.starts_with("departure"));
@@ -154,7 +154,7 @@ pub fn part_two(input: &str) -> Option<u64> {
         .into_iter()
         .map(|rule| my_ticket[rule.pos.unwrap()])
         .product();
-    debug_assert!(erg < 7251649195183);
+    debug_assert!(erg < 7_251_649_195_183);
     Some(erg)
 }
 fn parse(input: &str) -> (Rules, Ticket, Tickets) {
@@ -162,7 +162,7 @@ fn parse(input: &str) -> (Rules, Ticket, Tickets) {
     let rules = it.next().unwrap();
     let my_ticket = it.next().unwrap();
     let tickets = it.next().unwrap();
-    debug_assert!(it.next().is_none());
+    assert!(it.next().is_none());
     let rules = rules.lines().map(|l| Rule::from_str(l).unwrap()).collect();
     let my_ticket = my_ticket
         .split_once('\n')

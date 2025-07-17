@@ -1,12 +1,12 @@
-pub mod dense_grid;
-pub mod grid_index;
-pub mod sparse_grid;
+pub mod dense;
+pub mod index;
+pub mod sparse;
 use std::{
     fmt::Debug,
     ops::{Index, IndexMut},
 };
 
-use grid_index::GridIndex;
+use index::GridIndex;
 
 use crate::helper::position::Direction8;
 
@@ -84,31 +84,26 @@ where
     }
 }
 
-#[inline(always)]
 fn get_north<T>(grid: &impl Grid<T>, index: impl GridIndex<T>) -> Option<((usize, usize), &T)> {
     let (y, x) = index.to_coordinates(grid);
-    if let Some(y) = y.checked_sub(1) {
-        grid.get((y, x)).map(|r| ((y, x), r))
-    } else {
-        None
-    }
+    let y = y.checked_sub(1)?;
+    grid.get((y, x)).map(|r| ((y, x), r))
 }
-#[inline(always)]
+
 fn get_north_east<T>(
     grid: &impl Grid<T>,
     index: impl GridIndex<T>,
 ) -> Option<((usize, usize), &T)> {
     let (y, x) = index.to_coordinates(grid);
-    y.checked_sub(1).and_then(|new_y| {
-        let new_x = x + 1;
-        if new_x < grid.width() {
-            grid.get((new_y, new_x)).map(|r| ((new_y, new_x), r))
-        } else {
-            None
-        }
-    })
+    let new_y = y.checked_sub(1)?;
+    let new_x = x + 1;
+    if new_x < grid.width() {
+        grid.get((new_y, new_x)).map(|r| ((new_y, new_x), r))
+    } else {
+        None
+    }
 }
-#[inline(always)]
+
 fn get_east<T>(grid: &impl Grid<T>, index: impl GridIndex<T>) -> Option<((usize, usize), &T)> {
     let (y, x) = index.to_coordinates(grid);
     let x = x + 1;
@@ -118,7 +113,7 @@ fn get_east<T>(grid: &impl Grid<T>, index: impl GridIndex<T>) -> Option<((usize,
         None
     }
 }
-#[inline(always)]
+
 fn get_south_east<T>(
     grid: &impl Grid<T>,
     index: impl GridIndex<T>,
@@ -132,7 +127,7 @@ fn get_south_east<T>(
         None
     }
 }
-#[inline(always)]
+
 fn get_south<T>(grid: &impl Grid<T>, index: impl GridIndex<T>) -> Option<((usize, usize), &T)> {
     let (y, x) = index.to_coordinates(grid);
     let y = y + 1;
@@ -142,37 +137,33 @@ fn get_south<T>(grid: &impl Grid<T>, index: impl GridIndex<T>) -> Option<((usize
         None
     }
 }
-#[inline(always)]
+
 fn get_south_west<T>(
     grid: &impl Grid<T>,
     index: impl GridIndex<T>,
 ) -> Option<((usize, usize), &T)> {
     let (y, x) = index.to_coordinates(grid);
-    x.checked_sub(1).and_then(|new_x| {
-        let new_y = y + 1;
-        if new_y < grid.height() {
-            grid.get((new_y, new_x)).map(|r| ((new_y, new_x), r))
-        } else {
-            None
-        }
-    })
-}
-#[inline(always)]
-fn get_west<T>(grid: &impl Grid<T>, index: impl GridIndex<T>) -> Option<((usize, usize), &T)> {
-    let (y, x) = index.to_coordinates(grid);
-    if let Some(x) = x.checked_sub(1) {
-        grid.get((y, x)).map(|r| ((y, x), r))
+    let new_x = x.checked_sub(1)?;
+    let new_y = y + 1;
+    if new_y < grid.height() {
+        grid.get((new_y, new_x)).map(|r| ((new_y, new_x), r))
     } else {
         None
     }
 }
-#[inline(always)]
+
+fn get_west<T>(grid: &impl Grid<T>, index: impl GridIndex<T>) -> Option<((usize, usize), &T)> {
+    let (y, x) = index.to_coordinates(grid);
+    let x = x.checked_sub(1)?;
+    grid.get((y, x)).map(|r| ((y, x), r))
+}
+
 fn get_north_west<T>(
     grid: &impl Grid<T>,
     index: impl GridIndex<T>,
 ) -> Option<((usize, usize), &T)> {
     let (y, x) = index.to_coordinates(grid);
-    x.checked_sub(1)
-        .and_then(|new_x| y.checked_sub(1).map(|new_y| (new_y, new_x)))
-        .and_then(|(new_y, new_x)| grid.get((new_y, new_x)).map(|r| ((new_y, new_x), r)))
+    let (new_y, new_x) = x.checked_sub(1)
+        .and_then(|new_x| y.checked_sub(1).map(|new_y| (new_y, new_x)))?;
+    grid.get((new_y, new_x)).map(|r| ((new_y, new_x), r))
 }

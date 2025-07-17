@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use all_aoc::helper::{
-    grid::{Grid, dense_grid::DenseGrid, grid_index::GridIndex},
+    grid::{Grid, dense::DenseGrid, index::GridIndex},
     position::Direction4,
 };
 
@@ -35,18 +35,19 @@ pub fn part_one(input: &str) -> Option<usize> {
 pub fn part_two(input: &str) -> Option<usize> {
     let mut grid = parse(input);
     let (pos, dir) = extract_guard_pos(&mut grid);
-    let possible_poses = get_all_locations_visited(&grid, pos, dir)
-        .into_iter()
-        .filter(|p| *p != pos && *grid.get(*p).unwrap() == Tile::Air)
-        .collect::<Vec<_>>();
+
     Some(
-        possible_poses
+        get_all_locations_visited(&grid, pos, dir)
             .into_iter()
             .filter(|p| {
-                grid[*p] = Tile::Obstruction;
-                let ret = check_if_loop(&grid, pos, dir);
-                grid[*p] = Tile::Air;
-                ret
+                if *p != pos && *grid.get(*p).unwrap() == Tile::Air {
+                    grid[*p] = Tile::Obstruction;
+                    let ret = check_if_loop(&grid, pos, dir);
+                    grid[*p] = Tile::Air;
+                    ret
+                } else {
+                    false
+                }
             })
             .count(),
     )
@@ -57,9 +58,8 @@ fn extract_guard_pos(grid: &mut DenseGrid<Tile>) -> (usize, Direction4) {
         .enumerate()
         .find(|(_, t)| matches!(t, Tile::Guard(_)))
         .expect("There has to be a guard");
-    let dir = match *tile {
-        Tile::Guard(direction4) => direction4,
-        _ => unreachable!(),
+    let Tile::Guard(dir) = *tile else {
+        unreachable!()
     };
     grid[pos] = Tile::Air;
     (pos, dir)
@@ -98,7 +98,7 @@ fn check_if_loop(grid: &DenseGrid<Tile>, pos: usize, dir: Direction4) -> bool {
         };
         if !set.insert((next_pos, next_dir)) {
             return true;
-        };
+        }
         pos = next_pos;
         dir = next_dir;
     }

@@ -1,4 +1,4 @@
-use super::{Grid, grid_index::GridIndex};
+use super::{Grid, index::GridIndex};
 use std::fmt::Write;
 use std::{
     fmt::Debug,

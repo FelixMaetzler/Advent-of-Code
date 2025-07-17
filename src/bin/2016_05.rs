@@ -6,7 +6,7 @@ struct Md5iterator {
     index: u32,
 }
 impl Md5iterator {
-    fn new(door_id: String) -> Self {
+    const fn new(door_id: String) -> Self {
         Self { door_id, index: 0 }
     }
 }
@@ -27,7 +27,7 @@ impl Iterator for Md5iterator {
     }
 }
 pub fn part_one(input: &str) -> Option<String> {
-    let md5 = Md5iterator::new(input.to_string());
+    let md5 = Md5iterator::new(input.to_owned());
     Some(
         md5.into_iter()
             .take(8)
@@ -36,7 +36,7 @@ pub fn part_one(input: &str) -> Option<String> {
     )
 }
 pub fn part_two(input: &str) -> Option<String> {
-    let md5 = Md5iterator::new(input.to_string());
+    let md5 = Md5iterator::new(input.to_owned());
     let mut array = [None; 8];
     for hash in md5 {
         let index = hash
@@ -52,7 +52,7 @@ pub fn part_two(input: &str) -> Option<String> {
         if array[index].is_none() {
             array[index] = Some(val);
         }
-        if array.iter().all(|t| t.is_some()) {
+        if array.iter().all(core::option::Option::is_some) {
             return Some(array.into_iter().map(|v| v.unwrap()).collect());
         }
     }
@@ -66,24 +66,24 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(&all_aoc::cli::read_examples_file(DAY));
-        assert_eq!(result, Some("18f47a30".to_string()));
+        assert_eq!(result, Some("18f47a30".to_owned()));
     }
 
     #[test]
     fn test_part_one_actual() {
         let result = part_one(&all_aoc::cli::read_inputs_file(DAY));
-        assert_eq!(result, Some("f77a0e6e".to_string()));
+        assert_eq!(result, Some("f77a0e6e".to_owned()));
     }
 
     #[test]
     fn test_part_two() {
         let result = part_two(&all_aoc::cli::read_examples_file(DAY));
-        assert_eq!(result, Some("05ace8e3".to_string()));
+        assert_eq!(result, Some("05ace8e3".to_owned()));
     }
 
     #[test]
     fn test_part_two_actual() {
         let result = part_two(&all_aoc::cli::read_inputs_file(DAY));
-        assert_eq!(result, Some("999828ec".to_string()));
+        assert_eq!(result, Some("999828ec".to_owned()));
     }
 }

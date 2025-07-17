@@ -1,4 +1,4 @@
-use all_aoc::helper::permutations::IteratorPermutator;
+use all_aoc::helper::permutations::IteratorPermutator as _;
 
 all_aoc::solution!(3, 2016);
 fn is_valid(a: u32, b: u32, c: u32) -> bool {

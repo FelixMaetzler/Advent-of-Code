@@ -1,6 +1,7 @@
-use std::str::FromStr;
+use core::str::FromStr;
 
 all_aoc::solution!(8, 2016);
+#[derive(Clone, Copy)]
 enum Instruction {
     Rect(usize, usize),
     RotRow(usize, usize),
@@ -79,7 +80,7 @@ fn char_from_string(s: &str) -> Result<char, &str> {
         " ##  \n#  # \n#  # \n#  # \n#  # \n ##  " => Ok('O'),
         " ##  \n#  # \n#    \n# ## \n#  # \n ### " => Ok('G'),
         "###  \n#  # \n#  # \n###  \n#    \n#    " => Ok('P'),
-        x => todo!("needs to be added: {x}"),
+        x => unimplemented!("needs to be added: {x}"),
         //x => Err(x),
     }
 }
@@ -106,14 +107,10 @@ impl FromStr for Instruction {
                 if v.len() != 5 {
                     return Err(());
                 }
-                let b = if let Ok(b) = v[4].parse() {
-                    b
-                } else {
+                let Ok(b) = v[4].parse() else {
                     return Err(());
                 };
-                let a = if let Ok(a) = v[2].split('=').nth(1).unwrap_or_default().parse() {
-                    a
-                } else {
+                let Ok(a) = v[2].split('=').nth(1).unwrap_or_default().parse() else {
                     return Err(());
                 };
                 match v[1] {
@@ -160,6 +157,6 @@ mod tests {
     #[test]
     fn test_part_two_actual() {
         let result = part_two(&all_aoc::cli::read_inputs_file(DAY));
-        assert_eq!(result, Some("ZFHFSFOGPO".to_string()));
+        assert_eq!(result, Some("ZFHFSFOGPO".to_owned()));
     }
 }

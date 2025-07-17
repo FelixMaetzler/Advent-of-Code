@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use all_aoc::helper::permutations::{Combinator, IteratorCombinator};
+use all_aoc::helper::permutations::{Combinator, IteratorCombinator as _};
 
 all_aoc::solution!(24, 2015);
 
@@ -16,7 +16,7 @@ fn execute(input: &str, count: usize) -> Option<u64> {
     while let Some(x) = combs
         .iter()
         .enumerate()
-        .min_by_key(|(_, d)| (d.len(), d.iter().map(|a| *a as u128).sum::<u128>()))
+        .min_by_key(|(_, d)| (d.len(), d.iter().map(|a| u128::from(*a)).sum::<u128>()))
     {
         let first = combs.swap_remove(x.0);
         let clone = combs

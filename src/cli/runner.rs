@@ -27,8 +27,7 @@ where
         let result = self
             .result
             .as_ref()
-            .map(|r| r.to_string())
-            .unwrap_or_else(|| "None".to_string());
+            .map_or_else(|| "None".to_owned(), std::string::ToString::to_string);
         let durations = self
             .durations
             .iter()
@@ -49,26 +48,26 @@ where
             ));
         }
 
-        let day = Day::from_str(parts[0]).map_err(|_| "Invalid day value".to_string())?;
+        let day = Day::from_str(parts[0]).map_err(|_| "Invalid day value".to_owned())?;
         let part = parts[1]
             .parse::<u8>()
-            .map_err(|_| "Invalid part value".to_string())?;
+            .map_err(|_| "Invalid part value".to_owned())?;
         let result = if parts[2] == "None" {
             None
         } else {
             Some(
                 parts[2]
                     .parse::<T>()
-                    .map_err(|_| "Invalid result value".to_string())?,
+                    .map_err(|_| "Invalid result value".to_owned())?,
             )
         };
         let durations = parts[3]
             .split(';')
             .map(|d| d.parse::<u64>().map(Duration::from_nanos))
             .collect::<Result<Vec<_>, _>>()
-            .map_err(|_| "Invalid duration value".to_string())?;
+            .map_err(|_| "Invalid duration value".to_owned())?;
 
-        Ok(PartDayResult {
+        Ok(Self {
             day,
             part,
             result,
@@ -82,8 +81,8 @@ where
 {
     pub fn pretty_print(&self) -> String {
         let avg = self.average_duration();
-        if let Some(x) = &self.result {
-            match self.durations.len() {
+        #[expect(clippy::non_ascii_literal, reason="looks nice")]
+        self.result.as_ref().map_or_else(|| format!("Part {ANSI_BOLD}{}{ANSI_RESET}: ✖", self.part), |x| match self.durations.len() {
                 0 => unreachable!(),
                 1 => format!(
                     "Part {}: {ANSI_BOLD}{}{ANSI_RESET} ({:.02?})",
@@ -106,10 +105,7 @@ where
                     self.durations.iter().min().unwrap(),
                     self.durations.iter().max().unwrap(),
                 ),
-            }
-        } else {
-            format!("Part {ANSI_BOLD}{}{ANSI_RESET}: ✖", self.part)
-        }
+            })
     }
 }
 impl<T> PartDayResult<T> {
@@ -206,9 +202,9 @@ fn submit_result<T: Display>(result: T, day: Day, part: u8) {
         return;
     }
 
-    submit(day, part, result.to_string())
+    submit(day, part, &result.to_string());
 }
-fn submit(day: Day, part: u8, answer: String) {
+fn submit(day: Day, part: u8, answer: &str) {
     if !check() {
         eprintln!(
             "command \"aoc\" not found or not callable. Try running \"cargo install aoc-cli\" to install it."
@@ -217,9 +213,9 @@ fn submit(day: Day, part: u8, answer: String) {
     }
     //println!("Submitting result via aoc-cli...");
     let mut args = day.as_args();
-    args.push("submit".to_string());
+    args.push("submit".to_owned());
     args.push(part.to_string());
-    args.push(answer.to_string());
+    args.push(answer.to_owned());
 
     Command::new("aoc")
         .args(args)

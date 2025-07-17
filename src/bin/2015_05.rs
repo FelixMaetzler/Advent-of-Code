@@ -7,7 +7,7 @@ pub fn part_one(input: &str) -> Option<usize> {
 pub fn part_two(input: &str) -> Option<usize> {
     Some(input.lines().filter(|l| part_2_nice_string(l)).count())
 }
-fn is_vowel(c: char) -> bool {
+const fn is_vowel(c: char) -> bool {
     matches!(c, 'a' | 'e' | 'i' | 'o' | 'u')
 }
 fn three_vowels(input: &str) -> bool {

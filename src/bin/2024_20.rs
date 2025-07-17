@@ -1,8 +1,8 @@
 use std::{collections::HashMap, fmt::Debug};
 
 use all_aoc::helper::{
-    graph::{GraphWithWeights, build_graph4_special},
-    grid::{Grid, dense_grid::DenseGrid, grid_index::GridIndex},
+    graph::{WithWeights, build_graph4_special},
+    grid::{Grid, dense::DenseGrid, index::GridIndex},
     permutations::IteratorCombinator,
 };
 
@@ -19,10 +19,10 @@ impl TryFrom<char> for Tile {
 
     fn try_from(value: char) -> Result<Self, Self::Error> {
         match value {
-            '.' => Ok(Tile::Track),
-            '#' => Ok(Tile::Wall),
-            'S' => Ok(Tile::Start),
-            'E' => Ok(Tile::End),
+            '.' => Ok(Self::Track),
+            '#' => Ok(Self::Wall),
+            'S' => Ok(Self::Start),
+            'E' => Ok(Self::End),
             x => Err(x),
         }
     }
@@ -38,21 +38,17 @@ fn execute(input: &str, saving: u32, cheats_activated: u32) -> Option<u32> {
     let grid = parse(input);
     let (start, end) = start_end(&grid);
     let graph = build_graph4_special(&grid, |curr, n| {
-        if *curr != Tile::Wall && *n != Tile::Wall {
-            Some(1)
-        } else {
-            None
-        }
+        (*curr != Tile::Wall && *n != Tile::Wall).then_some(1)
     });
     let (dist_map, path) = graph.dijkstra_shortest_path(start, end);
-    let length_without_cheats = *dist_map.get(&end).unwrap();
+    let length_without_cheats = dist_map[&end];
     let mut ret = HashMap::new();
     for v in path.into_iter().combinations(2) {
         let from = v[0];
         let to = v[1];
         if let Some(x) = is_cheatable(from, to, &grid, cheats_activated) {
-            let length_to_from = *dist_map.get(&from).unwrap();
-            let length_from_to_to_end = length_without_cheats - dist_map.get(&to).unwrap();
+            let length_to_from = dist_map[&from];
+            let length_from_to_to_end = length_without_cheats - dist_map[&to];
             let new_len = length_from_to_to_end + x + length_to_from;
             let save = length_without_cheats.saturating_sub(new_len);
             if save > 0 {
@@ -79,11 +75,7 @@ where
     let a = a.to_coordinates(grid);
     let b = b.to_coordinates(grid);
     let dist = (a.0.abs_diff(b.0) + a.1.abs_diff(b.1)) as u32;
-    if (2..=max_dist).contains(&dist) {
-        Some(dist)
-    } else {
-        None
-    }
+    (2..=max_dist).contains(&dist).then_some(dist)
 }
 fn start_end(grid: &DenseGrid<Tile>) -> (usize, usize) {
     let start = grid

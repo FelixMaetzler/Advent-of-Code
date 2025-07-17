@@ -1,6 +1,6 @@
-use std::{fmt::Display, iter, str::FromStr};
+use core::{fmt::Display, iter, str::FromStr};
 
-use all_aoc::helper::{modulo::ModuloSignedExt, position::Position};
+use all_aoc::helper::{modulo::SignedExt as _, position::Position};
 
 all_aoc::solution!(14, 2024);
 #[derive(Debug)]
@@ -63,14 +63,14 @@ impl FromStr for Robot {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (p, v) = s.split_once(" ").unwrap();
+        let (p, v) = s.split_once(' ').unwrap();
         let p = p[2..].parse().unwrap();
         let v = v[2..].parse().unwrap();
         Ok(Self { p, v })
     }
 }
 impl Display for Grid {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let s = (0..self.size.y)
             .map(|y| {
                 (0..self.size.x)

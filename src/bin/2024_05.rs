@@ -7,7 +7,7 @@ pub fn part_one(input: &str) -> Option<u32> {
     Some(
         updates
             .into_iter()
-            .flat_map(|update| is_right_order(&page_ordering, &update))
+            .filter_map(|update| is_right_order(&page_ordering, &update))
             .sum(),
     )
 }
@@ -57,13 +57,13 @@ fn parse(input: &str) -> (HashSet<(u32, u32)>, Vec<Vec<u32>>) {
     let (page_ordering, updates) = input.split_once("\n\n").unwrap();
     let page_ordering = page_ordering
         .lines()
-        .map(|l| l.split_once("|").unwrap())
+        .map(|l| l.split_once('|').unwrap())
         .map(|(s1, s2)| (s1.parse().unwrap(), s2.parse().unwrap()))
         .collect();
 
     let updates = updates
         .lines()
-        .map(|l| l.split(",").map(|i| i.parse().unwrap()).collect())
+        .map(|l| l.split(',').map(|i| i.parse().unwrap()).collect())
         .collect();
     (page_ordering, updates)
 }

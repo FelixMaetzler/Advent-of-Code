@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use core::str::FromStr;
 
 all_aoc::solution!(15, 2015);
 struct Ingridient {
@@ -18,7 +18,7 @@ impl FromStr for Ingridient {
         let flavor = vec[6].trim_end_matches(',').parse().unwrap();
         let texture = vec[8].trim_end_matches(',').parse().unwrap();
         let calories = vec[10].trim_end_matches(',').parse().unwrap();
-        Ok(Ingridient {
+        Ok(Self {
             capacity,
             durability,
             flavor,
@@ -30,21 +30,20 @@ impl FromStr for Ingridient {
 pub fn part_one(input: &str) -> Option<i32> {
     let vec = parse(input);
     let comb = generate_combinations(100, vec.len());
-    let comb = comb
-        .into_iter()
+
+    comb.into_iter()
         .filter(|v| v.iter().sum::<i32>() == 100)
-        .collect::<Vec<_>>();
-    comb.into_iter().map(|comb| calc(&vec, &comb)).max()
+        .map(|comb| calc(&vec, &comb))
+        .max()
 }
 
 pub fn part_two(input: &str) -> Option<i32> {
     let vec = parse(input);
     let comb = generate_combinations(100, vec.len());
-    let comb = comb
-        .into_iter()
+    comb.into_iter()
         .filter(|v| v.iter().sum::<i32>() == 100 && calories(&vec, v) == 500)
-        .collect::<Vec<_>>();
-    comb.into_iter().map(|comb| calc(&vec, &comb)).max()
+        .map(|comb| calc(&vec, &comb))
+        .max()
 }
 fn calc(ingridients: &[Ingridient], comb: &[i32]) -> i32 {
     let mut capacity = 0;

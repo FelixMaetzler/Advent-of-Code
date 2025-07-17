@@ -1,0 +1,2 @@
+absolute-paths-allowed-crates = ["all_aoc"]
+avoid-breaking-exported-api = false

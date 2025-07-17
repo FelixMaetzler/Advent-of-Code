@@ -18,7 +18,7 @@ impl FromStr for Instruction {
                 .chars()
                 .rev()
                 .enumerate()
-                .flat_map(|(i, c)| match c {
+                .filter_map(|(i, c)| match c {
                     'X' => None,
                     '1' => Some((i, true)),
                     '0' => Some((i, false)),
@@ -38,7 +38,7 @@ impl FromStr for Instruction {
             let val = n.parse().unwrap();
             Ok(Self::Write { index, val })
         } else {
-            Err(s.to_string())
+            Err(s.to_owned())
         }
     }
 }
@@ -82,7 +82,7 @@ pub fn part_two(input: &str) -> Option<u64> {
     Some(mem.values().sum())
 }
 fn use_mask(mem: usize, mask: &[(usize, bool)]) -> (usize, Vec<usize>) {
-    let mask: HashMap<usize, bool> = HashMap::from_iter(mask.iter().copied());
+    let mask: HashMap<usize, bool> = mask.iter().copied().collect();
     let mut v = vec![];
     let mut mem = mem;
     for i in 0..36 {

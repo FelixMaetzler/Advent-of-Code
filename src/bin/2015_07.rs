@@ -10,11 +10,8 @@ impl FromStr for Type {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if let Ok(x) = s.parse() {
-            Ok(Self::Number(x))
-        } else {
-            Ok(Self::Wire(s.to_string()))
-        }
+        s.parse()
+            .map_or_else(|_| Ok(Self::Wire(s.to_owned())), |x| Ok(Self::Number(x)))
     }
 }
 #[derive(Clone)]
@@ -67,64 +64,64 @@ impl FromStr for Instruction {
 pub fn part_one(input: &str) -> Option<u16> {
     let instructions = parse(input);
     let mut erg = HashMap::new();
-    solve(&instructions, &mut erg, "a".to_string());
+    solve(&instructions, &mut erg, "a");
     erg.get("a").copied()
 }
 pub fn part_two(input: &str) -> Option<u16> {
     let instructions = parse(input);
     let mut erg = HashMap::new();
-    solve(&instructions, &mut erg, "a".to_string());
+    solve(&instructions, &mut erg, "a");
     let a = erg.get("a").copied().unwrap();
     erg.clear();
-    erg.insert("b".to_string(), a);
-    solve(&instructions, &mut erg, "a".to_string());
+    erg.insert("b".to_owned(), a);
+    solve(&instructions, &mut erg, "a");
     erg.get("a").copied()
 }
 fn solve(
     instructions: &HashMap<String, Instruction>,
     erg: &mut HashMap<String, u16>,
-    wire: String,
+    wire: &str,
 ) -> u16 {
-    if let Some(x) = erg.get(&wire) {
+    if let Some(x) = erg.get(wire) {
         return *x;
     }
-    match instructions.get(&wire).unwrap() {
+    match instructions.get(wire).unwrap() {
         Instruction::Assignment(input, output) => {
             let input = resolve(instructions, erg, input.clone());
-            erg.insert(output.to_string(), input);
+            erg.insert(output.clone(), input);
             input
         }
         Instruction::And(input_1, input_2, output) => {
             let input_1 = resolve(instructions, erg, input_1.clone());
             let input_2 = resolve(instructions, erg, input_2.clone());
             let r = input_1 & input_2;
-            erg.insert(output.to_string(), r);
+            erg.insert(output.clone(), r);
             r
         }
         Instruction::Lshift(input_1, input_2, output) => {
             let input_1 = resolve(instructions, erg, input_1.clone());
             let input_2 = resolve(instructions, erg, input_2.clone());
             let r = input_1 << input_2;
-            erg.insert(output.to_string(), r);
+            erg.insert(output.clone(), r);
             r
         }
         Instruction::RShift(input_1, input_2, output) => {
             let input_1 = resolve(instructions, erg, input_1.clone());
             let input_2 = resolve(instructions, erg, input_2.clone());
             let r = input_1 >> input_2;
-            erg.insert(output.to_string(), r);
+            erg.insert(output.clone(), r);
             r
         }
         Instruction::Or(input_1, input_2, output) => {
             let input_1 = resolve(instructions, erg, input_1.clone());
             let input_2 = resolve(instructions, erg, input_2.clone());
             let r = input_1 | input_2;
-            erg.insert(output.to_string(), r);
+            erg.insert(output.clone(), r);
             r
         }
         Instruction::Not(input, output) => {
             let input = !resolve(instructions, erg, input.clone());
-            erg.insert(output.to_string(), input);
+            erg.insert(output.clone(), input);
             input
         }
     }
@@ -136,7 +133,7 @@ fn resolve(
 ) -> u16 {
     match typ {
         Type::Number(x) => x,
-        Type::Wire(s) => solve(instructions, erg, s),
+        Type::Wire(s) => solve(instructions, erg, &s),
     }
 }
 
@@ -144,12 +141,12 @@ fn parse(input: &str) -> HashMap<String, Instruction> {
     input
         .lines()
         .map(|l| match Instruction::from_str(l).unwrap() {
-            ref x @ Instruction::Assignment(_, ref r) => (r.clone(), x.clone()),
-            ref x @ Instruction::And(_, _, ref r) => (r.clone(), x.clone()),
-            ref x @ Instruction::Lshift(_, _, ref r) => (r.clone(), x.clone()),
-            ref x @ Instruction::RShift(_, _, ref r) => (r.clone(), x.clone()),
-            ref x @ Instruction::Or(_, _, ref r) => (r.clone(), x.clone()),
-            ref x @ Instruction::Not(_, ref r) => (r.clone(), x.clone()),
+            ref x @ (Instruction::Not(_, ref r)
+            | Instruction::Or(_, _, ref r)
+            | Instruction::Lshift(_, _, ref r)
+            | Instruction::RShift(_, _, ref r)
+            | Instruction::And(_, _, ref r)
+            | Instruction::Assignment(_, ref r)) => (r.clone(), x.clone()),
         })
         .collect()
 }

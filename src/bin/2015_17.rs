@@ -1,4 +1,4 @@
-use all_aoc::helper::permutations::IteratorCombinator;
+use all_aoc::helper::permutations::IteratorCombinator as _;
 
 all_aoc::solution!(17, 2015);
 
@@ -24,7 +24,7 @@ fn solve_part_2(input: &str, sum: u32) -> Option<usize> {
         .powerset()
         .filter(|c| c.iter().sum::<u32>() == sum)
         .collect::<Vec<_>>();
-    let min = comb.iter().map(|v| v.len()).min().unwrap_or(0);
+    let min = comb.iter().map(std::vec::Vec::len).min().unwrap_or(0);
     Some(comb.into_iter().filter(|v| v.len() == min).count())
 }
 fn parse(input: &str) -> Vec<u32> {

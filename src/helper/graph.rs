@@ -1,9 +1,10 @@
+use std::fmt::Write;
 use std::{
     collections::{BinaryHeap, HashMap, HashSet},
     ops::Add,
 };
 
-use super::grid::{Grid, grid_index::GridIndex};
+use super::grid::{Grid, index::GridIndex};
 
 /// `curr_to_neighbor_comparison` is a function that
 ///  has as arguments the current node and the neighbor node of the grid
@@ -38,19 +39,20 @@ where
 pub fn build_graph4_special<T, W>(
     grid: &impl Grid<T>,
     curr_to_neighbor_comparison: impl Fn(&T, &T) -> Option<W> + Copy,
-) -> SpecialGraph<W>
+) -> Special<W>
 where
     T: Clone,
     W: Copy,
 {
-    SpecialGraph::from_edges(grid.all_indices().flat_map(|from| {
-        grid.get_neigbors4(from).flat_map(move |(to_ind, to_val)| {
-            curr_to_neighbor_comparison(
-                grid.get(from).expect("all_indices already checked that"),
-                to_val,
-            )
-            .map(|w| (from.to_flat_index(grid), to_ind.to_flat_index(grid), w))
-        })
+    Special::from_edges(grid.all_indices().flat_map(|from| {
+        grid.get_neigbors4(from)
+            .filter_map(move |(to_ind, to_val)| {
+                curr_to_neighbor_comparison(
+                    grid.get(from).expect("all_indices already checked that"),
+                    to_val,
+                )
+                .map(|w| (from.to_flat_index(grid), to_ind.to_flat_index(grid), w))
+            })
     }))
 }
 
@@ -82,7 +84,7 @@ where
     vec
 }
 type NodeIndex = usize;
-pub trait GraphWithoutWeights
+pub trait WithoutWeights
 where
     Self: Graph + Sized,
 {
@@ -93,7 +95,7 @@ where
         g
     }
 }
-pub trait GraphWithWeights<T>
+pub trait WithWeights<T>
 where
     Self: Graph + Sized,
     T: Copy,
@@ -143,17 +145,14 @@ where
                     position: v,
                 };
 
-                match dist.get(&v) {
-                    Some(&current_cost) => {
-                        if next.cost < current_cost {
-                            dist.insert(v, next.cost);
-                            heap.push(next);
-                        }
-                    }
-                    None => {
+                if let Some(&current_cost) = dist.get(&v) {
+                    if next.cost < current_cost {
                         dist.insert(v, next.cost);
                         heap.push(next);
                     }
+                } else {
+                    dist.insert(v, next.cost);
+                    heap.push(next);
                 }
             }
         }
@@ -199,27 +198,24 @@ where
                     position: v,
                 };
 
-                match dist.get(&v) {
-                    Some(&current_cost) => {
-                        if next.cost < current_cost {
-                            dist.insert(v, next.cost);
-                            heap.push(next);
-
-                            // Update the path to this node
-                            let mut new_path = paths[&u].clone();
-                            new_path.push(v);
-                            paths.insert(v, new_path);
-                        }
-                    }
-                    None => {
+                if let Some(&current_cost) = dist.get(&v) {
+                    if next.cost < current_cost {
                         dist.insert(v, next.cost);
                         heap.push(next);
 
-                        // Create the path to this node
+                        // Update the path to this node
                         let mut new_path = paths[&u].clone();
                         new_path.push(v);
                         paths.insert(v, new_path);
                     }
+                } else {
+                    dist.insert(v, next.cost);
+                    heap.push(next);
+
+                    // Create the path to this node
+                    let mut new_path = paths[&u].clone();
+                    new_path.push(v);
+                    paths.insert(v, new_path);
                 }
             }
         }
@@ -286,13 +282,12 @@ pub trait Graph {
         } else {
             String::from("digraph G {\n")
         };
-
         // Add nodes with labels
         for node in self.nodes() {
             let label = node_label_fn
                 .as_ref()
                 .map_or_else(|| node.to_string(), |f| f(node));
-            dot.push_str(&format!("    {node} [label=\"{label}\"];\n"));
+            writeln!(dot, "    {node} [label=\"{label}\"];").expect("cant fail");
         }
 
         // Add edges with labels
@@ -313,13 +308,15 @@ pub trait Graph {
                     let label = edge_label_fn
                         .as_ref()
                         .map_or_else(String::new, |f| f(edge.0, edge.1));
-                    dot.push_str(&format!(
-                        "    {} {} {} [label=\"{}\"];\n",
+                    writeln!(
+                        dot,
+                        "    {} {} {} [label=\"{}\"];",
                         edge.0,
                         if undirected { "--" } else { "->" },
                         edge.1,
                         label
-                    ));
+                    )
+                    .expect("cant fail");
                 }
             }
         }
@@ -332,11 +329,6 @@ pub trait Graph {
     where
         Self: Sized,
     {
-        let mut all_cliques = Vec::new();
-        let r = HashSet::new(); // Current clique
-        let mut p: HashSet<NodeIndex> = self.nodes().collect(); // Potential candidates
-        let mut x = HashSet::new(); // Already processed nodes
-
         // Recursive function
         fn bron_kerbosch1_recursive<G: Graph>(
             graph: &G,
@@ -347,12 +339,12 @@ pub trait Graph {
         ) {
             if p.is_empty() && x.is_empty() {
                 // Report R as a maximal clique
-                all_cliques.push(r.iter().cloned().collect());
+                all_cliques.push(r.iter().copied().collect());
                 return;
             }
 
             // Iterate over a copy of P to allow mutation of P during iteration
-            for &v in p.clone().iter() {
+            for &v in &p.clone() {
                 // R ⋃ {v}
                 let mut new_r = r.clone();
                 new_r.insert(v);
@@ -379,6 +371,10 @@ pub trait Graph {
                 x.insert(v);
             }
         }
+        let mut all_cliques = Vec::new();
+        let r = HashSet::new(); // Current clique
+        let mut p: HashSet<NodeIndex> = self.nodes().collect(); // Potential candidates
+        let mut x = HashSet::new(); // Already processed nodes
 
         bron_kerbosch1_recursive(self, &r, &mut p, &mut x, &mut all_cliques);
         all_cliques
@@ -403,9 +399,7 @@ pub trait Graph {
                 }
             }
         }
-        if graph.edges_count() != 0 {
-            panic!("Graph has a cycle");
-        }
+        assert!((graph.edges_count() == 0), "Graph has a cycle");
         l
     }
 }
@@ -431,7 +425,7 @@ fn dfs(
     path.pop();
 }
 
-impl GraphWithoutWeights for Vec<Vec<NodeIndex>> {
+impl WithoutWeights for Vec<Vec<NodeIndex>> {
     fn add_edge(&mut self, from: NodeIndex, to: NodeIndex) {
         debug_assert!(!self[from].contains(&to));
         self[from].push(to);
@@ -458,35 +452,33 @@ impl Graph for Vec<Vec<NodeIndex>> {
     }
 
     fn edges_count(&self) -> usize {
-        self.iter().map(|v| v.len()).sum()
+        self.iter().map(std::vec::Vec::len).sum()
     }
 
     fn nodes(&self) -> impl Iterator<Item = NodeIndex> {
         let set = self.iter().flat_map(|v| v.iter()).collect::<HashSet<_>>();
         let mut vec = set.into_iter().collect::<Vec<_>>();
         vec.sort();
-        vec.into_iter().cloned()
+        vec.into_iter().copied()
     }
 
     fn remove_edge(&mut self, from: NodeIndex, to: NodeIndex) -> bool {
-        match self.get_mut(from) {
-            Some(v) => match v.iter().enumerate().find(|(_, x)| **x == to) {
+        self.get_mut(from)
+            .is_some_and(|v| match v.iter().enumerate().find(|(_, x)| **x == to) {
                 Some((i, _)) => {
                     v.remove(i);
                     true
                 }
                 None => false,
-            },
-            None => false,
-        }
+            })
     }
 }
 #[derive(Clone)]
-pub struct SpecialGraph<T> {
+pub struct Special<T> {
     adj_matrix: HashMap<NodeIndex, HashSet<NodeIndex>>,
     edges: HashMap<(NodeIndex, NodeIndex), T>,
 }
-impl<T> SpecialGraph<T> {
+impl<T> Special<T> {
     pub fn remove_node(&mut self, index: NodeIndex) -> bool {
         let incoming = self.incoming(index).collect::<Vec<_>>();
         let outgoing = self.outgoing(index).collect::<Vec<_>>();
@@ -508,16 +500,12 @@ impl<T> SpecialGraph<T> {
             debug_assert!(x);
             true
         } else {
-            debug_assert!(if let Some(x) = self.adj_matrix.get(&from) {
-                !x.contains(&to)
-            } else {
-                true
-            });
+            debug_assert!(self.adj_matrix.get(&from).is_none_or(|x| !x.contains(&to)));
             false
         }
     }
 }
-impl<T> Graph for SpecialGraph<T> {
+impl<T> Graph for Special<T> {
     fn new() -> Self {
         Self {
             adj_matrix: HashMap::new(),
@@ -537,7 +525,7 @@ impl<T> Graph for SpecialGraph<T> {
             .iter()
             .filter(move |(_, v)| v.contains(&index))
             .map(|(i, _)| i)
-            .cloned()
+            .copied()
     }
 
     fn nodes_count(&self) -> usize {
@@ -562,7 +550,7 @@ impl<T> Graph for SpecialGraph<T> {
             .collect::<HashSet<_>>();
         let mut vec = set.into_iter().collect::<Vec<_>>();
         vec.sort();
-        vec.into_iter().cloned()
+        vec.into_iter().copied()
     }
 
     fn remove_edge(&mut self, from: NodeIndex, to: NodeIndex) -> bool {
@@ -572,7 +560,7 @@ impl<T> Graph for SpecialGraph<T> {
         self.edges.remove(&(from, to)).is_some()
     }
 }
-impl<T> GraphWithWeights<T> for SpecialGraph<T>
+impl<T> WithWeights<T> for Special<T>
 where
     T: Copy,
 {
@@ -586,7 +574,7 @@ where
             .and_modify(|s| {
                 s.insert(to);
             })
-            .or_insert(HashSet::from_iter([to]));
+            .or_insert_with(|| HashSet::from_iter([to]));
         self.edges.insert((from, to), weight);
     }
 }

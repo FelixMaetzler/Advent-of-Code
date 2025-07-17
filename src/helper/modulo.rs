@@ -6,16 +6,16 @@ use std::ops::{Add, Rem};
 /// eg: `(a + b).modulo(c)`
 ///
 /// returns always a non-negative number
-pub trait ModuloSignedExt {
+pub trait SignedExt {
+    #[must_use]
     fn modulo(&self, n: Self) -> Self;
 }
 
-impl<T> ModuloSignedExt for T
+impl<T> SignedExt for T
 where
     Self: Copy,
     T: Rem<Output = T> + Add<Output = T>,
 {
-    #[inline(always)]
     fn modulo(&self, n: Self) -> Self {
         (*self % n + n) % n
     }

@@ -5,7 +5,7 @@ const S: [u32; 64] = [
     14, 20, 5, 9, 14, 20, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 6, 10, 15,
     21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21,
 ];
-
+#[expect(clippy::unreadable_literal, reason = "doesnt need to be readable")]
 const K: [u32; 64] = [
     0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
     0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be, 0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
@@ -18,7 +18,7 @@ const K: [u32; 64] = [
 ];
 
 // Hilfsfunktionen
-fn left_rotate(x: u32, c: u32) -> u32 {
+const fn left_rotate(x: u32, c: u32) -> u32 {
     (x << c) | (x >> (32 - c))
 }
 
@@ -32,14 +32,14 @@ fn md5_padding(message: &mut Vec<u8>) {
 
     message.extend_from_slice(&message_len_bits.to_le_bytes());
 }
-
+#[expect(clippy::many_single_char_names, reason = "this is the algorithm")]
 fn md5_transform(chunk: &[u8], hash: &mut [u32; 4]) {
     let mut a = hash[0];
     let mut b = hash[1];
     let mut c = hash[2];
     let mut d = hash[3];
 
-    let mut m = [0u32; 16];
+    let mut m = [0_u32; 16];
     for (i, val) in m.iter_mut().enumerate() {
         *val = u32::from_le_bytes([
             chunk[i * 4],
@@ -75,7 +75,8 @@ fn md5_transform(chunk: &[u8], hash: &mut [u32; 4]) {
 }
 
 pub fn md5(message: &str) -> String {
-    let mut hash = [0x67452301u32, 0xefcdab89u32, 0x98badcfeu32, 0x10325476u32];
+    #[expect(clippy::unreadable_literal, reason = "doesnt need to be readable")]
+    let mut hash = [0x67452301_u32, 0xefcdab89_u32, 0x98badcfe_u32, 0x10325476_u32];
     let mut message_bytes = message.as_bytes().to_vec();
 
     // Padding hinzufügen

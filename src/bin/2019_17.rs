@@ -1,7 +1,7 @@
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 use all_aoc::helper::{
-    grid::{Grid, dense_grid::DenseGrid, grid_index::GridIndex},
+    grid::{Grid, dense::DenseGrid, index::GridIndex},
     intcode::{InputMode, IntInteger, Intcode, Return},
     misc::Joinable,
     position::Direction4,
@@ -17,12 +17,12 @@ impl TryFrom<char> for Tile {
 
     fn try_from(value: char) -> Result<Self, Self::Error> {
         match value {
-            '.' => Ok(Tile::Space),
-            '#' => Ok(Tile::Scaffolding),
-            '^' => Ok(Tile::Robot(Direction4::North)),
-            '>' => Ok(Tile::Robot(Direction4::East)),
-            '<' => Ok(Tile::Robot(Direction4::West)),
-            'v' => Ok(Tile::Robot(Direction4::South)),
+            '.' => Ok(Self::Space),
+            '#' => Ok(Self::Scaffolding),
+            '^' => Ok(Self::Robot(Direction4::North)),
+            '>' => Ok(Self::Robot(Direction4::East)),
+            '<' => Ok(Self::Robot(Direction4::West)),
+            'v' => Ok(Self::Robot(Direction4::South)),
             x => Err(x),
         }
     }
@@ -33,7 +33,7 @@ enum Turn {
     Right,
 }
 impl Debug for Turn {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Left => write!(f, "L"),
             Self::Right => write!(f, "R"),
@@ -46,13 +46,13 @@ struct Instruction {
     len: u32,
 }
 impl Debug for Instruction {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{:?},", self.turn)?;
         write!(f, "{}", self.len)
     }
 }
 impl Debug for Tile {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Space => write!(f, "."),
             Self::Scaffolding => write!(f, "#"),
@@ -109,7 +109,7 @@ pub fn part_two(input: &str) -> Option<IntInteger> {
     }
     debug_assert_eq!(options.len(), 1);
     let (ins, s) = options.pop().unwrap();
-    let mut computer = computer.clone();
+    let mut computer = computer;
     computer[0] = 2;
     let mut s = s;
     s.push('\n');
@@ -171,7 +171,8 @@ fn compress(grid: &DenseGrid<Tile>) -> Vec<Instruction> {
         for d in Direction4::all_dirs() {
             if d == prev_dir.opposite() {
                 continue;
-            } else if grid.get_dir8(next, d.into()).map(|(_, d)| d) == Some(&Tile::Scaffolding) {
+            }
+            if grid.get_dir8(next, d.into()).map(|(_, d)| d) == Some(&Tile::Scaffolding) {
                 debug_assert_ne!(d, dir);
                 debug_assert!(!e);
                 e = true;
@@ -252,11 +253,9 @@ fn divide(
             cont = true;
         }
     }
-    if to_match.is_empty() {
-        Some(([a, b, c], combi.chars().join(",")))
-    } else {
-        None
-    }
+    to_match
+        .is_empty()
+        .then(|| ([a, b, c], combi.chars().join(",")))
 }
 fn parse(input: &str) -> Intcode {
     Intcode::new(input.split(',').map(|x| x.parse().unwrap()).collect())

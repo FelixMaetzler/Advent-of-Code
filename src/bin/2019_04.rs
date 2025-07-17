@@ -1,4 +1,4 @@
-use std::iter;
+use core::iter;
 
 all_aoc::solution!(4, 2019);
 

@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use all_aoc::helper::permutations::IteratorPermutator;
+use all_aoc::helper::permutations::IteratorPermutator as _;
 
 all_aoc::solution!(9, 2015);
 
@@ -31,8 +31,8 @@ fn parse(input: &str) -> HashMap<(String, String), u32> {
     let mut map = HashMap::new();
     for line in input.lines() {
         let vec = line.split(' ').collect::<Vec<_>>();
-        let s1 = vec[0].to_string();
-        let s2 = vec[2].to_string();
+        let s1 = vec[0].to_owned();
+        let s2 = vec[2].to_owned();
         let x = vec[4].parse().unwrap();
         map.insert((s1.clone(), s2.clone()), x);
         map.insert((s2, s1), x);

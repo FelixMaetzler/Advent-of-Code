@@ -7,7 +7,7 @@ pub enum Return {
     Finished,
     NewOutput,
 }
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum InputMode {
     Extend,
     Replace,
@@ -71,7 +71,7 @@ impl IndexMut<isize> for Intcode {
     }
 }
 impl Intcode {
-    pub fn new(program: Vec<IntInteger>) -> Self {
+    pub const fn new(program: Vec<IntInteger>) -> Self {
         Self {
             program,
             pointer: 0,
@@ -119,10 +119,10 @@ impl Intcode {
     pub fn get_outputs(&self) -> Vec<IntInteger> {
         self.output.clone()
     }
-    pub fn halt_at_output(&mut self, b: bool) {
-        self.halt_at_output = b
+    pub const fn halt_at_output(&mut self, b: bool) {
+        self.halt_at_output = b;
     }
-    #[inline(always)]
+
     fn get_first_parameter(&self) -> IntInteger {
         match self.mode[0] {
             Mode::Position => self[self[self.pointer + 1]],
@@ -130,7 +130,7 @@ impl Intcode {
             Mode::Relative => self[self[self.pointer + 1] + self.realtive_base],
         }
     }
-    #[inline(always)]
+
     fn get_second_parameter(&self) -> IntInteger {
         match self.mode[1] {
             Mode::Position => self[self[self.pointer + 2]],
@@ -138,7 +138,7 @@ impl Intcode {
             Mode::Relative => self[self[self.pointer + 2] + self.realtive_base],
         }
     }
-    #[inline(always)]
+
     fn set(&mut self, val: IntInteger) {
         let idx = self[self.pointer + 3]
             + match self.mode[2] {
@@ -148,21 +148,21 @@ impl Intcode {
             };
         self[idx] = val;
     }
-    #[inline(always)]
-    fn inc_ptr(&mut self, x: isize) {
+
+    const fn inc_ptr(&mut self, x: isize) {
         self.pointer += x;
     }
-    #[inline(always)]
+
     fn add(&mut self) {
         self.set(self.get_first_parameter() + self.get_second_parameter());
         self.inc_ptr(4);
     }
-    #[inline(always)]
+
     fn multiply(&mut self) {
         self.set(self.get_first_parameter() * self.get_second_parameter());
         self.inc_ptr(4);
     }
-    #[inline(always)]
+
     fn input(&mut self) {
         let pos = self[self.pointer + 1]
             + match self.mode[0] {
@@ -173,12 +173,12 @@ impl Intcode {
         self[pos] = self.input.pop_front().expect("Nothing to input");
         self.inc_ptr(2);
     }
-    #[inline(always)]
+
     fn output(&mut self) {
         self.output.push(self.get_first_parameter());
         self.inc_ptr(2);
     }
-    #[inline(always)]
+
     fn jump_if_true(&mut self) {
         if self.get_first_parameter() != 0 {
             self.pointer = self.get_second_parameter();
@@ -186,7 +186,7 @@ impl Intcode {
             self.inc_ptr(3);
         }
     }
-    #[inline(always)]
+
     fn jump_if_false(&mut self) {
         if self.get_first_parameter() == 0 {
             self.pointer = self.get_second_parameter();
@@ -194,23 +194,15 @@ impl Intcode {
             self.inc_ptr(3);
         }
     }
-    #[inline(always)]
+
     fn less_than(&mut self) {
-        let s = if self.get_first_parameter() < self.get_second_parameter() {
-            1
-        } else {
-            0
-        };
+        let s = IntInteger::from(self.get_first_parameter() < self.get_second_parameter());
         self.set(s);
         self.inc_ptr(4);
     }
-    #[inline(always)]
+
     fn equals(&mut self) {
-        let s = if self.get_first_parameter() == self.get_second_parameter() {
-            1
-        } else {
-            0
-        };
+        let s = IntInteger::from(self.get_first_parameter() == self.get_second_parameter());
         self.set(s);
         self.inc_ptr(4);
     }
@@ -226,17 +218,17 @@ mod tests {
 
     #[test]
     fn test_day_02() {
-        assert!(equal(vec![1, 0, 0, 0, 99], vec![2, 0, 0, 0, 99]));
-        assert!(equal(vec![2, 3, 0, 3, 99], vec![2, 3, 0, 6, 99]));
-        assert!(equal(vec![2, 4, 4, 5, 99, 0], vec![2, 4, 4, 5, 99, 9801]));
+        assert!(equal(vec![1, 0, 0, 0, 99], &[2, 0, 0, 0, 99]));
+        assert!(equal(vec![2, 3, 0, 3, 99], &[2, 3, 0, 6, 99]));
+        assert!(equal(vec![2, 4, 4, 5, 99, 0], &[2, 4, 4, 5, 99, 9801]));
         assert!(equal(
             vec![1, 1, 1, 4, 99, 5, 6, 0, 99],
-            vec![30, 1, 1, 4, 2, 5, 6, 0, 99]
+            &[30, 1, 1, 4, 2, 5, 6, 0, 99]
         ));
     }
     #[test]
     fn test_day_05() {
-        assert!(equal(vec![1101, 100, -1, 4, 0], vec![1101, 100, -1, 4, 99]));
+        assert!(equal(vec![1101, 100, -1, 4, 0], &[1101, 100, -1, 4, 99]));
     }
     #[test]
     fn test_day_09() {
@@ -247,21 +239,21 @@ mod tests {
         m.execute();
         assert_eq!(m.get_outputs(), v);
         // ---
-        let v = vec![1102, 34915192, 34915192, 7, 4, 7, 99, 0];
+        let v = vec![1102, 34_915_192, 34_915_192, 7, 4, 7, 99, 0];
         let mut m = Intcode::new(v);
         m.execute();
         let o = m.get_outputs();
         assert_eq!(o.len(), 1);
         assert_eq!(o.first().unwrap().to_string().chars().count(), 16);
         // ---
-        let v = vec![104, 1_125_899_906_842_624, 99];
+        let v = vec![104, 0x0004_0000_0000_0000, 99];
         let mut m = Intcode::new(v);
         m.execute();
         let o = m.get_outputs();
 
-        assert_eq!(*o.first().unwrap(), 1_125_899_906_842_624);
+        assert_eq!(*o.first().unwrap(), 0x0004_0000_0000_0000);
     }
-    fn equal(input: Vec<IntInteger>, output: Vec<IntInteger>) -> bool {
+    fn equal(input: Vec<IntInteger>, output: &[IntInteger]) -> bool {
         let mut m = Intcode::new(input);
         m.execute();
         m.program == output

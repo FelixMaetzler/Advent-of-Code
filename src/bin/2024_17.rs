@@ -12,7 +12,7 @@ enum Instruction {
     Bdv(u64),
     Cdv(u64),
 }
-#[inline(always)]
+
 fn combo(map: (u64, u64, u64), val: u64) -> u64 {
     match val {
         0..=3 => val,
@@ -22,6 +22,7 @@ fn combo(map: (u64, u64, u64), val: u64) -> u64 {
         x => unreachable!("not a valid combo operand: {x}"),
     }
 }
+#[expect(clippy::many_single_char_names, reason = "this is the algorithm")]
 fn machine(a: u64, vec: &[Instruction]) -> Vec<u64> {
     let mut ptr = 0;
     let mut out = vec![];
@@ -88,7 +89,7 @@ pub fn part_two(input: &str) -> Option<u64> {
         .split(": ")
         .last()
         .unwrap()
-        .split(",")
+        .split(',')
         .map(|s| s.parse().unwrap())
         .collect::<Vec<_>>();
     let ((_, b, c), vec) = parse(input);
@@ -112,7 +113,7 @@ pub fn part_two(input: &str) -> Option<u64> {
         possible_a_s = new_as;
     }
 
-    maybe_erg.sort();
+    maybe_erg.sort_unstable();
     maybe_erg.into_iter().find(|a| machine(*a, &vec) == vgl)
 }
 fn parse(input: &str) -> ((u64, u64, u64), Vec<Instruction>) {
@@ -128,7 +129,7 @@ fn parse(input: &str) -> ((u64, u64, u64), Vec<Instruction>) {
         .split_once(": ")
         .unwrap()
         .1
-        .split(",")
+        .split(',')
         .map(|s| s.parse::<u64>().unwrap())
         .collect::<Vec<_>>();
     let ins = program
@@ -145,14 +146,7 @@ fn parse(input: &str) -> ((u64, u64, u64), Vec<Instruction>) {
             x => unreachable!("not a valid Op Code: {x}"),
         })
         .collect();
-    (
-        (
-            *map.get(&'A').unwrap(),
-            *map.get(&'B').unwrap(),
-            *map.get(&'C').unwrap(),
-        ),
-        ins,
-    )
+    ((map[&'A'], map[&'B'], map[&'C']), ins)
 }
 #[cfg(test)]
 mod tests {
@@ -161,13 +155,13 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(&all_aoc::cli::read_examples_file(DAY));
-        assert_eq!(result, Some("4,6,3,5,6,3,5,2,1,0".to_string()));
+        assert_eq!(result, Some("4,6,3,5,6,3,5,2,1,0".to_owned()));
     }
 
     #[test]
     fn test_part_one_actual() {
         let result = part_one(&all_aoc::cli::read_inputs_file(DAY));
-        assert_eq!(result, Some("5,1,3,4,3,7,2,1,7".to_string()));
+        assert_eq!(result, Some("5,1,3,4,3,7,2,1,7".to_owned()));
     }
 
     #[test]

@@ -7,24 +7,24 @@ pub mod sequence;
 pub type ParseResult<'a, Output> = Result<(&'a str, Output), &'a str>;
 pub trait Parser<'a, Output> {
     fn parse(&self, input: &'a str) -> ParseResult<'a, Output>;
-    fn map<F, NewOutput>(self, map_fn: F) -> BoxedParser<'a, NewOutput>
+    fn map<F, NewOutput>(self, map_fn: F) -> Boxed<'a, NewOutput>
     where
         Self: Sized + 'a,
         Output: 'a,
         NewOutput: 'a,
         F: Fn(Output) -> NewOutput + 'a,
     {
-        BoxedParser::new(map(self, map_fn))
+        Boxed::new(map(self, map_fn))
     }
-    fn pred<F>(self, pred_fn: F) -> BoxedParser<'a, Output>
+    fn pred<F>(self, pred_fn: F) -> Boxed<'a, Output>
     where
         Self: Sized + 'a,
         Output: 'a,
         F: Fn(&Output) -> bool + 'a,
     {
-        BoxedParser::new(pred(self, pred_fn))
+        Boxed::new(pred(self, pred_fn))
     }
-    fn and_then<F, NextParser, NewOutput>(self, f: F) -> BoxedParser<'a, NewOutput>
+    fn and_then<F, NextParser, NewOutput>(self, f: F) -> Boxed<'a, NewOutput>
     where
         Self: Sized + 'a,
         Output: 'a,
@@ -32,7 +32,7 @@ pub trait Parser<'a, Output> {
         NextParser: Parser<'a, NewOutput> + 'a,
         F: Fn(Output) -> NextParser + 'a,
     {
-        BoxedParser::new(and_then(self, f))
+        Boxed::new(and_then(self, f))
     }
 }
 impl<'a, F, Output> Parser<'a, Output> for F
@@ -43,22 +43,22 @@ where
         self(input)
     }
 }
-pub struct BoxedParser<'a, Output> {
+pub struct Boxed<'a, Output> {
     parser: Box<dyn Parser<'a, Output> + 'a>,
 }
 
-impl<'a, Output> BoxedParser<'a, Output> {
+impl<'a, Output> Boxed<'a, Output> {
     pub fn new<P>(parser: P) -> Self
     where
         P: Parser<'a, Output> + 'a,
     {
-        BoxedParser {
+        Boxed {
             parser: Box::new(parser),
         }
     }
 }
 
-impl<'a, Output> Parser<'a, Output> for BoxedParser<'a, Output> {
+impl<'a, Output> Parser<'a, Output> for Boxed<'a, Output> {
     fn parse(&self, input: &'a str) -> ParseResult<'a, Output> {
         self.parser.parse(input)
     }

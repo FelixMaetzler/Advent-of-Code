@@ -64,7 +64,7 @@ fn run(computer: Intcode, start: isize) -> (HashMap<Position<i32>, isize>, HashS
                     x => unreachable!("false Turn: {x}"),
                 }
             }
-        };
+        }
         grid.insert(pos, paint);
         set.insert(pos);
         pos = pos.direction(dir);

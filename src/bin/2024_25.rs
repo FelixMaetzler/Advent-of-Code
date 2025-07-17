@@ -11,7 +11,7 @@ pub fn part_one(input: &str) -> Option<usize> {
     )
 }
 
-pub fn part_two(_: &str) -> Option<u32> {
+pub const fn part_two(_: &str) -> Option<u32> {
     None
 }
 

@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use all_aoc::helper::{
-    grid::{Grid, dense_grid::DenseGrid, grid_index::GridIndex},
+    grid::{Grid, dense::DenseGrid, index::GridIndex},
     misc::gcd,
     position::Position,
 };
@@ -17,8 +17,8 @@ impl TryFrom<char> for Tile {
 
     fn try_from(value: char) -> Result<Self, Self::Error> {
         match value {
-            '.' => Ok(Tile::Empty),
-            '#' => Ok(Tile::Asteroid),
+            '.' => Ok(Self::Empty),
+            '#' => Ok(Self::Asteroid),
             x => Err(x),
         }
     }
@@ -31,8 +31,8 @@ struct Asteroid {
 impl Asteroid {
     fn new(pos: Position<i32>, reference: Position<i32>) -> Self {
         let diff = pos - reference;
-        let angle = (-diff.y as f64).atan2(diff.x as f64).to_degrees();
-        let mag = ((diff.x * diff.x + diff.y * diff.y) as f64).sqrt();
+        let angle = f64::from(-diff.y).atan2(f64::from(diff.x)).to_degrees();
+        let mag = f64::from(diff.x * diff.x + diff.y * diff.y).sqrt();
         Self { pos, angle, mag }
     }
 }
@@ -42,7 +42,7 @@ impl PartialEq for Asteroid {
     }
 }
 impl Ord for Asteroid {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
         match transform(self.angle).partial_cmp(&transform(other.angle)) {
             Some(core::cmp::Ordering::Equal) => {}
             ord => return ord.unwrap(),
@@ -51,7 +51,7 @@ impl Ord for Asteroid {
     }
 }
 impl PartialOrd for Asteroid {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
         Some(self.cmp(other))
     }
 }
@@ -72,7 +72,8 @@ pub fn part_two(input: &str) -> Option<i32> {
     let mut asteroids = grid
         .iter()
         .enumerate()
-        .flat_map(|(i, t)| (*t == Tile::Asteroid).then(|| i.to_position(&grid)))
+        .filter(|&(_, t)| (*t == Tile::Asteroid))
+        .map(|(i, _)| i.to_position(&grid))
         .map(|Position { x, y }| Position {
             x: x as i32,
             y: y as i32,
@@ -97,7 +98,8 @@ fn solve_part_one(grid: &DenseGrid<Tile>) -> Option<(usize, Position<i32>)> {
     let all_astroids = grid
         .iter()
         .enumerate()
-        .flat_map(|(i, t)| (*t == Tile::Asteroid).then(|| i.to_position(grid)))
+        .filter(|&(_, t)| (*t == Tile::Asteroid))
+        .map(|(i, _)| i.to_position(grid))
         .map(|Position { x, y }| Position {
             x: x as i32,
             y: y as i32,

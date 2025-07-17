@@ -1,5 +1,5 @@
 use all_aoc::helper::{
-    grid::{Grid, dense_grid::DenseGrid, grid_index::GridIndex},
+    grid::{Grid, dense::DenseGrid, index::GridIndex},
     position::Direction8,
 };
 
@@ -30,7 +30,7 @@ fn check_part1(grid: &DenseGrid<char>, idx: impl GridIndex<char>, dir: Direction
     let mut index = idx.to_flat_index(grid);
     if grid.get(index).is_none_or(|c| *c != 'X') {
         return false;
-    };
+    }
     match grid.get_dir8(index, dir) {
         Some((i, 'M')) => index = i.to_flat_index(grid),
         _ => return false,
@@ -44,13 +44,12 @@ fn check_part1(grid: &DenseGrid<char>, idx: impl GridIndex<char>, dir: Direction
 fn check_part2(grid: &DenseGrid<char>, index: impl GridIndex<char>) -> bool {
     if grid.get(index).is_none_or(|c| *c != 'A') {
         return false;
-    };
+    }
     match (
         grid.get_dir8(index, Direction8::NorthEast),
         grid.get_dir8(index, Direction8::SouthWest),
     ) {
-        (Some((_, 'M')), Some((_, 'S'))) => {}
-        (Some((_, 'S')), Some((_, 'M'))) => {}
+        (Some((_, 'S')), Some((_, 'M'))) | (Some((_, 'M')), Some((_, 'S'))) => {}
         _ => return false,
     }
     matches!(

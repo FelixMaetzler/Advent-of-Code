@@ -47,7 +47,7 @@ impl Add for Stats {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Stats {
+        Self {
             cost: self.cost + rhs.cost,
             damage: self.damage + rhs.damage,
             armor: self.armor + rhs.armor,
@@ -63,7 +63,7 @@ impl AddAssign for Stats {
 }
 impl iter::Sum for Stats {
     fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
-        iter.fold(Stats::default(), |acc, s| acc + s)
+        iter.fold(Self::default(), |acc, s| acc + s)
     }
 }
 #[derive(Debug, Default, Clone, Copy, Hash, Eq, PartialEq)]
@@ -83,7 +83,7 @@ fn setup_all_player_combs() -> HashSet<Entitiy> {
     for rings in all_ring_combs {
         for weapon in &all_weapon_combs {
             for armor in all_armor_combs.iter().flatten() {
-                let stats: Stats = rings.iter().cloned().sum::<Stats>() + *weapon + *armor;
+                let stats: Stats = rings.iter().copied().sum::<Stats>() + *weapon + *armor;
 
                 players.insert(Entitiy {
                     stats,

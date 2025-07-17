@@ -85,22 +85,21 @@ pub fn part_two(input: &str) -> Option<isize> {
         if x == -1 && y == 0 {
             score = Some(t);
             continue;
-        } else {
-            let t = Tile::try_from(t).unwrap();
-            match t {
-                Tile::Paddle => {
-                    paddle.x = x;
-                    paddle.y = y;
-                    input = 0;
-                }
-                Tile::Ball => {
-                    ball.x = x;
-                    ball.y = y;
-                    input = (ball.x - paddle.x).signum()
-                }
-                _ => {
-                    input = 0;
-                }
+        }
+        let t = Tile::try_from(t).unwrap();
+        match t {
+            Tile::Paddle => {
+                paddle.x = x;
+                paddle.y = y;
+                input = 0;
+            }
+            Tile::Ball => {
+                ball.x = x;
+                ball.y = y;
+                input = (ball.x - paddle.x).signum();
+            }
+            Tile::Empty | Tile::Wall | Tile::Block => {
+                input = 0;
             }
         }
     }

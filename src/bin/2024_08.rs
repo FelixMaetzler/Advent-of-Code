@@ -66,7 +66,7 @@ fn parse(input: &str) -> (HashMap<char, Vec<Position<i32>>>, Position<i32>) {
                 let y = y as i32;
                 map.entry(c)
                     .and_modify(|v: &mut Vec<Position<i32>>| v.push(Position { x, y }))
-                    .or_insert(vec![Position { x, y }]);
+                    .or_insert_with(|| vec![Position { x, y }]);
             }
         }
     }

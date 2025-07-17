@@ -18,7 +18,7 @@ struct GameState {
 }
 
 impl GameState {
-    fn new(player_hp: i32, boss_hp: i32, mana: i32, damage: i32) -> Self {
+    const fn new(player_hp: i32, boss_hp: i32, mana: i32, damage: i32) -> Self {
         Self {
             player_hp,
             boss_hp,
@@ -78,9 +78,7 @@ impl GameState {
     }
 
     fn cast(&self, spell: &Spell) -> Self {
-        if self.mana < spell.cost {
-            panic!("bug in move generator");
-        }
+        assert!((self.mana >= spell.cost), "bug in move generator");
 
         if spell.duration > 0 {
             let mut effects = self.effects.clone();
@@ -145,7 +143,7 @@ impl GameState {
     }
 
     fn cheapest_win(&self, mut max: i32) -> Option<Self> {
-        let mut best_so_far: Option<GameState> = None;
+        let mut best_so_far: Option<Self> = None;
 
         let turn = self.start_turn()?;
 
@@ -191,7 +189,6 @@ impl GameState {
                     best_so_far = Some(move_state);
                 }
             } else if move_state.player_hp <= 0 {
-                continue;
             } else if let Some(cheapest) = move_state.cheapest_win(max) {
                 if let Some(best) = &best_so_far {
                     if best.spent > cheapest.spent {

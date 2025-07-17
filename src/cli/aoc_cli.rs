@@ -13,7 +13,7 @@ impl From<AOCCommands> for String {
             AOCCommands::Download => "download",
             AOCCommands::Submit => "submit",
         }
-        .to_string()
+        .to_owned()
     }
 }
 use super::day::Day;
@@ -26,11 +26,12 @@ pub enum AOCError {
     FileNotExist(PathBuf),
 }
 impl Display for AOCError {
+    #[expect(clippy::use_debug, reason = "dont bother")]
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{self:?}")
     }
 }
-pub fn call_aoc_cli(args: &[String]) -> Result<Output, AOCError> {
+pub fn call(args: &[String]) -> Result<Output, AOCError> {
     let output = Command::new("aoc")
         .args(args)
         .stdout(Stdio::inherit())
@@ -45,7 +46,10 @@ pub fn call_aoc_cli(args: &[String]) -> Result<Output, AOCError> {
     }
 }
 pub fn build_args(command: AOCCommands, args: &[&str], day: Day) -> Vec<String> {
-    let mut cmd_args = args.iter().map(|s| s.to_string()).collect::<Vec<_>>();
+    let mut cmd_args = args
+        .iter()
+        .map(std::string::ToString::to_string)
+        .collect::<Vec<_>>();
 
     cmd_args.push("--year".into());
     cmd_args.push(day.year.to_string());

@@ -1,6 +1,6 @@
 use all_aoc::helper::{
-    graph::{GraphWithWeights, build_graph4_special},
-    grid::{Grid, dense_grid::DenseGrid, grid_index::GridIndex},
+    graph::{WithWeights, build_graph4_special},
+    grid::{Grid, dense::DenseGrid, index::GridIndex},
     position::Position,
 };
 
@@ -20,15 +20,11 @@ fn solve_part_1(input: &str, size: usize, bytes: usize) -> Option<u32> {
         grid[p.as_yx_tuple()] = Tile::Corrupted;
     });
     let graph = build_graph4_special(&grid, |curr, neig| {
-        if *neig == Tile::Empty && *curr == Tile::Empty {
-            Some(1)
-        } else {
-            None
-        }
+        (*neig == Tile::Empty && *curr == Tile::Empty).then_some(1)
     });
     let end = grid.len() - 1;
     let erg = graph.dijkstra_distances(0, Some(end));
-    Some(*erg.get(&end).unwrap())
+    Some(erg[&end])
 }
 fn solve_part_2(input: &str, size: usize) -> Option<String> {
     let vec = parse(input);
@@ -80,12 +76,12 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = solve_part_2(&all_aoc::cli::read_examples_file(DAY), 7);
-        assert_eq!(result, Some("6,1".to_string()));
+        assert_eq!(result, Some("6,1".to_owned()));
     }
 
     #[test]
     fn test_part_two_actual() {
         let result = part_two(&all_aoc::cli::read_inputs_file(DAY));
-        assert_eq!(result, Some("56,29".to_string()));
+        assert_eq!(result, Some("56,29".to_owned()));
     }
 }

@@ -5,11 +5,11 @@ use std::{
 
 use crate::Day;
 
-pub fn solve_single_day(day: Day, release: bool, submit: Option<u8>, time: bool) {
+pub fn single_day(day: Day, release: bool, submit: Option<u8>, time: bool) {
     let (e1, e2) = day.execute(release, time, submit);
-    println!("{}\n{}", e1.pretty_print(), e2.pretty_print())
+    println!("{}\n{}", e1.pretty_print(), e2.pretty_print());
 }
-pub fn solve_year(days: Vec<Day>, release: bool, time: bool) {
+pub fn year(days: Vec<Day>, release: bool, time: bool) {
     let mut part_1 = vec![];
     let mut part_2 = vec![];
     let year = days[0].year;
@@ -53,6 +53,7 @@ pub fn solve_year(days: Vec<Day>, release: bool, time: bool) {
         .chain(part_2.iter())
         .filter(|p| p.average_duration() >= Duration::from_millis(1))
         .count();
+
     println!(
         "The minimum Duration of a Part is {min:.2?} and the max is {max:.2?}. {over_1_ms}/{} are over 1 ms.",
         part_1.len() + part_2.len()

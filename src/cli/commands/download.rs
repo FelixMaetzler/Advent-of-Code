@@ -1,10 +1,11 @@
 use std::{fs, path::Path, process::Output};
 
 use crate::cli::{
-    aoc_cli::{AOCCommands, AOCError, build_args, call_aoc_cli},
+    aoc_cli::{AOCCommands, AOCError, build_args, call},
     day::Day,
 };
 
+#[expect(clippy::non_ascii_literal, reason = "looks nice")]
 pub fn download(day: Day) -> Result<Output, AOCError> {
     let input_path = day.input_path();
     let puzzle_path = day.puzzle_path();
@@ -21,7 +22,7 @@ pub fn download(day: Day) -> Result<Output, AOCError> {
         ],
         day,
     );
-    let output = call_aoc_cli(&args)?;
+    let output = call(&args)?;
     println!("---");
     println!(
         "🎄 Successfully wrote input to \"{}\".",

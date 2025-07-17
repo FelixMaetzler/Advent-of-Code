@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use core::str::FromStr;
 
 use all_aoc::helper::position::Position;
 
@@ -11,6 +11,7 @@ struct ClawMachine {
 }
 
 impl ClawMachine {
+    #[expect(clippy::many_single_char_names, reason = "this is the algorithm")]
     fn solve(&self) -> Option<u64> {
         // through observation i see that every LGS in the input has exactly one solution (|A| != 0)
         // the only catch is to see if this solution is a integer one
@@ -21,15 +22,13 @@ impl ClawMachine {
         let second = -c * x + a * y;
         let det = det(a, b, c, d);
         // Here i check for the integer solution
-        if first % det == 0 && second % det == 0 {
+        (first % det == 0 && second % det == 0).then(|| {
             let i = first / det;
             let j = second / det;
             debug_assert!(!i.is_negative());
             debug_assert!(!j.is_negative());
-            Some((3 * i + j) as u64)
-        } else {
-            None
-        }
+            (3 * i + j) as u64
+        })
     }
 }
 impl FromStr for ClawMachine {
@@ -40,32 +39,32 @@ impl FromStr for ClawMachine {
         debug_assert_eq!(v.len(), 3);
         let a = v[0].split_ascii_whitespace().collect::<Vec<_>>();
         let a = Position {
-            x: a[2][2..].trim_end_matches(",").parse().unwrap(),
+            x: a[2][2..].trim_end_matches(',').parse().unwrap(),
             y: a[3][2..].parse().unwrap(),
         };
         let b = v[1].split_ascii_whitespace().collect::<Vec<_>>();
         let b = Position {
-            x: b[2][2..].trim_end_matches(",").parse().unwrap(),
+            x: b[2][2..].trim_end_matches(',').parse().unwrap(),
             y: b[3][2..].parse().unwrap(),
         };
         let prize = v[2].split_ascii_whitespace().collect::<Vec<_>>();
         let prize = Position {
-            x: prize[1][2..].trim_end_matches(",").parse().unwrap(),
+            x: prize[1][2..].trim_end_matches(',').parse().unwrap(),
             y: prize[2][2..].parse().unwrap(),
         };
-        Ok(ClawMachine { a, b, prize })
+        Ok(Self { a, b, prize })
     }
 }
 pub fn part_one(input: &str) -> Option<u64> {
     let machines = parse(input);
-    Some(machines.into_iter().flat_map(|m| m.solve()).sum())
+    Some(machines.into_iter().filter_map(|m| m.solve()).sum())
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
     const ADD: i64 = 10_000_000_000_000;
     let mut machines = parse(input);
     machines.iter_mut().for_each(|m| m.prize += ADD);
-    Some(machines.into_iter().flat_map(|m| m.solve()).sum())
+    Some(machines.into_iter().filter_map(|m| m.solve()).sum())
 }
 fn parse(input: &str) -> Vec<ClawMachine> {
     input
@@ -73,7 +72,7 @@ fn parse(input: &str) -> Vec<ClawMachine> {
         .map(|m| ClawMachine::from_str(m).unwrap())
         .collect()
 }
-fn det(a: i64, b: i64, c: i64, d: i64) -> i64 {
+const fn det(a: i64, b: i64, c: i64, d: i64) -> i64 {
     a * d - b * c
 }
 #[cfg(test)]

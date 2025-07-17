@@ -25,7 +25,7 @@ impl<T> Position<T> {
     where
         T: FromStr<Err = E>,
     {
-        let (y, x) = s.split_once(",").unwrap();
+        let (y, x) = s.split_once(',').unwrap();
         let y = y.parse()?;
         let x = x.parse()?;
         Ok(Self { x, y })
@@ -34,7 +34,7 @@ impl<T> Position<T> {
     where
         T: FromStr<Err = E>,
     {
-        let (x, y) = s.split_once(",").unwrap();
+        let (x, y) = s.split_once(',').unwrap();
         let y = y.parse()?;
         let x = x.parse()?;
         Ok(Self { x, y })
@@ -155,7 +155,7 @@ impl<T> Mul<T> for Position<T>
 where
     T: Mul<Output = T> + Copy,
 {
-    type Output = Position<T>;
+    type Output = Self;
 
     fn mul(self, rhs: T) -> Self::Output {
         Self {
@@ -170,21 +170,22 @@ where
     T: Add<Output = T> + Sub<Output = T> + Copy,
     i32: Into<T>,
 {
+    #[must_use]
     pub fn direction(&self, d: Direction4) -> Self {
         match d {
-            Direction4::North => Position {
+            Direction4::North => Self {
                 x: self.x,
                 y: self.y + 1.into(),
             },
-            Direction4::East => Position {
+            Direction4::East => Self {
                 x: self.x + 1.into(),
                 y: self.y,
             },
-            Direction4::West => Position {
+            Direction4::West => Self {
                 x: self.x - 1.into(),
                 y: self.y,
             },
-            Direction4::South => Position {
+            Direction4::South => Self {
                 x: self.x,
                 y: self.y - 1.into(),
             },
@@ -246,61 +247,63 @@ pub enum Direction4 {
 }
 impl Direction4 {
     /// Converts ^, <, v, > into Direction
-    pub fn from_hat(c: char) -> Result<Self, char> {
+    pub const fn from_hat(c: char) -> Result<Self, char> {
         match c {
-            '^' => Ok(Direction4::North),
-            '>' => Ok(Direction4::East),
-            '<' => Ok(Direction4::West),
-            'v' => Ok(Direction4::South),
+            '^' => Ok(Self::North),
+            '>' => Ok(Self::East),
+            '<' => Ok(Self::West),
+            'v' => Ok(Self::South),
             c => Err(c),
         }
     }
     /// Converts Direction into ^, <, v, >
-    pub fn to_hat(&self) -> char {
+    pub const fn to_hat(self) -> char {
         match self {
-            Direction4::North => '^',
-            Direction4::East => '>',
-            Direction4::West => '<',
-            Direction4::South => 'v',
+            Self::North => '^',
+            Self::East => '>',
+            Self::West => '<',
+            Self::South => 'v',
         }
     }
-
-    pub fn turn_right(&self) -> Direction4 {
+    #[must_use]
+    pub const fn turn_right(self) -> Self {
         match self {
-            Direction4::North => Self::East,
-            Direction4::East => Self::South,
-            Direction4::West => Self::North,
-            Direction4::South => Self::West,
+            Self::North => Self::East,
+            Self::East => Self::South,
+            Self::West => Self::North,
+            Self::South => Self::West,
         }
     }
-    pub fn turn_left(&self) -> Direction4 {
+    #[must_use]
+    pub const fn turn_left(self) -> Self {
         match self {
-            Direction4::North => Self::West,
-            Direction4::East => Self::North,
-            Direction4::West => Self::South,
-            Direction4::South => Self::East,
+            Self::North => Self::West,
+            Self::East => Self::North,
+            Self::West => Self::South,
+            Self::South => Self::East,
         }
     }
-    pub fn opposite(&self) -> Direction4 {
+    #[must_use]
+    pub const fn opposite(self) -> Self {
         match self {
-            Direction4::North => Self::South,
-            Direction4::East => Self::West,
-            Direction4::West => Self::East,
-            Direction4::South => Self::North,
+            Self::North => Self::South,
+            Self::East => Self::West,
+            Self::West => Self::East,
+            Self::South => Self::North,
         }
     }
-    pub fn all_dirs() -> [Direction4; 4] {
-        use Direction4::*;
+    pub const fn all_dirs() -> [Self; 4] {
+        use Direction4::{East, North, South, West};
         [North, East, South, West]
     }
 }
 impl From<Direction4> for Direction8 {
     fn from(val: Direction4) -> Self {
         match val {
-            Direction4::North => Direction8::North,
-            Direction4::East => Direction8::East,
-            Direction4::West => Direction8::West,
-            Direction4::South => Direction8::South,
+            Direction4::North => Self::North,
+            Direction4::East => Self::East,
+            Direction4::West => Self::West,
+            Direction4::South => Self::South,
         }
     }
 }
@@ -316,8 +319,8 @@ pub enum Direction8 {
     NorthWest,
 }
 impl Direction8 {
-    pub fn all_dirs() -> [Direction8; 8] {
-        use Direction8::*;
+    pub const fn all_dirs() -> [Self; 8] {
+        use Direction8::{East, North, NorthEast, NorthWest, South, SouthEast, SouthWest, West};
         [
             North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest,
         ]
