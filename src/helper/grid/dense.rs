@@ -5,6 +5,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 #[derive(Clone)]
+#[expect(clippy::module_name_repetitions, reason = "makes more sense")]
 pub struct DenseGrid<T> {
     data: Vec<T>,
     height: usize,
@@ -27,11 +28,17 @@ where
     fn is_empty(&self) -> bool {
         self.data.is_empty()
     }
-    fn get(&self, index: impl GridIndex<T>) -> Option<&T> {
+    fn get<I>(&self, index: I) -> Option<&T>
+    where
+        I: GridIndex<T>,
+    {
         self.data.get(index.to_flat_index(self))
     }
 
-    fn set(&mut self, index: impl GridIndex<T>, val: T) -> bool {
+    fn set<I>(&mut self, index: I, val: T) -> bool
+    where
+        I: GridIndex<T>,
+    {
         let i = index.to_flat_index(self);
         if i < self.data.len() {
             self.data[i] = val;
@@ -53,7 +60,10 @@ where
     }
 }
 impl<T> DenseGrid<T> {
-    pub fn from_iter(it: impl Iterator<Item = T>, width: usize) -> Self {
+    pub fn from_iter<I>(it: I, width: usize) -> Self
+    where
+        I: Iterator<Item = T>,
+    {
         let data: Vec<_> = it.collect();
         let height = data.len() / width;
         debug_assert_eq!(height * width, data.len());
@@ -63,7 +73,11 @@ impl<T> DenseGrid<T> {
             width,
         }
     }
-    pub fn from_iter_iter(it: impl Iterator<Item = impl Iterator<Item = T>>) -> Self {
+    pub fn from_iter_iter<O, I>(it: O) -> Self
+    where
+        O: Iterator<Item = I>,
+        I: Iterator<Item = T>,
+    {
         let mut data = vec![];
         it.size_hint();
         let mut cols = None;

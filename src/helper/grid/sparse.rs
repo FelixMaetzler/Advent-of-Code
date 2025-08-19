@@ -6,6 +6,7 @@ use std::{
 
 use super::{Grid, index::GridIndex};
 #[derive(Clone, PartialEq, Eq)]
+#[expect(clippy::module_name_repetitions, reason = "makes more sense")]
 pub struct SparseGrid<T> {
     data: HashMap<usize, T>,
     width: usize,
@@ -31,10 +32,16 @@ where
         self.data.is_empty()
     }
 
-    fn get(&self, index: impl GridIndex<T>) -> Option<&T> {
+    fn get<I>(&self, index: I) -> Option<&T>
+    where
+        I: GridIndex<T>,
+    {
         self.data.get(&index.to_flat_index(self))
     }
-    fn set(&mut self, index: impl GridIndex<T>, val: T) -> bool {
+    fn set<I>(&mut self, index: I, val: T) -> bool
+    where
+        I: GridIndex<T>,
+    {
         let i = index.to_flat_index(self);
         if i < self.height() * self.width() {
             self.data.insert(i, val);

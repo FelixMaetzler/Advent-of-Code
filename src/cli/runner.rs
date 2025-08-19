@@ -126,8 +126,8 @@ impl<T> PartDayResult<T> {
         Duration::from_nanos(erg.sqrt() as u64)
     }
 }
-pub fn run_part<I: Clone, T: FromStr + Display>(
-    func: impl Fn(I) -> Option<T>,
+pub fn run_part<I: Clone, T: FromStr + Display, F: Fn(I) -> Option<T>>(
+    func: F,
     input: I,
     day: Day,
     part: u8,

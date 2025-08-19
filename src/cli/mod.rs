@@ -1,3 +1,4 @@
+#[expect(clippy::module_name_repetitions, reason = "makes more sense")]
 pub mod aoc_cli;
 pub mod commands;
 pub mod day;

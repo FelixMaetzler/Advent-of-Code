@@ -24,20 +24,22 @@ where
     fn height(&self) -> usize;
     fn len(&self) -> usize;
     fn is_empty(&self) -> bool;
-    fn get(&self, index: impl GridIndex<T>) -> Option<&T>;
-    fn set(&mut self, index: impl GridIndex<T>, val: T) -> bool;
+    fn get<I>(&self, index: I) -> Option<&T>
+    where
+        I: GridIndex<T>;
+    fn set<I>(&mut self, index: I, val: T) -> bool
+    where
+        I: GridIndex<T>;
     fn all_indices(&self) -> impl Iterator<Item = impl GridIndex<T>>;
     fn iter<'a>(&'a self) -> impl Iterator<Item = &'a T>
     where
         T: 'a;
     /// returns the neigbors (if they exist) counterclockwise starting from the North
-    fn get_neigbors4<'a>(
-        &'a self,
-        index: impl GridIndex<T>,
-    ) -> impl Iterator<Item = (impl GridIndex<T>, &'a T)>
+    fn get_neigbors4<'a, I>(&'a self, index: I) -> impl Iterator<Item = (impl GridIndex<T>, &'a T)>
     where
         T: 'a,
         Self: Sized,
+        I: GridIndex<T>,
     {
         [
             get_north(self, index),
@@ -49,13 +51,11 @@ where
         .flatten()
     }
     /// returns the neigbors (if they exist) counterclockwise starting from the North
-    fn get_neigbors8<'a>(
-        &'a self,
-        index: impl GridIndex<T>,
-    ) -> impl Iterator<Item = (impl GridIndex<T>, &'a T)>
+    fn get_neigbors8<'a, I>(&'a self, index: I) -> impl Iterator<Item = (impl GridIndex<T>, &'a T)>
     where
         T: 'a,
         Self: Sized,
+        I: GridIndex<T>,
     {
         [
             get_north(self, index),
@@ -70,7 +70,10 @@ where
         .into_iter()
         .flatten()
     }
-    fn get_dir8(&self, index: impl GridIndex<T>, dir: Direction8) -> Option<((usize, usize), &T)> {
+    fn get_dir8<I>(&self, index: I, dir: Direction8) -> Option<((usize, usize), &T)>
+    where
+        I: GridIndex<T>,
+    {
         match dir {
             Direction8::North => get_north(self, index),
             Direction8::NorthEast => get_north_east(self, index),
