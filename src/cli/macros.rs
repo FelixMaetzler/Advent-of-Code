@@ -3,7 +3,7 @@ macro_rules! solution {
     ($day:expr, $year:expr) => {
         /// The current day.
 
-        const DAY: $crate::Day = $crate::day!($day, $year);
+        const DAY: $crate::cli::day::Day = $crate::day!($day, $year);
 
         fn main() {
             use $crate::cli::runner::*;
@@ -16,7 +16,7 @@ macro_rules! solution {
 #[macro_export]
 macro_rules! day {
     ($day:expr, $year:expr) => {
-        $crate::Day {
+        $crate::cli::day::Day {
             day: $day,
             year: $year,
         }

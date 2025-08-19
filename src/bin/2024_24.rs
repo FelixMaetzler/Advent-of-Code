@@ -117,7 +117,7 @@ pub fn part_two(input: &str) -> Option<String> {
     Some(bad.join(","))
 }
 type Gates<'a> = HashMap<&'a str, (&'a str, Instruction, &'a str)>;
-fn parse(input: &str) -> (HashMap<&str, bool>, Gates) {
+fn parse(input: &'_ str) -> (HashMap<&'_ str, bool>, Gates<'_>) {
     let (first, second) = input.split_once("\n\n").unwrap();
     let first = first
         .lines()

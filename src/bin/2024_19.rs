@@ -31,11 +31,11 @@ fn check(design: &str, towels: &[String], cache: &mut HashMap<String, bool>) -> 
     }
 
     for t in towels {
-        if let Some(x) = design.strip_prefix(t) {
-            if check(x, towels, cache) {
-                cache.insert(design.to_owned(), true);
-                return true;
-            }
+        if let Some(x) = design.strip_prefix(t)
+            && check(x, towels, cache)
+        {
+            cache.insert(design.to_owned(), true);
+            return true;
         }
     }
     cache.insert(design.to_owned(), false);

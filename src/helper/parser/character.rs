@@ -5,7 +5,7 @@ use super::{
     multi::{many0, many1},
     pred,
 };
-pub fn char(input: &str) -> ParseResult<char> {
+pub fn char(input: &'_ str) -> ParseResult<'_, char> {
     input
         .chars()
         .next()
@@ -28,7 +28,7 @@ pub fn tag<'a>(expected: &'static str) -> impl Parser<'a, &'a str> {
         _ => Err(input),
     }
 }
-pub fn unsigned_integer<T>(input: &str) -> ParseResult<T>
+pub fn unsigned_integer<T>(input: &'_ str) -> ParseResult<'_, T>
 where
     T: FromStr,
 {

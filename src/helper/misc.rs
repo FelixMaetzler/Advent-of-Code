@@ -58,6 +58,7 @@ macro_rules! impl_zero_for_types {
             impl Zero for $t {
                 #[allow(clippy::allow_attributes, reason = "doesnt lint for every type")]
                 #[allow(clippy::cast_lossless, reason = "doesnt lint for every type")]
+                #[allow(clippy::cast_precision_loss, reason = "doenst loose precision")]
                 fn zero() -> Self {
                     // Return zero for each type
                     0 as $t
@@ -81,6 +82,7 @@ macro_rules! impl_one_for_types {
             impl One for $t {
                 #[allow(clippy::allow_attributes, reason = "doesnt lint for every type")]
                 #[allow(clippy::cast_lossless, reason = "doesnt lint for every type")]
+                #[allow(clippy::cast_precision_loss, reason = "doenst loose precision")]
                 fn one() -> Self {
                     // Return one for each type
                     1 as $t

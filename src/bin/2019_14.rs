@@ -70,10 +70,10 @@ fn solve_part_one(amount: usize, name: String, receips: &HashMap<String, Reactio
             }
             let reaction = receips.get(&ingredient.name).unwrap();
             let times = to_be_produced.div_ceil(reaction.output.amount);
-            if let Some(result) = (reaction.output.amount * times).checked_sub(to_be_produced) {
-                if result > 0 {
-                    *map.entry(ingredient.name).or_insert(0) += result;
-                }
+            if let Some(result) = (reaction.output.amount * times).checked_sub(to_be_produced)
+                && result > 0
+            {
+                *map.entry(ingredient.name).or_insert(0) += result;
             }
             for req in &reaction.ingredients {
                 queue.push(Chemical {

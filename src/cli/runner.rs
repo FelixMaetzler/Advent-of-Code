@@ -6,7 +6,8 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crate::Day;
+use crate::cli::day::Day;
+
 pub const ANSI_BOLD: &str = "\u{1b}[1m";
 pub const ANSI_ITALIC: &str = "\u{1b}[3m";
 pub const ANSI_RESET: &str = "\u{1b}[0m";
@@ -118,6 +119,7 @@ impl<T> PartDayResult<T> {
         for n in &self.durations {
             erg += (n.as_nanos().abs_diff(average)).pow(2);
         }
+        #[expect(clippy::cast_precision_loss, reason = "dont need such exact numbers")]
         let erg = erg as f64 / (self.durations.len() - 1) as f64;
         Duration::from_nanos(erg.sqrt() as u64)
     }

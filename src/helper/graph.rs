@@ -131,10 +131,10 @@ where
             }
 
             // Stop early if the target node is reached
-            if let Some(target) = end {
-                if position == target {
-                    break;
-                }
+            if let Some(target) = end
+                && position == target
+            {
+                break;
             }
 
             for v in self.outgoing(position) {

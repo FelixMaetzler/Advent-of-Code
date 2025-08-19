@@ -3,7 +3,7 @@ use std::{
     time::Duration,
 };
 
-use crate::Day;
+use crate::cli::day::Day;
 
 pub fn single_day(day: Day, release: bool, submit: Option<u8>, time: bool) {
     let (e1, e2) = day.execute(release, time, submit);

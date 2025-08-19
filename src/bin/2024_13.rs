@@ -63,7 +63,9 @@ pub fn part_one(input: &str) -> Option<u64> {
 pub fn part_two(input: &str) -> Option<u64> {
     const ADD: i64 = 10_000_000_000_000;
     let mut machines = parse(input);
-    machines.iter_mut().for_each(|m| m.prize += ADD);
+    for m in &mut machines {
+        m.prize += ADD;
+    }
     Some(machines.into_iter().filter_map(|m| m.solve()).sum())
 }
 fn parse(input: &str) -> Vec<ClawMachine> {

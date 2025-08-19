@@ -174,10 +174,10 @@ impl GameState {
 
             let move_state = turn.cast(spell);
 
-            if let Some(best) = &best_so_far {
-                if best.spent < max {
-                    max = best.spent;
-                }
+            if let Some(best) = &best_so_far
+                && best.spent < max
+            {
+                max = best.spent;
             }
 
             if move_state.boss_hp <= 0 {

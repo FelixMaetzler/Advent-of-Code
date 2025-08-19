@@ -6,7 +6,7 @@ pub mod macros;
 use core::panic;
 use std::fs;
 
-pub use day::Day;
+use day::Day;
 pub mod runner;
 
 #[must_use]

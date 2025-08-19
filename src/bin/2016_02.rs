@@ -32,10 +32,10 @@ fn get_number(
 ) -> (char, (usize, usize)) {
     let mut pos = start;
     for &dir in dirs {
-        if let Some((x, y)) = keypad.get_dir8(pos, dir.into()) {
-            if y.is_some() {
-                pos = x;
-            }
+        if let Some((x, y)) = keypad.get_dir8(pos, dir.into())
+            && y.is_some()
+        {
+            pos = x;
         }
     }
     (keypad.get(pos).unwrap().unwrap(), pos)

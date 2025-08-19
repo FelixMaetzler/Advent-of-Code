@@ -71,10 +71,10 @@ where
     F: Fn(&A) -> bool,
 {
     move |input| {
-        if let Ok((next_input, value)) = parser.parse(input) {
-            if predicate(&value) {
-                return Ok((next_input, value));
-            }
+        if let Ok((next_input, value)) = parser.parse(input)
+            && predicate(&value)
+        {
+            return Ok((next_input, value));
         }
         Err(input)
     }

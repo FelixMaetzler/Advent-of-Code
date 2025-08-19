@@ -44,12 +44,12 @@ fn setup(grid: &DenseGrid<Tile>) -> Special<u32> {
         }
         for dir in Direction4::all_dirs() {
             let x = map(&(i, dir));
-            if let Some((new_index, new_tile)) = grid.get_dir8(i, dir.into()) {
-                if *new_tile != Tile::Wall {
-                    let new_index = new_index.to_flat_index(grid);
-                    let y = map(&(new_index, dir));
-                    graph.add_edge(x, y, 1);
-                }
+            if let Some((new_index, new_tile)) = grid.get_dir8(i, dir.into())
+                && *new_tile != Tile::Wall
+            {
+                let new_index = new_index.to_flat_index(grid);
+                let y = map(&(new_index, dir));
+                graph.add_edge(x, y, 1);
             }
             let l = map(&(i, dir.turn_left()));
             let r = map(&(i, dir.turn_right()));
@@ -112,12 +112,11 @@ pub fn part_two(input: &str) -> Option<usize> {
         for d in Direction4::all_dirs() {
             let index_forward = map(&(i, d));
             let index_backward = map(&(i, d.opposite()));
-            if let Some(starting) = from_start.get(&index_forward) {
-                if let Some(ending) = from_end.get(&index_backward) {
-                    if ret == starting + ending {
-                        set.insert(i);
-                    }
-                }
+            if let Some(starting) = from_start.get(&index_forward)
+                && let Some(ending) = from_end.get(&index_backward)
+                && ret == starting + ending
+            {
+                set.insert(i);
             }
         }
     }

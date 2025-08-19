@@ -94,12 +94,11 @@ impl FromStr for Instruction {
         }
         match v[0] {
             "rect" => {
-                if let Some((x, y)) = v[1].split_once('x') {
-                    if let Ok(x) = x.parse() {
-                        if let Ok(y) = y.parse() {
-                            return Ok(Self::Rect(x, y));
-                        }
-                    }
+                if let Some((x, y)) = v[1].split_once('x')
+                    && let Ok(x) = x.parse()
+                    && let Ok(y) = y.parse()
+                {
+                    return Ok(Self::Rect(x, y));
                 }
                 Err(())
             }
@@ -127,14 +126,18 @@ impl FromStr for Instruction {
 pub fn part_one(input: &str) -> Option<usize> {
     let vec = parse(input);
     let mut grid: Grid<50, 6> = Grid::default();
-    vec.into_iter().for_each(|i| grid.execute(i));
+    for i in vec {
+        grid.execute(i);
+    }
     Some(grid.array.into_iter().flatten().filter(|b| *b).count())
 }
 
 pub fn part_two(input: &str) -> Option<String> {
     let vec = parse(input);
     let mut grid: Grid<50, 6> = Grid::default();
-    vec.into_iter().for_each(|i| grid.execute(i));
+    for i in vec {
+        grid.execute(i);
+    }
     let s = grid.print();
     Some(s)
 }

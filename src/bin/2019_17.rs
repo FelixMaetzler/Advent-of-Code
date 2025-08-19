@@ -99,10 +99,10 @@ pub fn part_two(input: &str) -> Option<IntInteger> {
     for a in 1..x.len() - 2 {
         for b in 1..x.len() - 2 {
             for c in 1..x.len() - 2 {
-                if let Some((ins, s)) = divide(&x, a, b, c) {
-                    if is_viable(ins, &s) {
-                        options.push((ins, s));
-                    }
+                if let Some((ins, s)) = divide(&x, a, b, c)
+                    && is_viable(ins, &s)
+                {
+                    options.push((ins, s));
                 }
             }
         }
