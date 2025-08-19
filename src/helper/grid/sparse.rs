@@ -66,9 +66,10 @@ where
             height,
         }
     }
-    pub fn from_it(it: impl Iterator<Item = ((usize, usize), T)> + Clone) -> Self
+    pub fn from_it<I>(it: I) -> Self
     where
         T: Clone,
+        I: Iterator<Item = ((usize, usize), T)> + Clone,
     {
         let width = it.clone().map(|((_, x), _)| x).max().unwrap() + 1;
         let height = it.clone().map(|((y, _), _)| y).max().unwrap() + 1;

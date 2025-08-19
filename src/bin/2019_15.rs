@@ -42,7 +42,10 @@ const START: Position<usize> = Position {
 };
 pub fn part_one(input: &str) -> Option<u32> {
     let maze = generate_maze(parse(input));
-    let grid = SparseGrid::from_it(maze.iter().map(|(k, v)| ((k.y as usize, k.x as usize), *v)));
+    let grid = SparseGrid::from_it(
+        maze.iter()
+            .map(|(k, v)| ((k.y.try_into().unwrap(), k.x.try_into().unwrap()), *v)),
+    );
     let graph = build_graph4_special(&grid, |curr, n| {
         (matches!(curr, Tile::Air | Tile::OygenSystem)
             && matches!(n, Tile::Air | Tile::OygenSystem))
@@ -68,8 +71,8 @@ fn generate_maze(mut computer: Intcode) -> HashMap<Position<i32>, Tile> {
     computer.halt_at_output(true);
     let mut map = HashMap::new();
     let mut curr = Position {
-        x: START.x as i32,
-        y: START.y as i32,
+        x: START.x.try_into().unwrap(),
+        y: START.y.try_into().unwrap(),
     };
     map.insert(curr, Tile::Air);
     fill_up_with_unknown(&mut map);
@@ -135,7 +138,10 @@ fn fill_up_with_unknown(map: &mut HashMap<Position<i32>, Tile>) {
 }
 pub fn part_two(input: &str) -> Option<u32> {
     let maze = generate_maze(parse(input));
-    let grid = SparseGrid::from_it(maze.iter().map(|(k, v)| ((k.y as usize, k.x as usize), *v)));
+    let grid = SparseGrid::from_it(
+        maze.iter()
+            .map(|(k, v)| ((k.y.try_into().unwrap(), k.x.try_into().unwrap()), *v)),
+    );
     let mut grid = SparseGrid::from_it(grid.iter_all().filter_map(|(i, v)| {
         match v {
             Tile::Air => Some(false),

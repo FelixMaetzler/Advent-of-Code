@@ -163,7 +163,8 @@ fn get_north_west<T>(
     index: impl GridIndex<T>,
 ) -> Option<((usize, usize), &T)> {
     let (y, x) = index.to_coordinates(grid);
-    let (new_y, new_x) = x.checked_sub(1)
+    let (new_y, new_x) = x
+        .checked_sub(1)
         .and_then(|new_x| y.checked_sub(1).map(|new_y| (new_y, new_x)))?;
     grid.get((new_y, new_x)).map(|r| ((new_y, new_x), r))
 }

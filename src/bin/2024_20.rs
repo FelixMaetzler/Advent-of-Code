@@ -74,7 +74,7 @@ where
 {
     let a = a.to_coordinates(grid);
     let b = b.to_coordinates(grid);
-    let dist = (a.0.abs_diff(b.0) + a.1.abs_diff(b.1)) as u32;
+    let dist = (a.0.abs_diff(b.0) + a.1.abs_diff(b.1)).try_into().unwrap();
     (2..=max_dist).contains(&dist).then_some(dist)
 }
 fn start_end(grid: &DenseGrid<Tile>) -> (usize, usize) {

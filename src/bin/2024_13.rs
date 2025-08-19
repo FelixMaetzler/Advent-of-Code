@@ -27,7 +27,7 @@ impl ClawMachine {
             let j = second / det;
             debug_assert!(!i.is_negative());
             debug_assert!(!j.is_negative());
-            (3 * i + j) as u64
+            (3 * i + j).try_into().unwrap()
         })
     }
 }

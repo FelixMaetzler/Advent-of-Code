@@ -9,12 +9,11 @@ use super::grid::{Grid, index::GridIndex};
 /// `curr_to_neighbor_comparison` is a function that
 ///  has as arguments the current node and the neighbor node of the grid
 /// and has to determine if these nodes have a edge in the graph
-pub fn build_graph4<T>(
-    grid: &impl Grid<T>,
-    curr_to_neighbor_comparison: impl Fn(&T, &T) -> bool,
-) -> Vec<Vec<NodeIndex>>
+pub fn build_graph4<T, G, F>(grid: &G, curr_to_neighbor_comparison: F) -> Vec<Vec<NodeIndex>>
 where
     T: Clone,
+    G: Grid<T>,
+    F: Fn(&T, &T) -> bool,
 {
     let mut vec = Vec::with_capacity(grid.len());
     for i in grid.all_indices() {
@@ -36,13 +35,12 @@ where
 /// `curr_to_neighbor_comparison` is a function that
 ///  has as arguments the current node and the neighbor node of the grid
 /// and has to determine if these nodes have a edge in the graph and the weight
-pub fn build_graph4_special<T, W>(
-    grid: &impl Grid<T>,
-    curr_to_neighbor_comparison: impl Fn(&T, &T) -> Option<W> + Copy,
-) -> Special<W>
+pub fn build_graph4_special<T, W, G, F>(grid: &G, curr_to_neighbor_comparison: F) -> Special<W>
 where
     T: Clone,
     W: Copy,
+    G: Grid<T>,
+    F: Fn(&T, &T) -> Option<W> + Copy,
 {
     Special::from_edges(grid.all_indices().flat_map(|from| {
         grid.get_neigbors4(from)
@@ -59,12 +57,11 @@ where
 /// `curr_to_neighbor_comparison` is a function that
 ///  has as arguments the current node and the neighbor node of the grid
 /// and has to determine if these nodes have a edge in the graph
-pub fn build_graph8<T>(
-    grid: &impl Grid<T>,
-    curr_to_neighbor_comparison: impl Fn(&T, &T) -> bool,
-) -> Vec<Vec<NodeIndex>>
+pub fn build_graph8<T, G, F>(grid: &G, curr_to_neighbor_comparison: F) -> Vec<Vec<NodeIndex>>
 where
     T: Clone,
+    G: Grid<T>,
+    F: Fn(&T, &T) -> bool,
 {
     let mut vec = Vec::with_capacity(grid.len());
     for i in grid.all_indices() {
@@ -89,7 +86,10 @@ where
     Self: Graph + Sized,
 {
     fn add_edge(&mut self, from: NodeIndex, to: NodeIndex);
-    fn from_edges(it: impl Iterator<Item = (NodeIndex, NodeIndex)>) -> Self {
+    fn from_edges<I>(it: I) -> Self
+    where
+        I: Iterator<Item = (NodeIndex, NodeIndex)>,
+    {
         let mut g = Self::new();
         it.for_each(|(from, to)| g.add_edge(from, to));
         g
@@ -102,7 +102,10 @@ where
 {
     fn weight(&self, from: NodeIndex, to: NodeIndex) -> Option<T>;
     fn add_edge(&mut self, from: NodeIndex, to: NodeIndex, weight: T);
-    fn from_edges(it: impl Iterator<Item = (NodeIndex, NodeIndex, T)>) -> Self {
+    fn from_edges<I>(it: I) -> Self
+    where
+        I: Iterator<Item = (NodeIndex, NodeIndex, T)>,
+    {
         let mut g = Self::new();
         it.for_each(|(from, to, weight)| g.add_edge(from, to, weight));
         g

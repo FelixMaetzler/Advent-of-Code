@@ -62,16 +62,23 @@ fn parse(input: &str) -> (HashMap<char, Vec<Position<i32>>>, Position<i32>) {
     for (y, l) in input.lines().enumerate() {
         for (x, c) in l.chars().enumerate() {
             if c != '.' {
-                let x = x as i32;
-                let y = y as i32;
+                let x = x.try_into().unwrap();
+                let y = y.try_into().unwrap();
                 map.entry(c)
                     .and_modify(|v: &mut Vec<Position<i32>>| v.push(Position { x, y }))
                     .or_insert_with(|| vec![Position { x, y }]);
             }
         }
     }
-    let y_max = input.lines().count() as i32;
-    let x_max = input.lines().next().unwrap().chars().count() as i32;
+    let y_max = input.lines().count().try_into().unwrap();
+    let x_max = input
+        .lines()
+        .next()
+        .unwrap()
+        .chars()
+        .count()
+        .try_into()
+        .unwrap();
     (map, Position { x: x_max, y: y_max })
 }
 #[cfg(test)]

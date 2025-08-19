@@ -75,8 +75,8 @@ pub fn part_two(input: &str) -> Option<i32> {
         .filter(|&(_, t)| (*t == Tile::Asteroid))
         .map(|(i, _)| i.to_position(&grid))
         .map(|Position { x, y }| Position {
-            x: x as i32,
-            y: y as i32,
+            x: x.try_into().unwrap(),
+            y: y.try_into().unwrap(),
         })
         .map(|p| Asteroid::new(p, station))
         .collect::<Vec<_>>();
@@ -89,6 +89,8 @@ pub fn part_two(input: &str) -> Option<i32> {
         if counter == 200 {
             return Some(a.pos.x * 100 + a.pos.y);
         }
+        #[expect(clippy::float_cmp, reason = "is exactly the same")]
+        #[expect(clippy::while_float, reason = "is exactly the same")]
         while asteroids[i % asteroids.len()].angle == a.angle {
             i = (i + 1) % asteroids.len();
         }
@@ -101,8 +103,8 @@ fn solve_part_one(grid: &DenseGrid<Tile>) -> Option<(usize, Position<i32>)> {
         .filter(|&(_, t)| (*t == Tile::Asteroid))
         .map(|(i, _)| i.to_position(grid))
         .map(|Position { x, y }| Position {
-            x: x as i32,
-            y: y as i32,
+            x: x.try_into().unwrap(),
+            y: y.try_into().unwrap(),
         })
         .collect::<HashSet<_>>();
     Some(
@@ -113,8 +115,8 @@ fn solve_part_one(grid: &DenseGrid<Tile>) -> Option<(usize, Position<i32>)> {
                     calc(
                         all_astroids.clone(),
                         *pos,
-                        grid.width() as i32,
-                        grid.height() as i32,
+                        grid.width().try_into().unwrap(),
+                        grid.height().try_into().unwrap(),
                     ),
                     *pos,
                 )
@@ -160,7 +162,7 @@ fn calc(mut set: HashSet<Position<i32>>, pos: Position<i32>, width: i32, height:
 }
 fn shrink(pos: Position<i32>) -> Position<i32> {
     let Position { x, y } = pos;
-    let gcd = gcd(x.unsigned_abs(), y.unsigned_abs()) as i32;
+    let gcd: i32 = gcd(x.unsigned_abs(), y.unsigned_abs()).try_into().unwrap();
     Position {
         x: x / gcd,
         y: y / gcd,

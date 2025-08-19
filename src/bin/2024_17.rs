@@ -49,7 +49,7 @@ fn machine(a: u64, vec: &[Instruction]) -> Vec<u64> {
                 if a == 0 {
                     ptr += 1;
                 } else {
-                    ptr = x as usize;
+                    ptr = x.try_into().unwrap();
                 }
             }
             Instruction::Bxc => {

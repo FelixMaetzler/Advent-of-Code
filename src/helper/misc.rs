@@ -4,11 +4,9 @@ use std::{
     ops::{AddAssign, Div, Mul, Rem, SubAssign},
 };
 
-pub const fn number_to_digit_count(x: u64) -> u8 {
-    match x.checked_ilog10() {
-        Some(x) => (x + 1) as u8,
-        None => 1,
-    }
+pub fn number_to_digit_count(x: u64) -> u8 {
+    x.checked_ilog10()
+        .map_or(1, |x| u8::try_from(x + 1).unwrap())
 }
 pub trait Joinable<T> {
     fn join(self, separator: &str) -> String;

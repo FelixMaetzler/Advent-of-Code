@@ -25,7 +25,7 @@ fn parse(input: &str) -> (Vec<Vec<u32>>, Vec<Vec<u32>>) {
             for (i, line) in block.lines().skip(1).enumerate() {
                 for (j, c) in line.chars().enumerate() {
                     if c == '#' {
-                        lock[j] = 1 + i as u32;
+                        lock[j] = 1 + u32::try_from(i).unwrap();
                     }
                 }
             }
@@ -36,7 +36,7 @@ fn parse(input: &str) -> (Vec<Vec<u32>>, Vec<Vec<u32>>) {
             for (i, line) in block.lines().skip(1).enumerate() {
                 for (j, c) in line.chars().enumerate() {
                     if c == '.' {
-                        key[j] = 4 - i as u32;
+                        key[j] = 4 - u32::try_from(i).unwrap();
                     }
                 }
             }

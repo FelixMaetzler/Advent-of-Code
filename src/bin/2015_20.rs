@@ -45,7 +45,8 @@ fn present_part_2(house: u32) -> u32 {
 /// all divisors of n (including 1 and itself)
 fn divisors(n: u32) -> Vec<u32> {
     let mut divisors = Vec::new();
-
+    #[expect(clippy::cast_possible_truncation, reason = "f64 to u32")]
+    #[expect(clippy::cast_sign_loss, reason = "f64 to u32")]
     for i in 1..=(f64::from(n).sqrt() as u32) {
         if n % i == 0 {
             divisors.push(i);

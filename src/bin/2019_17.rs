@@ -70,7 +70,7 @@ fn get_grid(mut computer: Intcode) -> DenseGrid<Tile> {
     let output = computer.get_outputs();
     let s = output
         .iter()
-        .map(|&i| char::from_u32(i as u32).unwrap())
+        .map(|&i| char::from_u32(i.try_into().unwrap()).unwrap())
         .join("");
     DenseGrid::from_string(&s)
 }

@@ -40,7 +40,7 @@ pub fn part_one(input: &str) -> Option<u32> {
         }
     }
 
-    Some((pos.x.abs() + pos.y.abs()) as u32)
+    Some((pos.x.abs() + pos.y.abs()).try_into().unwrap())
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
@@ -71,7 +71,7 @@ pub fn part_two(input: &str) -> Option<u32> {
             }
         }
     }
-    Some((pos.x.abs() + pos.y.abs()) as u32)
+    Some((pos.x.abs() + pos.y.abs()).try_into().unwrap())
 }
 fn parse(input: &str) -> Vec<Turn> {
     input

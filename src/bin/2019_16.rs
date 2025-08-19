@@ -5,7 +5,7 @@ pub fn part_one(input: &str) -> Option<i32> {
 
 pub fn part_two(input: &str) -> Option<i32> {
     let vec = parse(input);
-    let start = folding_to_number(&vec[0..7]) as usize;
+    let start = folding_to_number(&vec[0..7]).try_into().unwrap();
     let end = vec.len() * 10_000;
 
     let mut current = Vec::new();
@@ -55,7 +55,7 @@ fn folding_to_number(input: &[i32]) -> i32 {
 fn parse(input: &str) -> Vec<i32> {
     input
         .chars()
-        .map(|n| n.to_digit(10).unwrap() as i32)
+        .map(|n| n.to_digit(10).unwrap().try_into().unwrap())
         .collect()
 }
 

@@ -14,7 +14,7 @@ where
         + Sub<Output = Self>,
 {
     fn set_bit(&mut self, index: usize, val: bool) {
-        let mask = Self::one() << (index as u32);
+        let mask = Self::one() << (index.try_into().unwrap());
         if val {
             *self = *self | mask;
         } else {

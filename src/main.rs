@@ -172,7 +172,7 @@ fn parse_day(arg: &str) -> Result<Days, String> {
         let n = arg.parse::<u16>().map_err(|e| e.to_string())?;
         if (1..=25).contains(&n) {
             Ok(Days::Day(Day {
-                day: n as u8,
+                day: n.try_into().unwrap(),
                 year: match std::env::var("AOC_YEAR") {
                     Ok(x) => x.parse::<u16>().map_err(|e| e.to_string())?,
                     Err(_) => return Err(

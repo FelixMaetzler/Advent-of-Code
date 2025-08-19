@@ -111,7 +111,7 @@ where
 }
 impl<T> PartDayResult<T> {
     pub fn average_duration(&self) -> Duration {
-        self.durations.iter().sum::<Duration>() / (self.durations.len() as u32)
+        self.durations.iter().sum::<Duration>() / (self.durations.len().try_into().unwrap())
     }
     fn standard_deviation(&self) -> Duration {
         let average = self.average_duration().as_nanos();
@@ -121,6 +121,8 @@ impl<T> PartDayResult<T> {
         }
         #[expect(clippy::cast_precision_loss, reason = "dont need such exact numbers")]
         let erg = erg as f64 / (self.durations.len() - 1) as f64;
+        #[expect(clippy::cast_possible_truncation, reason = "f64 to u64")]
+        #[expect(clippy::cast_sign_loss, reason = "f64 to u64")]
         Duration::from_nanos(erg.sqrt() as u64)
     }
 }

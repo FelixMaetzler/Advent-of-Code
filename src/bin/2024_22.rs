@@ -16,11 +16,11 @@ pub fn part_one(input: &str) -> Option<u64> {
             .sum(),
     )
 }
-const fn index(deltas: (i8, i8, i8, i8)) -> usize {
-    (deltas.0 + 9) as usize * 19 * 19 * 19
-        + (deltas.1 + 9) as usize * 19 * 19
-        + (deltas.2 + 9) as usize * 19
-        + (deltas.3 + 9) as usize
+fn index(deltas: (i8, i8, i8, i8)) -> usize {
+    usize::try_from(deltas.0 + 9).unwrap() * 19 * 19 * 19
+        + usize::try_from(deltas.1 + 9).unwrap() * 19 * 19
+        + usize::try_from(deltas.2 + 9).unwrap() * 19
+        + usize::try_from(deltas.3 + 9).unwrap()
 }
 pub fn part_two(input: &str) -> Option<u64> {
     let vec = parse(input);
@@ -48,7 +48,7 @@ pub fn part_two(input: &str) -> Option<u64> {
             map[idx] += i32::from(price);
         }
     }
-    Some(map.into_iter().max().unwrap() as u64)
+    Some(map.into_iter().max().unwrap().try_into().unwrap())
 }
 fn parse(input: &str) -> Vec<u64> {
     input.lines().map(|l| l.parse().unwrap()).collect()

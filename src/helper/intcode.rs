@@ -45,11 +45,7 @@ impl Index<isize> for Intcode {
     type Output = IntInteger;
 
     fn index(&self, index: isize) -> &Self::Output {
-        let index = if index < 0 {
-            panic!("Index out of bounds")
-        } else {
-            index as usize
-        };
+        let index = usize::try_from(index).expect("index out of bounds");
         if index >= self.program.len() {
             &0
         } else {
@@ -59,11 +55,7 @@ impl Index<isize> for Intcode {
 }
 impl IndexMut<isize> for Intcode {
     fn index_mut(&mut self, index: isize) -> &mut Self::Output {
-        let index = if index < 0 {
-            panic!("Index out of bounds")
-        } else {
-            index as usize
-        };
+        let index = usize::try_from(index).expect("index out of bounds");
         if index >= self.program.len() {
             self.program.resize(index + 1, 0);
         }
@@ -110,7 +102,10 @@ impl Intcode {
             }
         }
     }
-    pub fn set_inputs(&mut self, x: impl Iterator<Item = IntInteger>, mode: InputMode) {
+    pub fn set_inputs<I>(&mut self, x: I, mode: InputMode)
+    where
+        I: Iterator<Item = IntInteger>,
+    {
         match mode {
             InputMode::Extend => self.input.extend(x),
             InputMode::Replace => self.input = x.collect(),
