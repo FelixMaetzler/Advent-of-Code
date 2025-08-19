@@ -1,6 +1,6 @@
 use std::{collections::HashMap, str::FromStr};
 
-use all_aoc::helper::misc::Joinable;
+use all_aoc::helper::misc::Joinable as _;
 
 all_aoc::solution!(4, 2016);
 struct Room {

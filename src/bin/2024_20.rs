@@ -1,9 +1,9 @@
 use std::{collections::HashMap, fmt::Debug};
 
 use all_aoc::helper::{
-    graph::{WithWeights, build_graph4_special},
-    grid::{Grid, dense::DenseGrid, index::GridIndex},
-    permutations::IteratorCombinator,
+    graph::{WithWeights as _, build_graph4_special},
+    grid::{Grid as _, dense::DenseGrid, index::GridIndex},
+    permutations::IteratorCombinator as _,
 };
 
 all_aoc::solution!(20, 2024);

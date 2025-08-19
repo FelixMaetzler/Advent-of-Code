@@ -1,6 +1,6 @@
 use std::{collections::HashMap, str::FromStr};
 
-use all_aoc::helper::{bitmask::Bitmask, permutations::IteratorCombinator};
+use all_aoc::helper::{bitmask::Bitmask as _, permutations::IteratorCombinator as _};
 
 all_aoc::solution!(14, 2020);
 #[derive(Debug)]

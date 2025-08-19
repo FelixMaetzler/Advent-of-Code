@@ -1,5 +1,5 @@
 use std::{
-    io::{self, Write},
+    io::{self, Write as _},
     time::Duration,
 };
 
@@ -53,9 +53,9 @@ pub fn year(days: Vec<Day>, release: bool, time: bool) {
         .chain(part_2.iter())
         .filter(|p| p.average_duration() >= Duration::from_millis(1))
         .count();
-
-    println!(
+    let s = format!(
         "The minimum Duration of a Part is {min:.2?} and the max is {max:.2?}. {over_1_ms}/{} are over 1 ms.",
         part_1.len() + part_2.len()
     );
+    println!("{s}");
 }

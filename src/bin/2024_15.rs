@@ -1,10 +1,10 @@
 use std::{
     collections::HashSet,
-    fmt::{Debug, Write},
+    fmt::{Debug, Write as _},
 };
 
 use all_aoc::helper::{
-    grid::{Grid, dense::DenseGrid, index::GridIndex},
+    grid::{Grid as _, dense::DenseGrid, index::GridIndex},
     position::{Direction4, Direction8},
 };
 
@@ -38,7 +38,7 @@ enum TilePart2 {
     Empty,
 }
 impl Debug for TilePart2 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.write_char(match self {
             Self::Robot => '@',
             Self::Wall => '#',

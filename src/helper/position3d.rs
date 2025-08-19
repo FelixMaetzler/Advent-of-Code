@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign};
+use core::ops::{Add, AddAssign, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign};
 
 #[derive(Debug, Default, PartialEq, Eq, Hash, Clone, Copy)]
 pub struct Position3d<T> {

@@ -1,9 +1,9 @@
 use core::fmt::Debug;
 
 use all_aoc::helper::{
-    grid::{Grid, dense::DenseGrid, index::GridIndex},
+    grid::{Grid as _, dense::DenseGrid, index::GridIndex as _},
     intcode::{InputMode, IntInteger, Intcode, Return},
-    misc::Joinable,
+    misc::Joinable as _,
     position::Direction4,
 };
 #[derive(Clone, Copy, PartialEq, Eq)]

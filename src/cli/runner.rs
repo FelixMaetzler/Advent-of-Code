@@ -1,9 +1,7 @@
+use core::{cmp, fmt::Display, str::FromStr, time::Duration};
 use std::{
-    cmp,
-    fmt::Display,
     process::{self, Command, Stdio},
-    str::FromStr,
-    time::{Duration, Instant},
+    time::Instant,
 };
 
 use crate::cli::day::Day;

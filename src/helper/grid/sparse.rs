@@ -1,5 +1,8 @@
 use std::{
-    collections::{HashMap, hash_map::Iter},
+    collections::{
+        HashMap,
+        hash_map::{IntoValues, Iter},
+    },
     fmt::Debug,
     ops::{Index, IndexMut},
 };
@@ -128,7 +131,7 @@ where
 }
 impl<T> IntoIterator for SparseGrid<T> {
     type Item = T;
-    type IntoIter = std::collections::hash_map::IntoValues<usize, T>;
+    type IntoIter = IntoValues<usize, T>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.data.into_values()
@@ -138,7 +141,7 @@ impl<T> Debug for SparseGrid<T>
 where
     T: Clone + Debug,
 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let mut s = String::new();
         for y in 0..self.height {
             for x in 0..self.width {

@@ -1,4 +1,4 @@
-use std::{fs, fs::OpenOptions, io::Write};
+use std::{fs, fs::OpenOptions, io::Write as _};
 
 use crate::cli::{aoc_cli::AOCError, commands::download::create_path, day::Day};
 

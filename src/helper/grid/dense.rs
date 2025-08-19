@@ -1,6 +1,6 @@
 use super::{Grid, index::GridIndex};
-use std::fmt::Write;
-use std::{
+use core::fmt::Write as _;
+use core::{
     fmt::Debug,
     ops::{Index, IndexMut},
 };
@@ -162,7 +162,7 @@ impl<T> Debug for DenseGrid<T>
 where
     T: Debug,
 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let s = self
             .data
             .chunks(self.width)

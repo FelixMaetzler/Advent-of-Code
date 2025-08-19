@@ -1,8 +1,7 @@
+use core::{fmt::Display, str::FromStr};
 use std::{
-    fmt::Display,
     path::PathBuf,
     process::{Command, Stdio},
-    str::FromStr,
 };
 
 use super::runner::PartDayResult;
@@ -78,7 +77,7 @@ impl Day {
     }
 }
 impl Display for Day {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{:02}.12.{}", self.day, self.year)
     }
 }

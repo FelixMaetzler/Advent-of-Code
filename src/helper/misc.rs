@@ -1,4 +1,4 @@
-use std::hash::Hash;
+use core::hash::Hash;
 use std::{
     collections::HashMap,
     ops::{AddAssign, Div, Mul, Rem, SubAssign},

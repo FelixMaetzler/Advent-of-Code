@@ -100,7 +100,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                     .and_modify(|e: &mut HashSet<usize>| {
                         e.insert(j);
                     })
-                    .or_insert_with(|| std::iter::once(j).collect());
+                    .or_insert_with(|| core::iter::once(j).collect());
             }
         }
     }

@@ -4,7 +4,7 @@ use std::{
     ops::{Add, AddAssign},
 };
 
-use all_aoc::helper::permutations::IteratorCombinator;
+use all_aoc::helper::permutations::IteratorCombinator as _;
 
 enum Win {
     BossWin(u32),

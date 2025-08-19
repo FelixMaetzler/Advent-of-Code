@@ -5,7 +5,7 @@ use std::{
 
 use all_aoc::helper::{
     intcode::{InputMode, Intcode, Return},
-    misc::Joinable,
+    misc::Joinable as _,
     position::{Direction4, Position},
 };
 

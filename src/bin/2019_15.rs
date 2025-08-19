@@ -5,8 +5,8 @@ use std::{
 };
 
 use all_aoc::helper::{
-    graph::{WithWeights, build_graph4_special},
-    grid::{Grid, index::GridIndex, sparse::SparseGrid},
+    graph::{WithWeights as _, build_graph4_special},
+    grid::{Grid as _, index::GridIndex as _, sparse::SparseGrid},
     intcode::{InputMode, IntInteger, Intcode, Return},
     position::{Direction4, Position},
 };
@@ -20,7 +20,7 @@ enum Tile {
     Unknown,
 }
 impl Debug for Tile {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Air => write!(f, "."),
             Self::Wall | Self::Unknown => write!(f, " "),

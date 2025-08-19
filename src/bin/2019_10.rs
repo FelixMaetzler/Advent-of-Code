@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use all_aoc::helper::{
-    grid::{Grid, dense::DenseGrid, index::GridIndex},
+    grid::{Grid as _, dense::DenseGrid, index::GridIndex as _},
     misc::gcd,
     position::Position,
 };

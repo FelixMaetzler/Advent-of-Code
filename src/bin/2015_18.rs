@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 
-use all_aoc::helper::grid::{Grid, dense::DenseGrid};
+use all_aoc::helper::grid::{Grid as _, dense::DenseGrid};
 all_aoc::solution!(18, 2015);
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum State {

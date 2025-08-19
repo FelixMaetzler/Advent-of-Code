@@ -1,8 +1,8 @@
 use std::collections::HashSet;
 
 use all_aoc::helper::{
-    graph::{Graph, build_graph4},
-    grid::{Grid, dense::DenseGrid},
+    graph::{Graph as _, build_graph4},
+    grid::{Grid as _, dense::DenseGrid},
 };
 
 all_aoc::solution!(10, 2024);

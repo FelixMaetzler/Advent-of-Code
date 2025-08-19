@@ -1,4 +1,4 @@
-use std::{
+use core::{
     fmt::Debug,
     ops::{Add, AddAssign, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign},
     str::FromStr,

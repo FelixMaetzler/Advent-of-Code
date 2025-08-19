@@ -1,10 +1,10 @@
-use std::fmt::Write;
+use core::fmt::Write as _;
 use std::{
     collections::{BinaryHeap, HashMap, HashSet},
     ops::Add,
 };
 
-use super::grid::{Grid, index::GridIndex};
+use super::grid::{Grid, index::GridIndex as _};
 
 /// `curr_to_neighbor_comparison` is a function that
 ///  has as arguments the current node and the neighbor node of the grid
@@ -239,7 +239,7 @@ impl<T> Ord for State<T>
 where
     T: Ord,
 {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
         other.cost.cmp(&self.cost)
     }
 }
@@ -247,7 +247,7 @@ impl<T> PartialOrd for State<T>
 where
     T: PartialOrd + Ord,
 {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
         Some(self.cmp(other))
     }
 }
@@ -497,7 +497,7 @@ impl<T> Special<T> {
         }
         self.adj_matrix.remove(&index).is_some()
     }
-    pub fn remove_edge(&mut self, from: NodeIndex, to: NodeIndex) -> bool {
+    pub fn delete_edge(&mut self, from: NodeIndex, to: NodeIndex) -> bool {
         if self.edges.remove(&(from, to)).is_some() {
             let x = self.adj_matrix.get_mut(&from).unwrap().remove(&to);
             debug_assert!(x);

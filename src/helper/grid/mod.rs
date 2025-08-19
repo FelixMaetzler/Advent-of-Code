@@ -1,7 +1,7 @@
 pub mod dense;
 pub mod index;
 pub mod sparse;
-use std::{
+use core::{
     fmt::Debug,
     ops::{Index, IndexMut},
 };

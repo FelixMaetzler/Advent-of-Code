@@ -2,7 +2,7 @@ pub trait IteratorPermutator: Iterator {
     fn permutations(self, k: usize) -> Permutator<<Self as Iterator>::Item>
     where
         Self: Sized,
-        <Self as std::iter::Iterator>::Item: Clone,
+        <Self as core::iter::Iterator>::Item: Clone,
     {
         let collect = self.collect::<Vec<_>>();
         Permutator::new(collect, k)
@@ -11,7 +11,7 @@ pub trait IteratorPermutator: Iterator {
     fn permutations_until(self, k: usize) -> impl Iterator<Item = Vec<<Self as Iterator>::Item>>
     where
         Self: Sized,
-        <Self as std::iter::Iterator>::Item: Clone,
+        <Self as core::iter::Iterator>::Item: Clone,
     {
         let collect = self.collect::<Vec<_>>();
         (0..=k).flat_map(move |size| Permutator::new(collect.clone(), size))
@@ -19,7 +19,7 @@ pub trait IteratorPermutator: Iterator {
     fn permutation(self) -> Permutator<<Self as Iterator>::Item>
     where
         Self: Sized,
-        <Self as std::iter::Iterator>::Item: Clone,
+        <Self as core::iter::Iterator>::Item: Clone,
     {
         let collect = self.collect::<Vec<_>>();
         let len = collect.len();
@@ -178,7 +178,7 @@ pub trait IteratorCombinator: Iterator {
     fn combinations(self, k: usize) -> Combinator<<Self as Iterator>::Item>
     where
         Self: Sized,
-        <Self as std::iter::Iterator>::Item: Clone,
+        <Self as core::iter::Iterator>::Item: Clone,
     {
         let collect = self.collect::<Vec<_>>();
         let c = Combinator::new(collect, k);
@@ -187,24 +187,24 @@ pub trait IteratorCombinator: Iterator {
     fn combinations_until<'a>(self, k: usize) -> impl Iterator<Item = Vec<<Self as Iterator>::Item>>
     where
         Self: Sized,
-        <Self as std::iter::Iterator>::Item: Clone + 'a,
+        <Self as core::iter::Iterator>::Item: Clone + 'a,
     {
         let collect = self.collect::<Vec<_>>();
 
         (0..=k)
             .map(move |k| Combinator::new(collect.clone(), k))
-            .flat_map(std::iter::IntoIterator::into_iter)
+            .flat_map(core::iter::IntoIterator::into_iter)
     }
     fn powerset<'a>(self) -> impl Iterator<Item = Vec<<Self as Iterator>::Item>>
     where
         Self: Sized,
-        <Self as std::iter::Iterator>::Item: Clone + 'a,
+        <Self as core::iter::Iterator>::Item: Clone + 'a,
     {
         let collect = self.collect::<Vec<_>>();
 
         (0..=collect.len())
             .map(move |k| Combinator::new(collect.clone(), k))
-            .flat_map(std::iter::IntoIterator::into_iter)
+            .flat_map(core::iter::IntoIterator::into_iter)
     }
 }
 
@@ -212,9 +212,9 @@ impl<T> IteratorCombinator for T where T: Iterator {}
 #[cfg(test)]
 mod tests {
 
-    use crate::helper::permutations::IteratorPermutator;
+    use crate::helper::permutations::IteratorPermutator as _;
 
-    use super::{Counter, IteratorCombinator};
+    use super::{Counter, IteratorCombinator as _};
 
     #[test]
     fn powerset_test() {

@@ -1,5 +1,5 @@
+use core::fmt::Display;
 use std::{
-    fmt::Display,
     path::PathBuf,
     process::{Command, Output, Stdio},
 };
@@ -27,7 +27,7 @@ pub enum AOCError {
 }
 impl Display for AOCError {
     #[expect(clippy::use_debug, reason = "dont bother")]
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{self:?}")
     }
 }

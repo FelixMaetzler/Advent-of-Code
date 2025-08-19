@@ -1,8 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
 use all_aoc::helper::{
-    graph::{Graph, Special, WithWeights},
-    grid::{Grid, dense::DenseGrid, index::GridIndex},
+    graph::{Graph as _, Special, WithWeights as _},
+    grid::{Grid as _, dense::DenseGrid, index::GridIndex as _},
     position::Direction4,
 };
 

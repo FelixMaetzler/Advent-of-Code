@@ -1,4 +1,4 @@
-use std::fmt::Write;
+use core::fmt::Write as _;
 // https://en.wikipedia.org/wiki/MD5
 const S: [u32; 64] = [
     7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9,
@@ -76,7 +76,12 @@ fn md5_transform(chunk: &[u8], hash: &mut [u32; 4]) {
 
 pub fn md5(message: &str) -> String {
     #[expect(clippy::unreadable_literal, reason = "doesnt need to be readable")]
-    let mut hash = [0x67452301_u32, 0xefcdab89_u32, 0x98badcfe_u32, 0x10325476_u32];
+    let mut hash = [
+        0x67452301_u32,
+        0xefcdab89_u32,
+        0x98badcfe_u32,
+        0x10325476_u32,
+    ];
     let mut message_bytes = message.as_bytes().to_vec();
 
     // Padding hinzufügen

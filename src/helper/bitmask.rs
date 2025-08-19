@@ -1,4 +1,4 @@
-use std::ops::{BitAnd, BitOr, Not, Shl, Sub};
+use core::ops::{BitAnd, BitOr, Not, Shl, Sub};
 
 use crate::helper::misc::One;
 

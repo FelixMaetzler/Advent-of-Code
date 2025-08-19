@@ -1,4 +1,4 @@
-use std::ops::{Add, Rem};
+use core::ops::{Add, Rem};
 
 ///
 /// Modulo that handles negative numbers, works the same as Python's `%`.
