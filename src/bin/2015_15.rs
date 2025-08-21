@@ -29,9 +29,7 @@ impl FromStr for Ingridient {
 }
 pub fn part_one(input: &str) -> Option<i32> {
     let vec = parse(input);
-    let comb = generate_combinations(100, vec.len().try_into().unwrap());
-
-    comb.into_iter()
+    generate_combinations(100, vec.len().try_into().unwrap())
         .filter(|v| v.iter().sum::<i32>() == 100)
         .map(|comb| calc(&vec, &comb))
         .max()
@@ -39,8 +37,7 @@ pub fn part_one(input: &str) -> Option<i32> {
 
 pub fn part_two(input: &str) -> Option<i32> {
     let vec = parse(input);
-    let comb = generate_combinations(100, vec.len().try_into().unwrap());
-    comb.into_iter()
+    generate_combinations(100, vec.len().try_into().unwrap())
         .filter(|v| v.iter().sum::<i32>() == 100 && calories(&vec, v) == 500)
         .map(|comb| calc(&vec, &comb))
         .max()
@@ -75,9 +72,9 @@ fn parse(input: &str) -> Vec<Ingridient> {
         .map(|l| Ingridient::from_str(l).unwrap())
         .collect()
 }
-fn generate_combinations(base: i32, n: u32) -> Vec<Vec<i32>> {
+fn generate_combinations(base: i32, n: u32) -> impl Iterator<Item = Vec<i32>> {
     let i = (base + 1).pow(n);
-    (0..i).map(|i| split_and_pad(i, base, n)).collect()
+    (0..i).map(move |i| split_and_pad(i, base, n))
 }
 fn split_and_pad(mut num: i32, base: i32, n: u32) -> Vec<i32> {
     let mut digits = Vec::with_capacity(n as usize);
@@ -90,7 +87,7 @@ fn split_and_pad(mut num: i32, base: i32, n: u32) -> Vec<i32> {
     while digits.len() < n as usize {
         digits.insert(0, 0);
     }
-
+    digits.shrink_to_fit();
     digits
 }
 #[cfg(test)]
