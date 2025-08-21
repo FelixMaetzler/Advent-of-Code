@@ -1,4 +1,12 @@
 all_aoc::solution!(22, 2015);
+
+pub fn part_one(input: &str) -> Option<i32> {
+    Some(solve(input, Difficulty::Easy))
+}
+
+pub fn part_two(input: &str) -> Option<i32> {
+    Some(solve(input, Difficulty::Hard))
+}
 #[derive(Debug, Clone, Copy)]
 enum Difficulty {
     Easy = 0,
@@ -15,6 +23,7 @@ struct GameState {
     turn: i32,
     difficulty: Difficulty,
     effects: Vec<Spell>,
+    gamelog: String,
 }
 
 impl GameState {
@@ -29,6 +38,7 @@ impl GameState {
             turn: 0,
             difficulty: Difficulty::Easy,
             effects: vec![],
+            gamelog: String::new(),
         }
     }
 
@@ -38,13 +48,26 @@ impl GameState {
         let mut mana = self.mana;
         let mut armor = 0;
         let mut effects = vec![];
-
+        let mut gamelog = if self.turn > 0 {
+            format!("{}\n", self.gamelog)
+        } else {
+            String::new()
+        };
         if self.turn % 2 == 0 {
             player_hp -= self.difficulty as i32;
             if player_hp <= 0 {
                 return None;
             }
         }
+
+        gamelog = format!(
+            "{gamelog}-- {} turn --\n- Player has {} hit points, {} armor, {} mana\n- Boss has {} hit points\n",
+            if self.turn % 2 == 0 { "Player" } else { "Boss" },
+            player_hp,
+            self.armor,
+            self.mana,
+            self.boss_hp
+        );
 
         for effect in &self.effects {
             if effect.armor > 0 {
@@ -53,10 +76,22 @@ impl GameState {
 
             if effect.damage > 0 {
                 boss_hp -= effect.damage;
+                gamelog = format!(
+                    "{gamelog}{} deals {} damage; its timer is now {}\n",
+                    effect.name,
+                    effect.damage,
+                    effect.duration - 1
+                );
             }
 
             if effect.mana > 0 {
                 mana += effect.mana;
+                gamelog = format!(
+                    "{gamelog}{} provides {} mana; its timer is now {}\n",
+                    effect.name,
+                    effect.mana,
+                    effect.duration - 1
+                );
             }
 
             if effect.duration > 1 {
@@ -74,10 +109,12 @@ impl GameState {
             turn: self.turn + 1,
             difficulty: self.difficulty,
             effects,
+            gamelog,
         })
     }
 
     fn cast(&self, spell: &Spell) -> Self {
+        let gamelog = format!("{}Player casts {}\n", self.gamelog, spell.name);
         assert!((self.mana >= spell.cost), "bug in move generator");
 
         if spell.duration > 0 {
@@ -93,6 +130,7 @@ impl GameState {
                 turn: self.turn,
                 difficulty: self.difficulty,
                 effects,
+                gamelog,
             }
         } else {
             Self {
@@ -105,6 +143,7 @@ impl GameState {
                 turn: self.turn,
                 difficulty: self.difficulty,
                 effects: self.effects.clone(),
+                gamelog,
             }
         }
     }
@@ -128,7 +167,7 @@ impl GameState {
 
     fn boss_move(&self) -> Self {
         let damage = 1.max(self.damage - self.armor);
-
+        let gamelog = format!("{}Boss attacks for {damage} damage\n", self.gamelog);
         Self {
             player_hp: self.player_hp - damage,
             boss_hp: self.boss_hp,
@@ -139,6 +178,7 @@ impl GameState {
             turn: self.turn,
             difficulty: self.difficulty,
             effects: self.effects.clone(),
+            gamelog,
         }
     }
 
@@ -203,6 +243,9 @@ impl GameState {
         best_so_far
     }
 }
+
+// --------------------------------------------------------------------------------
+
 #[derive(Debug, Clone)]
 struct Spell {
     name: &'static str,
@@ -269,41 +312,22 @@ const SPELLS: [Spell; 5] = [
         duration: 5,
     },
 ];
-pub fn part_one(input: &str) -> Option<i32> {
-    let (hp, dmg) = parse(input);
-    let starting_state = GameState::new(hp, 55, 500, dmg);
-    let win = starting_state.cheapest_win(i32::MAX).unwrap();
-    Some(win.spent)
-}
 
-pub fn part_two(input: &str) -> Option<i32> {
-    let (hp, dmg) = parse(input);
-    let mut starting_state = GameState::new(hp, 55, 500, dmg);
-    starting_state.difficulty = Difficulty::Hard;
+fn solve(input: &str, diff: Difficulty) -> i32 {
+    let (hit_points, dmg) = parse(input);
+    let mut starting_state = GameState::new(50, hit_points, 500, dmg);
+    starting_state.difficulty = diff;
     let win = starting_state.cheapest_win(i32::MAX).unwrap();
-    Some(win.spent)
+    win.spent
 }
 fn parse(input: &str) -> (i32, i32) {
-    (
-        input
-            .lines()
-            .next()
-            .unwrap()
-            .split_once(": ")
-            .unwrap()
-            .1
-            .parse()
-            .unwrap(),
-        input
-            .lines()
-            .nth(1)
-            .unwrap()
-            .split_once(": ")
-            .unwrap()
-            .1
-            .parse()
-            .unwrap(),
-    )
+    let (hit_points, dmg) = input.split_once('\n').unwrap();
+    let hit_points = hit_points
+        .trim_start_matches("Hit Points: ")
+        .parse()
+        .unwrap();
+    let dmg = dmg.trim_start_matches("Damage: ").parse().unwrap();
+    (hit_points, dmg)
 }
 #[cfg(test)]
 mod tests {
