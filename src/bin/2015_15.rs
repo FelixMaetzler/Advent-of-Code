@@ -102,7 +102,6 @@ mod tests {
         let result = part_one(&all_aoc::cli::read_examples_file(DAY));
         assert_eq!(result, Some(62_842_880));
     }
-    #[cfg(feature = "expensive")]
     #[test]
     fn test_part_one_actual() {
         let result = part_one(&all_aoc::cli::read_inputs_file(DAY));
@@ -114,7 +113,6 @@ mod tests {
         let result = part_two(&all_aoc::cli::read_examples_file(DAY));
         assert_eq!(result, Some(57_600_000));
     }
-    #[cfg(feature = "expensive")]
     #[test]
     fn test_part_two_actual() {
         let result = part_two(&all_aoc::cli::read_inputs_file(DAY));

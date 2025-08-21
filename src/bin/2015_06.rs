@@ -100,7 +100,6 @@ fn generate_all_combs(range: RangeInclusive<Position<i32>>) -> impl Iterator<Ite
 
     (start.y..=end.y).flat_map(move |y| (start.x..=end.x).map(move |x| Position { x, y }))
 }
-#[cfg(feature = "expensive")]
 #[cfg(test)]
 mod tests {
     use super::*;

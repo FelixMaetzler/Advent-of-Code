@@ -60,18 +60,18 @@ fn execute(vec: &[Operation], map: HashMap<char, u32>) -> Option<u32> {
                 ptr += 1;
             }
             Operation::Jump(offset) => {
-                ptr += usize::try_from(offset).unwrap();
+                ptr = (i32::try_from(ptr).unwrap() + offset).try_into().unwrap();
             }
             Operation::JumpIfEven(reg, offset) => {
                 if &map[&reg] % 2 == 0 {
-                    ptr += usize::try_from(offset).unwrap();
+                    ptr = (i32::try_from(ptr).unwrap() + offset).try_into().unwrap();
                 } else {
                     ptr += 1;
                 }
             }
             Operation::JumpIfOne(reg, offset) => {
                 if map[&reg] == 1 {
-                    ptr += usize::try_from(offset).unwrap();
+                    ptr = (i32::try_from(ptr).unwrap() + offset).try_into().unwrap();
                 } else {
                     ptr += 1;
                 }
