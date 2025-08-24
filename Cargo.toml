@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2024"
 default-run = "all_aoc"
 
+[profile.release]
+debug = true
+
 [features]
 expensive = []
 
