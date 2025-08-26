@@ -138,7 +138,7 @@ fn parse_number(input: &mut &str) -> Expression {
     while end < input.len() && input.as_bytes()[end].is_ascii_digit() {
         end += 1;
     }
-    assert!((end != 0), "Expected number at '{input}'");
+    assert!( end != 0, "Expected number at '{input}'");
 
     let (number_str, rest) = input.split_at(end);
     *input = rest;

@@ -1,4 +1,5 @@
-use std::{collections::HashSet, str::FromStr};
+use core::str::FromStr;
+use std::collections::HashSet;
 
 use all_aoc::helper::position::{Direction4, Position};
 

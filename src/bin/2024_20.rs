@@ -1,4 +1,5 @@
-use std::{collections::HashMap, fmt::Debug};
+use core::fmt::Debug;
+use std::collections::HashMap;
 
 use all_aoc::helper::{
     graph::{WithWeights as _, build_graph4_special},

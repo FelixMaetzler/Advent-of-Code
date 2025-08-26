@@ -1,4 +1,5 @@
-use std::{collections::HashMap, iter};
+use core::iter;
+use std::collections::HashMap;
 
 use all_aoc::helper::{
     intcode::{InputMode, IntInteger, Intcode, Return},

@@ -55,7 +55,7 @@ fn support_ssl(input: &str) -> bool {
         .map(|s| s.chars().collect::<Vec<_>>())
         .flat_map(|v| {
             v.windows(3)
-                .filter(|&w| (w[0] == w[2] && w[0] != w[1])).map(|w| (w[0], w[1]))
+                .filter(|&w| w[0] == w[2] && w[0] != w[1]).map(|w| (w[0], w[1]))
                 .collect::<Vec<_>>()
         })
         .collect::<HashSet<_>>();

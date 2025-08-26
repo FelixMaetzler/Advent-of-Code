@@ -1,4 +1,5 @@
-use std::{collections::HashMap, str::FromStr};
+use core::str::FromStr;
+use std::collections::HashMap;
 
 all_aoc::solution!(23, 2015);
 enum Operation {
@@ -63,7 +64,7 @@ fn execute(vec: &[Operation], map: HashMap<char, u32>) -> Option<u32> {
                 ptr = (i32::try_from(ptr).unwrap() + offset).try_into().unwrap();
             }
             Operation::JumpIfEven(reg, offset) => {
-                if &map[&reg] % 2 == 0 {
+                if map[&reg].is_multiple_of(2) {
                     ptr = (i32::try_from(ptr).unwrap() + offset).try_into().unwrap();
                 } else {
                     ptr += 1;

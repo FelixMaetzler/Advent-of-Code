@@ -1,7 +1,5 @@
-use std::{
-    io::{self, Write as _},
-    time::Duration,
-};
+use core::time::Duration;
+use std::io::{self, Write as _};
 
 use crate::cli::day::Day;
 

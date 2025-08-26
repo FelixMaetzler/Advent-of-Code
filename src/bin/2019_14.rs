@@ -1,4 +1,5 @@
-use std::{collections::HashMap, str::FromStr};
+use core::str::FromStr;
+use std::collections::HashMap;
 
 all_aoc::solution!(14, 2019);
 #[derive(Debug)]

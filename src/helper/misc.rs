@@ -1,8 +1,6 @@
 use core::hash::Hash;
-use std::{
-    collections::HashMap,
-    ops::{AddAssign, Div, Mul, Rem, SubAssign},
-};
+use core::ops::{AddAssign, Div, Mul, Rem, SubAssign};
+use std::collections::HashMap;
 
 pub fn number_to_digit_count(x: u64) -> u8 {
     x.checked_ilog10()

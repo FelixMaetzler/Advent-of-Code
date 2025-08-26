@@ -115,7 +115,7 @@ impl GameState {
 
     fn cast(&self, spell: &Spell) -> Self {
         let gamelog = format!("{}Player casts {}\n", self.gamelog, spell.name);
-        assert!((self.mana >= spell.cost), "bug in move generator");
+        assert!( self.mana >= spell.cost, "bug in move generator");
 
         if spell.duration > 0 {
             let mut effects = self.effects.clone();

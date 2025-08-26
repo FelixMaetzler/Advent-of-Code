@@ -23,7 +23,7 @@ impl Equation {
         let mut comb = comb;
         let mut sum = *self.numbers.first().expect("cant be empty");
         for n in &self.numbers[1..] {
-            if comb % 2 == 0 {
+            if comb.is_multiple_of(2) {
                 sum += n;
             } else {
                 sum *= n;
@@ -52,7 +52,7 @@ fn recurse(result: u64, numbers: &[u64]) -> bool {
     if result % m == last && recurse((result - last) / m, next) {
         return true;
     }
-    if result % last == 0 && recurse(result / last, next) {
+    if result.is_multiple_of(last) && recurse(result / last, next) {
         return true;
     }
     if last > result {

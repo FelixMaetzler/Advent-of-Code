@@ -1,4 +1,5 @@
-use std::{collections::HashMap, hash::Hash, str::FromStr};
+use core::{hash::Hash, str::FromStr};
+use std::collections::HashMap;
 
 all_aoc::solution!(7, 2015);
 #[derive(Debug, Hash, PartialEq, Eq, Clone)]

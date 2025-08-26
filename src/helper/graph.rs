@@ -1,8 +1,5 @@
-use core::fmt::Write as _;
-use std::{
-    collections::{BinaryHeap, HashMap, HashSet},
-    ops::Add,
-};
+use core::{fmt::Write as _, ops::Add};
+use std::collections::{BinaryHeap, HashMap, HashSet};
 
 use super::grid::{Grid, index::GridIndex as _};
 
@@ -402,7 +399,7 @@ pub trait Graph {
                 }
             }
         }
-        assert!((graph.edges_count() == 0), "Graph has a cycle");
+        assert!(graph.edges_count() == 0, "Graph has a cycle");
         l
     }
 }

@@ -1,4 +1,5 @@
-use std::{collections::HashMap, iter::successors};
+use core::iter::successors;
+use std::collections::HashMap;
 
 use all_aoc::helper::misc::number_to_digit_count;
 
@@ -16,7 +17,7 @@ fn blink(map: &HashMap<u64, u64>) -> HashMap<u64, u64> {
     for (stone, count) in map {
         if *stone == 0 {
             *ret.entry(1).or_default() += count;
-        } else if number_to_digit_count(*stone) % 2 == 0 {
+        } else if number_to_digit_count(*stone).is_multiple_of(2) {
             let (n1, n2) = split_number(*stone);
             *ret.entry(n1).or_default() += count;
             *ret.entry(n2).or_default() += count;

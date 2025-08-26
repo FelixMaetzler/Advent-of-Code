@@ -1,8 +1,5 @@
-use std::{
-    collections::{HashMap, HashSet},
-    fmt::Debug,
-    iter,
-};
+use core::{fmt::Debug, iter};
+use std::collections::{HashMap, HashSet};
 
 use all_aoc::helper::{
     graph::{WithWeights as _, build_graph4_special},

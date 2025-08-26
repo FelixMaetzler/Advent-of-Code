@@ -1,4 +1,5 @@
-use std::{collections::HashMap, ops::RangeInclusive, str::FromStr};
+use core::{ops::RangeInclusive, str::FromStr};
+use std::collections::HashMap;
 
 use all_aoc::helper::position::Position;
 

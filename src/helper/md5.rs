@@ -82,7 +82,8 @@ pub fn md5(message: &str) -> String {
         0x98badcfe_u32,
         0x10325476_u32,
     ];
-    let mut message_bytes = message.as_bytes().to_vec();
+    let mut message_bytes = Vec::with_capacity(message.len() * 4);
+    message_bytes.extend_from_slice(message.as_bytes());
 
     // Padding hinzufügen
     md5_padding(&mut message_bytes);

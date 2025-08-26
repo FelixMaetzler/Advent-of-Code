@@ -1,4 +1,5 @@
-use std::{collections::HashMap, str::FromStr};
+use core::str::FromStr;
+use std::collections::HashMap;
 
 use all_aoc::helper::{bitmask::Bitmask as _, permutations::IteratorCombinator as _};
 

@@ -1,7 +1,5 @@
-use std::{
-    collections::HashSet,
-    fmt::{Debug, Write as _},
-};
+use core::fmt::{Debug, Write as _};
+use std::collections::HashSet;
 
 use all_aoc::helper::{
     grid::{Grid as _, dense::DenseGrid, index::GridIndex},

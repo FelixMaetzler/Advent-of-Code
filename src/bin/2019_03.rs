@@ -1,7 +1,5 @@
-use std::{
-    collections::{HashMap, HashSet},
-    str::FromStr,
-};
+use core::str::FromStr;
+use std::collections::{HashMap, HashSet};
 
 use all_aoc::helper::position::{Direction4, Position};
 

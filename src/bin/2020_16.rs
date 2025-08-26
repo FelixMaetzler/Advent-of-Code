@@ -1,8 +1,5 @@
-use std::{
-    collections::{HashMap, HashSet},
-    ops::RangeInclusive,
-    str::FromStr,
-};
+use core::{ops::RangeInclusive, str::FromStr};
+use std::collections::{HashMap, HashSet};
 
 use all_aoc::helper::misc::count_occurrences;
 

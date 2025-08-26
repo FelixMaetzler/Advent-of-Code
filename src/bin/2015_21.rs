@@ -1,8 +1,8 @@
-use std::{
-    collections::HashSet,
+use core::{
     iter,
     ops::{Add, AddAssign},
 };
+use std::collections::HashSet;
 
 use all_aoc::helper::permutations::IteratorCombinator as _;
 

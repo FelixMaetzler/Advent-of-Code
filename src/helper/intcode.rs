@@ -1,7 +1,6 @@
-use std::{
-    collections::VecDeque,
-    ops::{Index, IndexMut},
-};
+use core::ops::{Index, IndexMut};
+use std::collections::VecDeque;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum Return {
     Finished,

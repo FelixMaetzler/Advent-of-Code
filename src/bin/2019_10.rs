@@ -72,7 +72,7 @@ pub fn part_two(input: &str) -> Option<i32> {
     let mut asteroids = grid
         .iter()
         .enumerate()
-        .filter(|&(_, t)| (*t == Tile::Asteroid))
+        .filter(|&(_, t)| *t == Tile::Asteroid)
         .map(|(i, _)| i.to_position(&grid))
         .map(|Position { x, y }| Position {
             x: x.try_into().unwrap(),
@@ -100,7 +100,7 @@ fn solve_part_one(grid: &DenseGrid<Tile>) -> Option<(usize, Position<i32>)> {
     let all_astroids = grid
         .iter()
         .enumerate()
-        .filter(|&(_, t)| (*t == Tile::Asteroid))
+        .filter(|&(_, t)| *t == Tile::Asteroid)
         .map(|(i, _)| i.to_position(grid))
         .map(|Position { x, y }| Position {
             x: x.try_into().unwrap(),

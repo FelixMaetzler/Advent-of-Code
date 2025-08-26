@@ -1,4 +1,5 @@
-use std::{collections::HashMap, fmt::Display};
+use core::fmt::Display;
+use std::collections::HashMap;
 
 use all_aoc::helper::graph::{Graph as _, Special, WithWeights as _};
 

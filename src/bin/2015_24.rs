@@ -50,7 +50,7 @@ fn execute(input: &str, count: usize) -> Option<u64> {
     w.sort_unstable_by(|a, b| b.cmp(a));
 
     let total: u64 = w.iter().sum();
-    if total % (count as u64) != 0 {
+    if !total.is_multiple_of(count as u64) {
         return None;
     }
     let target = total / (count as u64);
