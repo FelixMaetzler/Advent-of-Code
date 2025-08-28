@@ -10,3 +10,4 @@ pub mod permutations;
 pub mod position;
 pub mod position3d;
 pub mod rand;
+pub mod range;
