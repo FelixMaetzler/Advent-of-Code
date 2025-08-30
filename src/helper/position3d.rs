@@ -6,7 +6,21 @@ pub struct Position3d<T> {
     pub y: T,
     pub z: T,
 }
-
+impl<T> Position3d<T> {
+    pub fn from_it<I>(mut it: I) -> Option<Self>
+    where
+        I: Iterator<Item = T>,
+    {
+        let x = it.next()?;
+        let y = it.next()?;
+        let z = it.next()?;
+        if it.next().is_some() {
+            None
+        } else {
+            Some(Self { x, y, z })
+        }
+    }
+}
 impl<T> Sub for Position3d<T>
 where
     T: Sub<Output = T>,
@@ -150,3 +164,36 @@ call_macro_with_types!(
     impl_mul_for_type,
     [u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, f32, f64]
 );
+macro_rules! impl_manhattan_for_signed {
+    ($type:ty) => {
+        impl Position3d<$type> {
+            pub const fn manhattan_norm_squared(&self) -> $type {
+                self.x.abs() + self.y.abs() + self.z.abs()
+            }
+        }
+    };
+}
+
+macro_rules! impl_manhattan_for_unsigned {
+    ($type:ty) => {
+        impl Position3d<$type> {
+            pub const fn manhattan_norm_squared(&self) -> $type {
+                self.x + self.y + self.z
+            }
+        }
+    };
+}
+
+impl_manhattan_for_signed!(i8);
+impl_manhattan_for_signed!(i16);
+impl_manhattan_for_signed!(i32);
+impl_manhattan_for_signed!(i64);
+impl_manhattan_for_signed!(i128);
+impl_manhattan_for_signed!(isize);
+
+impl_manhattan_for_unsigned!(u8);
+impl_manhattan_for_unsigned!(u16);
+impl_manhattan_for_unsigned!(u32);
+impl_manhattan_for_unsigned!(u64);
+impl_manhattan_for_unsigned!(u128);
+impl_manhattan_for_unsigned!(usize);
