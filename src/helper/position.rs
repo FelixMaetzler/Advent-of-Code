@@ -325,4 +325,17 @@ impl Direction8 {
             North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest,
         ]
     }
+    pub fn from_short_name(name: &str) -> Result<Self, &str> {
+        match name {
+            "n" => Ok(Self::North),
+            "ne" => Ok(Self::NorthEast),
+            "e" => Ok(Self::East),
+            "se" => Ok(Self::SouthEast),
+            "s" => Ok(Self::South),
+            "sw" => Ok(Self::SouthWest),
+            "w" => Ok(Self::West),
+            "nw" => Ok(Self::NorthWest),
+            x => Err(x),
+        }
+    }
 }
