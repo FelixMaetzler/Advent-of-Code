@@ -1,5 +1,5 @@
 use core::{fmt::Write as _, ops::Add};
-use std::collections::{BinaryHeap, HashMap, HashSet};
+use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 
 use super::grid::{Grid, index::GridIndex as _};
 
@@ -256,6 +256,34 @@ pub trait Graph {
     fn nodes(&self) -> impl Iterator<Item = NodeIndex>;
     fn edges_count(&self) -> usize;
     fn remove_edge(&mut self, from: NodeIndex, to: NodeIndex) -> bool;
+    fn connected_components(&self) -> Vec<HashSet<NodeIndex>> {
+        let mut visited = HashSet::new();
+        let mut components = Vec::new();
+
+        for start in self.nodes() {
+            if visited.contains(&start) {
+                continue;
+            }
+
+            let mut component = HashSet::new();
+            let mut queue = VecDeque::new();
+            queue.push_back(start);
+            visited.insert(start);
+
+            while let Some(node) = queue.pop_front() {
+                component.insert(node);
+                for neigh in self.outgoing(node).chain(self.incoming(node)) {
+                    if visited.insert(neigh) {
+                        queue.push_back(neigh);
+                    }
+                }
+            }
+
+            components.push(component);
+        }
+
+        components
+    }
     fn all_paths(&self, start: NodeIndex, end: NodeIndex) -> Vec<Vec<NodeIndex>>
     where
         Self: Sized,
