@@ -23,7 +23,7 @@ pub fn part_two(input: &str) -> Option<String> {
         output
     });
 
-    Some(string)
+    Some(string.to_ascii_lowercase())
 }
 
 fn execute1(vec: &mut [usize], length: usize) -> usize {
