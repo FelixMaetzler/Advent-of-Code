@@ -1,13 +1,36 @@
+use core::num::TryFromIntError;
 use core::{
     fmt::Debug,
     ops::{Add, AddAssign, DivAssign, Mul, MulAssign, Rem, RemAssign, Sub, SubAssign},
     str::FromStr,
 };
 
+use crate::helper::misc::One;
+
 #[derive(Debug, Default, PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
 pub struct Position<T> {
     pub x: T,
     pub y: T,
+}
+impl TryFrom<Position<isize>> for Position<usize> {
+    type Error = TryFromIntError;
+
+    fn try_from(value: Position<isize>) -> Result<Self, Self::Error> {
+        Ok(Self {
+            x: usize::try_from(value.x)?,
+            y: usize::try_from(value.y)?,
+        })
+    }
+}
+impl TryFrom<Position<usize>> for Position<isize> {
+    type Error = TryFromIntError;
+
+    fn try_from(value: Position<usize>) -> Result<Self, Self::Error> {
+        Ok(Self {
+            x: isize::try_from(value.x)?,
+            y: isize::try_from(value.y)?,
+        })
+    }
 }
 impl<T> Position<T>
 where
@@ -167,27 +190,26 @@ where
 
 impl<T> Position<T>
 where
-    T: Add<Output = T> + Sub<Output = T> + Copy,
-    i32: Into<T>,
+    T: Add<Output = T> + Sub<Output = T> + Copy + One,
 {
     #[must_use]
     pub fn direction(&self, d: Direction4) -> Self {
         match d {
             Direction4::North => Self {
                 x: self.x,
-                y: self.y + 1.into(),
+                y: self.y + T::one(),
             },
             Direction4::East => Self {
-                x: self.x + 1.into(),
+                x: self.x + T::one(),
                 y: self.y,
             },
             Direction4::West => Self {
-                x: self.x - 1.into(),
+                x: self.x - T::one(),
                 y: self.y,
             },
             Direction4::South => Self {
                 x: self.x,
-                y: self.y - 1.into(),
+                y: self.y - T::one(),
             },
         }
     }
