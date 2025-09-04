@@ -1,6 +1,6 @@
 use core::ops::RangeInclusive;
 
-use all_aoc::helper::range::Ext as _;
+use all_aoc::helper::range::ExtRangeOps as _;
 
 all_aoc::solution!(20, 2016);
 #[derive(Debug)]
