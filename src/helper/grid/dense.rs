@@ -1,10 +1,12 @@
+use crate::helper::position::Position;
+
 use super::{Grid, index::GridIndex};
 use core::fmt::Write as _;
 use core::{
     fmt::Debug,
     ops::{Index, IndexMut},
 };
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 #[expect(clippy::module_name_repetitions, reason = "makes more sense")]
 pub struct DenseGrid<T> {
     data: Vec<T>,
@@ -116,6 +118,37 @@ impl<T> DenseGrid<T> {
             width,
         }
     }
+
+    pub fn get_row(&self, n: usize) -> impl Iterator<Item = &T> {
+        self.data.iter().skip(n * self.width).take(self.width)
+    }
+
+    pub fn get_col(&self, x: usize) -> impl Iterator<Item = &T> {
+        (0..self.height).map(move |row| &self.data[row * self.width + x])
+    }
+
+    pub fn set_row(&mut self, i: usize, row: &[T])
+    where
+        T: Clone,
+    {
+        assert_eq!(row.len(), self.width, "row length must match grid width");
+        let start = i * self.width;
+        let end = start + self.width;
+        self.data[start..end].clone_from_slice(row);
+    }
+    pub fn set_col(&mut self, x: usize, col: &[T])
+    where
+        T: Clone,
+    {
+        assert_eq!(
+            col.len(),
+            self.height,
+            "column length must match grid height"
+        );
+        for (y, item) in col.iter().enumerate() {
+            self.data[y * self.width + x] = item.clone();
+        }
+    }
 }
 impl<T> Index<usize> for DenseGrid<T> {
     type Output = T;
@@ -144,6 +177,25 @@ where
     T: Clone + Debug,
 {
     fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
+        let index = index.to_flat_index(self);
+        &mut self.data[index]
+    }
+}
+impl<T> Index<Position<usize>> for DenseGrid<T>
+where
+    T: Clone + Debug,
+{
+    type Output = T;
+
+    fn index(&self, index: Position<usize>) -> &Self::Output {
+        &self.data[index.to_flat_index(self)]
+    }
+}
+impl<T> IndexMut<Position<usize>> for DenseGrid<T>
+where
+    T: Clone + Debug,
+{
+    fn index_mut(&mut self, index: Position<usize>) -> &mut Self::Output {
         let index = index.to_flat_index(self);
         &mut self.data[index]
     }
