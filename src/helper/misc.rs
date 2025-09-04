@@ -145,6 +145,20 @@ where
 {
     lcm(a, lcm(b, c))
 }
+pub fn lcm_over_slice<T>(slice: &[T]) -> T
+where
+    T: Copy
+        + Ord
+        + Unsigned
+        + Rem<Output = T>
+        + Zero
+        + SubAssign
+        + AddAssign
+        + Mul<Output = T>
+        + Div<Output = T>,
+{
+    slice.iter().copied().reduce(|acc, e| lcm(acc, e)).unwrap()
+}
 #[cfg(test)]
 mod tests {
     use super::*;
