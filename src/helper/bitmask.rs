@@ -1,17 +1,20 @@
 use core::ops::{BitAnd, BitOr, Not, Shl, Sub};
 
-use crate::helper::misc::One;
+use crate::helper::misc::{One, Zero};
 
 pub trait Bitmask
 where
     Self: Sized
         + Copy
+        + Zero
         + One
         + BitOr<Output = Self>
         + BitAnd<Output = Self>
         + Not<Output = Self>
         + Shl<u32, Output = Self>
-        + Sub<Output = Self>,
+        + Sub<Output = Self>
+        + Default
+        + core::cmp::PartialEq,
 {
     fn set_bit(&mut self, index: usize, val: bool) {
         let mask = Self::one() << (index.try_into().unwrap());
@@ -20,6 +23,10 @@ where
         } else {
             *self = *self & !mask;
         }
+    }
+    fn get_bit(&self, index: usize) -> bool {
+        let mask = Self::one() << (index.try_into().unwrap());
+        (*self & mask) != Self::zero()
     }
 }
 
