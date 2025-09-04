@@ -3,4 +3,4 @@ download = "run --quiet --release -- download"
 prepare = "run --quiet --release -- prepare"
 solve = "run --quiet --release -- solve"
 [env]
-AOC_YEAR = "2019"
+AOC_YEAR = "2023"
