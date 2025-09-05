@@ -190,7 +190,7 @@ fn parse(input: &str) -> DenseGrid<u32> {
     DenseGrid::from_iter_iter(
         input
             .lines()
-            .map(|l| l.chars().map(|c| format!("{c}").parse().unwrap())),
+            .map(|l| l.chars().map(|c| c.to_digit(10).unwrap())),
     )
 }
 #[cfg(test)]
