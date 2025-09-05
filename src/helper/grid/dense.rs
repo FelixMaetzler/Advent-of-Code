@@ -149,6 +149,46 @@ impl<T> DenseGrid<T> {
             self.data[y * self.width + x] = item.clone();
         }
     }
+    pub fn split_width(&self, sub_width: usize) -> Vec<Self>
+    where
+        T: Clone,
+    {
+        debug_assert!(
+            self.width.is_multiple_of(sub_width),
+            "sub_width must divide evenly into width"
+        );
+        let cols = self.width / sub_width;
+
+        let mut result = Vec::with_capacity(cols);
+
+        for c in 0..cols {
+            let mut data = Vec::with_capacity(sub_width * self.height);
+
+            for y in 0..self.height {
+                let start = y * self.width + c * sub_width;
+                let end = start + sub_width;
+                data.extend_from_slice(&self.data[start..end]);
+            }
+
+            result.push(Self {
+                width: sub_width,
+                height: self.height,
+                data,
+            });
+        }
+
+        result
+    }
+    pub fn remove_col(&mut self, col: usize) {
+        assert!(col < self.width, "column out of bounds");
+
+        for row in (0..self.height).rev() {
+            let idx = row * self.width + col;
+            self.data.remove(idx);
+        }
+
+        self.width -= 1;
+    }
 }
 impl<T> Index<usize> for DenseGrid<T> {
     type Output = T;
