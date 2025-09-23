@@ -226,6 +226,23 @@ where
             paths.get(&end).cloned().unwrap_or_else(Vec::new), // Return an empty path if unreachable
         )
     }
+    fn all_pairs_shortest_distances(&self) -> HashMap<(NodeIndex, NodeIndex), T>
+    where
+        T: Copy + Add<Output = T> + Default + Ord,
+    {
+        let mut result = HashMap::new();
+
+        for u in self.nodes() {
+            let dist = self.dijkstra_distances(u, None);
+            for (v, d) in dist {
+                if u != v {
+                    result.insert((u, v), d);
+                }
+            }
+        }
+
+        result
+    }
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct State<T> {
