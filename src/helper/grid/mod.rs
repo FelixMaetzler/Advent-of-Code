@@ -34,6 +34,9 @@ where
     fn iter<'a>(&'a self) -> impl Iterator<Item = &'a T>
     where
         T: 'a;
+    fn iter_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut T>
+    where
+        T: 'a;
     /// returns the neigbors (if they exist) counterclockwise starting from the North
     fn get_neigbors4<'a, I>(&'a self, index: I) -> impl Iterator<Item = (impl GridIndex<T>, &'a T)>
     where

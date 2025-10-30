@@ -56,7 +56,12 @@ where
     {
         self.data.iter()
     }
-
+    fn iter_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut T>
+    where
+        T: 'a,
+    {
+        self.data.iter_mut()
+    }
     fn all_indices(&self) -> impl Iterator<Item = impl GridIndex<T>> {
         0..self.len()
     }

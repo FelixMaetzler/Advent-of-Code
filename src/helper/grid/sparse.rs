@@ -64,6 +64,13 @@ where
     fn all_indices(&self) -> impl Iterator<Item = impl GridIndex<T>> {
         self.data.keys().copied()
     }
+
+    fn iter_mut<'a>(&'a mut self) -> impl Iterator<Item = &'a mut T>
+    where
+        T: 'a,
+    {
+        self.data.values_mut()
+    }
 }
 impl<T> SparseGrid<T>
 where
