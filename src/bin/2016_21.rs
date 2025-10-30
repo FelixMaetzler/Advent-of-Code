@@ -67,10 +67,10 @@ impl<const T: usize> Str<T> {
         let n2 = self.find_index(c2).unwrap();
         self.swap_pos(n1, n2);
     }
-    fn rotate_right(&mut self, count: usize) {
+    const fn rotate_right(&mut self, count: usize) {
         self.0.rotate_right(count % T);
     }
-    fn rotate_left(&mut self, count: usize) {
+    const fn rotate_left(&mut self, count: usize) {
         self.0.rotate_left(count);
     }
     fn rotate_letter(&mut self, c: char) {

@@ -19,7 +19,7 @@ const K: [u32; 64] = [
 
 // Hilfsfunktionen
 const fn left_rotate(x: u32, c: u32) -> u32 {
-    (x << c) | (x >> (32 - c))
+    x.rotate_left(c)
 }
 
 fn md5_padding(message: &mut Vec<u8>) {

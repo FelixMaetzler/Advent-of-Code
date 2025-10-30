@@ -5,8 +5,8 @@ all_aoc::solution!(12, 2015);
 enum JsonObject {
     Number(i32),
     String(String),
-    Array(Vec<JsonObject>),
-    Dict(HashMap<String, JsonObject>),
+    Array(Vec<Self>),
+    Dict(HashMap<String, Self>),
 }
 impl JsonObject {
     fn sum(&self) -> i32 {

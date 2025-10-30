@@ -7,9 +7,9 @@ enum Op {
 #[derive(Debug)]
 enum Expression {
     Binary {
-        left: Box<Expression>,
+        left: Box<Self>,
         op: Op,
-        right: Box<Expression>,
+        right: Box<Self>,
     },
     Const(u64),
 }

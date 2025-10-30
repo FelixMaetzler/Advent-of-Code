@@ -68,7 +68,7 @@ pub fn part_one(input: &str) -> Option<i64> {
 enum Expr {
     Num(i64),
     Var,
-    BinOp(Box<Expr>, Op, Box<Expr>),
+    BinOp(Box<Self>, Op, Box<Self>),
 }
 fn expr_from_map(s: &str, map: &HashMap<String, Node>) -> Expr {
     if s == "humn" {

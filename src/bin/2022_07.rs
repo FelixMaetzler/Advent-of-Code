@@ -58,7 +58,7 @@ impl FromStr for List {
 #[derive(Debug)]
 enum FsEntry {
     File { size: u32 },
-    Dir { name: String, entries: Vec<FsEntry> },
+    Dir { name: String, entries: Vec<Self> },
 }
 impl FsEntry {
     fn insert(&mut self, path: &[String], file: (String, u32)) {
