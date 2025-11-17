@@ -113,6 +113,9 @@ impl Intcode {
     pub fn get_outputs(&self) -> Vec<IntInteger> {
         self.output.clone()
     }
+    pub fn clear_output(&mut self) {
+        self.output.clear();
+    }
     pub const fn halt_at_output(&mut self, b: bool) {
         self.halt_at_output = b;
     }

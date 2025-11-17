@@ -518,7 +518,7 @@ impl Graph for Vec<Vec<NodeIndex>> {
             })
     }
 }
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Special<T> {
     adj_matrix: HashMap<NodeIndex, HashSet<NodeIndex>>,
     edges: HashMap<(NodeIndex, NodeIndex), T>,

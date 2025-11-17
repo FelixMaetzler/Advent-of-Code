@@ -46,7 +46,6 @@ where
                 &parts
             ));
         }
-
         let day = Day::from_str(parts[0]).map_err(|_| "Invalid day value".to_owned())?;
         let part = parts[1]
             .parse::<u8>()
@@ -80,7 +79,6 @@ where
 {
     pub fn pretty_print(&self) -> String {
         let avg = self.average_duration();
-        #[expect(clippy::non_ascii_literal, reason="looks nice")]
         self.result.as_ref().map_or_else(|| format!("Part {ANSI_BOLD}{}{ANSI_RESET}: ✖", self.part), |x| match self.durations.len() {
                 0 => unreachable!(),
                 1 => format!(

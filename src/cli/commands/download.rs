@@ -5,7 +5,6 @@ use crate::cli::{
     day::Day,
 };
 
-#[expect(clippy::non_ascii_literal, reason = "looks nice")]
 pub fn download(day: Day) -> Result<Output, AOCError> {
     let input_path = day.input_path();
     let puzzle_path = day.puzzle_path();
