@@ -30,7 +30,7 @@ pub trait IteratorPermutator: Iterator {
 // Implement the trait for all iterators
 impl<T> IteratorPermutator for T where T: Iterator {}
 
-/// Permutator struct to handle permutations
+/// Permutator struct to handle permutations.
 #[derive(Clone)]
 pub struct Permutator<T> {
     items: Vec<T>,

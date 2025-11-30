@@ -21,7 +21,7 @@ pub fn multispace1<'a>() -> impl Parser<'a, Vec<char>> {
 pub fn multispace0<'a>() -> impl Parser<'a, Vec<char>> {
     many0(whitespace_char())
 }
-/// succeeds if the start of the input matches the expected one
+/// succeeds if the start of the input matches the expected one.
 pub fn tag<'a>(expected: &'static str) -> impl Parser<'a, &'a str> {
     move |input: &'a str| match input.get(0..expected.len()) {
         Some(next) if next == expected => Ok((&input[expected.len()..], next)),

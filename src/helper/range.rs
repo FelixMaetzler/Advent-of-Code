@@ -3,7 +3,7 @@ use core::{
     ops::{Add, Range, RangeInclusive, Sub},
 };
 
-/// Trait to normalize access to start/end of ranges
+/// Trait to normalize access to start/end of ranges.
 pub trait Normalized<T> {
     fn start_bound(&self) -> T;
     fn end_bound(&self) -> T;
@@ -38,7 +38,7 @@ impl<T: Copy> Normalized<T> for RangeInclusive<T> {
     }
 }
 
-/// Extension trait for set-like operations on ranges
+/// Extension trait for set-like operations on ranges.
 pub trait ExtRangeOps<T>: Normalized<T>
 where
     T: Copy + Ord + Add<Output = T> + Sub<Output = T> + From<u8>,

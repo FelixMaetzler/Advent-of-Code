@@ -8,7 +8,7 @@ use all_aoc::helper::{
 
 all_aoc::solution!(24, 2023);
 
-/// This function solves a * x = b where a is a matrix and x is unknown
+/// This function solves a * x = b where a is a matrix and x is unknown.
 fn solve_lgs(a: &DenseGrid<i256>, b: Vec<i256>) -> Vec<i256> {
     debug_assert_eq!(a.width(), a.height(), "a has to be square");
     debug_assert_eq!(a.width(), b.len(), "the dimensions has to match");
@@ -51,7 +51,7 @@ fn determinant(matrix: &DenseGrid<i256>) -> i256 {
     }
     det
 }
-/// calculates the minor of a given matrix at a specific index
+/// calculates the minor of a given matrix at a specific index.
 fn minor(matrix: &DenseGrid<i256>, index: (usize, usize)) -> i256 {
     determinant(&DenseGrid::from_iter(
         matrix

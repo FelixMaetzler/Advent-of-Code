@@ -3,9 +3,9 @@ use core::ops::{Add, Rem};
 ///
 /// Modulo that handles negative numbers, works the same as Python's `%`.
 ///
-/// eg: `(a + b).modulo(c)`
+/// eg: `(a + b).modulo(c)`.
 ///
-/// returns always a non-negative number
+/// returns always a non-negative number.
 pub trait SignedExt {
     #[must_use]
     fn modulo(&self, n: Self) -> Self;

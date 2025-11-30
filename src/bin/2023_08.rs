@@ -45,7 +45,7 @@ impl<'a> Node<'a> {
 }
 /// You can change the return type `OptimizedHashMap` to `HashMap` without any problems
 /// The solution takes then longer.
-/// This optimization was made to bring the time for part 2 under 1 ms
+/// This optimization was made to bring the time for part 2 under 1 ms.
 fn parse(input: &str) -> (Vec<Dir>, OptimizedHashMap<Data<'_>, Node<'_>>) {
     let (left, right) = input.trim().split_once("\n\n").unwrap();
     let left = left.chars().map(|c| Dir::try_from(c).unwrap()).collect();
@@ -77,7 +77,7 @@ impl TryFrom<char> for Dir {
     }
 }
 /// Is a replacement for a regular `HashMap`, that is optimized for exactly this szenario
-/// and uses a Vec unter the hood
+/// and uses a Vec unter the hood.
 struct OptimizedHashMap<K, V> {
     values: Vec<Option<V>>,
     keys: Vec<Option<K>>,

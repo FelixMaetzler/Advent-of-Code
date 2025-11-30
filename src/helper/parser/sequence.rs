@@ -12,8 +12,8 @@ where
     move |input| {
         let (next_input, result1) = parser1.parse(input)?;
         parser2
-                        .parse(next_input)
-                        .map(|(last_input, result2)| (last_input, (result1, result2)))
+            .parse(next_input)
+            .map(|(last_input, result2)| (last_input, (result1, result2)))
     }
 }
 pub fn triple<'a, P1, P2, P3, R1, R2, R3>(
@@ -30,11 +30,11 @@ where
         let (next_input, result1) = parser1.parse(input)?;
         let (next_input, result2) = parser2.parse(next_input)?;
         parser3
-                            .parse(next_input)
-                            .map(|(last_input, result3)| (last_input, (result1, result2, result3)))
+            .parse(next_input)
+            .map(|(last_input, result3)| (last_input, (result1, result2, result3)))
     }
 }
-/// Matches two Parsers and only returns the result of the left one
+/// Matches two Parsers and only returns the result of the left one.
 pub fn left<'a, P1, P2, R1, R2>(parser1: P1, parser2: P2) -> impl Parser<'a, R1>
 where
     P1: Parser<'a, R1>,
@@ -42,7 +42,7 @@ where
 {
     map(pair(parser1, parser2), |(left, _right)| left)
 }
-/// Matches two Parsers and only returns the result of the right one
+/// Matches two Parsers and only returns the result of the right one.
 pub fn right<'a, P1, P2, R1, R2>(parser1: P1, parser2: P2) -> impl Parser<'a, R2>
 where
     P1: Parser<'a, R1>,
@@ -50,7 +50,7 @@ where
 {
     map(pair(parser1, parser2), |(_left, right)| right)
 }
-/// matches <left> <middle> <right> and discards left and right
+/// matches <left> <middle> <right> and discards left and right.
 pub fn delimited<'a, P1, P2, P3, A, R1, R2>(le: P1, middle: P2, ri: P3) -> impl Parser<'a, A>
 where
     P1: Parser<'a, R1>,
@@ -73,8 +73,8 @@ where
     move |input| {
         let (next_input, result1) = new.parse(input)?;
         parser2
-                        .parse(next_input)
-                        .map(|(last_input, result2)| (last_input, (result1, result2)))
+            .parse(next_input)
+            .map(|(last_input, result2)| (last_input, (result1, result2)))
     }
 }
 /// matches <space0> parser <space0>

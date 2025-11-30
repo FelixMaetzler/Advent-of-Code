@@ -42,7 +42,7 @@ fn present_part_2(house: u32) -> u32 {
         .sum::<u32>()
 }
 
-/// all divisors of n (including 1 and itself)
+/// all divisors of n (including 1 and itself).
 fn divisors(n: u32) -> Vec<u32> {
     let mut divisors = Vec::new();
     #[expect(clippy::cast_possible_truncation, reason = "f64 to u32")]

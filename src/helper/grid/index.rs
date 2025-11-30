@@ -4,7 +4,7 @@ use crate::helper::position::{Direction8, Position};
 
 use super::Grid;
 
-/// `GridIndex` is always a valid index into the Grid
+/// `GridIndex` is always a valid index into the Grid.
 #[expect(clippy::module_name_repetitions, reason = "makes more sense")]
 pub trait GridIndex<T>
 where

@@ -220,7 +220,7 @@ where
     T::Err: Debug,
 {
     type Err = ();
-    /// x,y
+    /// x,y.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (x, y) = s.split_once(',').unwrap();
         let (x, y) = (x.parse().unwrap(), y.parse().unwrap());
@@ -268,7 +268,7 @@ pub enum Direction4 {
     South,
 }
 impl Direction4 {
-    /// Converts ^, <, v, > into Direction
+    /// Converts ^, <, v, > into Direction.
     pub const fn from_hat(c: char) -> Result<Self, char> {
         match c {
             '^' => Ok(Self::North),
@@ -278,7 +278,7 @@ impl Direction4 {
             c => Err(c),
         }
     }
-    /// Converts Direction into ^, <, v, >
+    /// Converts Direction into ^, <, v, >.
     pub const fn to_hat(self) -> char {
         match self {
             Self::North => '^',

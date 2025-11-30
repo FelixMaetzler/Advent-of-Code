@@ -28,7 +28,7 @@ impl i256 {
         Self::ZERO
     }
     /// Normally returns a u256 but i dont have it so it returns a i256
-    /// Because of that it will return None if it is `Self::MIN`
+    /// Because of that it will return None if it is `Self::MIN`.
     pub fn unsigned_abs(self) -> Option<Self> {
         if self == Self::MIN {
             return None;
@@ -79,7 +79,7 @@ impl i256 {
             .wrapping_sub(rhs.hi.wrapping_add(if carry { 1 } else { 0 }));
         Self { hi, lo }
     }
-    /// Only fails if it is `i256::MIN`
+    /// Only fails if it is `i256::MIN`.
     pub fn checked_neg(self) -> Option<Self> {
         if self == Self::MIN {
             None

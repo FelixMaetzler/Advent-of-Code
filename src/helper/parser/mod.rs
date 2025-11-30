@@ -64,7 +64,7 @@ impl<'a, Output> Parser<'a, Output> for Boxed<'a, Output> {
     }
 }
 
-/// matches a parser under a certain condition (F)
+/// matches a parser under a certain condition (F).
 pub fn pred<'a, P, A, F>(parser: P, predicate: F) -> impl Parser<'a, A>
 where
     P: Parser<'a, A>,

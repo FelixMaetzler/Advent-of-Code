@@ -5,7 +5,7 @@ use super::grid::{Grid, index::GridIndex as _};
 
 /// `curr_to_neighbor_comparison` is a function that
 ///  has as arguments the current node and the neighbor node of the grid
-/// and has to determine if these nodes have a edge in the graph
+/// and has to determine if these nodes have a edge in the graph.
 pub fn build_graph4<T, G, F>(grid: &G, curr_to_neighbor_comparison: F) -> Vec<Vec<NodeIndex>>
 where
     T: Clone,
@@ -31,7 +31,7 @@ where
 }
 /// `curr_to_neighbor_comparison` is a function that
 ///  has as arguments the current node and the neighbor node of the grid
-/// and has to determine if these nodes have a edge in the graph and the weight
+/// and has to determine if these nodes have a edge in the graph and the weight.
 pub fn build_graph4_special<T, W, G, F>(grid: &G, curr_to_neighbor_comparison: F) -> Special<W>
 where
     T: Clone,
@@ -53,7 +53,7 @@ where
 
 /// `curr_to_neighbor_comparison` is a function that
 ///  has as arguments the current node and the neighbor node of the grid
-/// and has to determine if these nodes have a edge in the graph
+/// and has to determine if these nodes have a edge in the graph.
 pub fn build_graph8<T, G, F>(grid: &G, curr_to_neighbor_comparison: F) -> Vec<Vec<NodeIndex>>
 where
     T: Clone,
