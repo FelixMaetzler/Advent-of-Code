@@ -1,75 +1,102 @@
+use core::iter;
 use core::ops::RangeInclusive;
+use std::collections::HashSet;
 
-use all_aoc::helper::misc::number_to_digit_count;
+use all_aoc::helper::misc::{Joinable as _, number_to_digit_count};
 
 all_aoc::solution!(2, 2025);
-
-/// Notice that 343434 is 34 * 10101
-/// the `length` is 6 and the `pattern_count` is 3
-/// (there are 3 patterns with each length 2)
-/// 10101 is the resulting magic number because if my number (e.g. 343434)
-/// is divisible by the magic number, it has a repeating pattern.
-fn magic_number(length: usize, pattern_count: usize) -> u64 {
-    if pattern_count == 0 {
-        return 0;
-    }
-
-    let zeros_between = (length / pattern_count) - 1;
-    let mut result: u64 = 0;
-    let mut multiplier: u64 = 1;
-    #[expect(clippy::cast_possible_truncation, reason = "zeros_between cant be big")]
-    let c = 10_u64.pow(zeros_between as u32 + 1);
-    for _ in 0..pattern_count - 1 {
-        result += multiplier;
-        multiplier *= c;
-    }
-    result += multiplier;
-
-    result
-}
 
 pub fn part_one(input: &str) -> Option<u64> {
     Some(
         parse(input)
+            .flat_map(|r| {
+                if number_to_digit_count(*r.start()) == number_to_digit_count(*r.end()) {
+                    [Some(r), None]
+                } else {
+                    [
+                        Some(
+                            *r.start()
+                                ..=10_u64.pow(u32::from(number_to_digit_count(*r.start()))) - 1,
+                        ),
+                        Some(
+                            (10_u64.pow(u32::from(number_to_digit_count(*r.start()))) + 1)
+                                ..=*r.end(),
+                        ),
+                    ]
+                }
+            })
             .flatten()
-            .filter(|x| !is_valid_part_1(*x))
+            .map(execute_range_part_1)
             .sum(),
     )
 }
-
-fn is_valid_part_1(x: u64) -> bool {
-    let len = number_to_digit_count(x) as usize;
-    if len.is_multiple_of(2) {
-        !x.is_multiple_of(magic_number(len, 2))
-    } else {
-        true
+fn execute_range_part_1(range: RangeInclusive<u64>) -> u64 {
+    let start = range.start().to_string();
+    let end = range.end().to_string();
+    debug_assert_eq!(start.len(), end.len());
+    if start.len() % 2 == 1 {
+        return 0;
     }
-}
+    let first_half_start: u64 = start[..start.len() / 2].parse().unwrap();
+    let first_half_end: u64 = end[..end.len() / 2].parse().unwrap();
 
+    (first_half_start..=first_half_end)
+        .map(|i| format!("{i}{i}").parse().unwrap())
+        .filter(|i| range.contains(i))
+        .sum()
+}
 pub fn part_two(input: &str) -> Option<u64> {
     Some(
         parse(input)
+            .flat_map(|r| {
+                if number_to_digit_count(*r.start()) == number_to_digit_count(*r.end()) {
+                    [Some(r), None]
+                } else {
+                    [
+                        Some(
+                            *r.start()
+                                ..=10_u64.pow(u32::from(number_to_digit_count(*r.start()))) - 1,
+                        ),
+                        Some(
+                            (10_u64.pow(u32::from(number_to_digit_count(*r.start()))) + 1)
+                                ..=*r.end(),
+                        ),
+                    ]
+                }
+            })
             .flatten()
-            .filter(|x| !is_valid_part_2(*x))
+            .map(execute_range_part_2)
             .sum(),
     )
 }
-fn is_valid_part_2(x: u64) -> bool {
-    let len = number_to_digit_count(x) as usize;
-    debug_assert!(len > 0);
-    let mut i = len;
-    while i != 1 {
-        if len.is_multiple_of(i) && x.is_multiple_of(magic_number(len, i)) {
-            return false;
-        }
-        i -= 1;
+fn execute_range_part_2(range: RangeInclusive<u64>) -> u64 {
+    let length = number_to_digit_count(*range.end());
+    let mut set = HashSet::new();
+    for i in 1..length {
+        set.extend(execute_range_part_2_with_n(range.clone(), i.into()));
     }
-    for i in 2..=len {
-        if len.is_multiple_of(i) && x.is_multiple_of(magic_number(len, i)) {
-            return false;
-        }
+    set.into_iter().filter(|v| range.contains(v)).sum()
+}
+fn execute_range_part_2_with_n(range: RangeInclusive<u64>, pattern_length: usize) -> HashSet<u64> {
+    let start = range.start().to_string();
+    let end = range.end().to_string();
+    debug_assert_eq!(start.len(), end.len());
+    if !start.len().is_multiple_of(pattern_length) {
+        return HashSet::new();
     }
-    true
+    let pattern_count = start.len() / pattern_length;
+
+    let first_half_start: u64 = start[..pattern_length].parse().unwrap();
+    let first_half_end: u64 = end[..pattern_length].parse().unwrap();
+
+    (first_half_start..=first_half_end)
+        .map(|i| {
+            iter::repeat_n(i, pattern_count)
+                .join("")
+                .parse::<u64>()
+                .unwrap()
+        })
+        .collect()
 }
 fn parse(input: &str) -> impl Iterator<Item = RangeInclusive<u64>> {
     input.split(',').map(|range| {
