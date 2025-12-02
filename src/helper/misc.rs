@@ -2,9 +2,15 @@ use core::hash::Hash;
 use core::ops::{AddAssign, Div, Mul, Rem, SubAssign};
 use std::collections::HashMap;
 
-pub fn number_to_digit_count(x: u64) -> u8 {
-    x.checked_ilog10()
-        .map_or(1, |x| u8::try_from(x + 1).unwrap())
+pub const fn number_to_digit_count(x: u64) -> u8 {
+    match x.checked_ilog10() {
+        #[expect(
+            clippy::cast_possible_truncation,
+            reason = "cant happen. x is not more than 128"
+        )]
+        Some(x) => (x + 1) as u8,
+        None => 1,
+    }
 }
 pub trait Joinable<T> {
     fn join(self, separator: &str) -> String;
