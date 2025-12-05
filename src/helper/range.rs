@@ -8,9 +8,13 @@ pub trait Normalized<T> {
     fn start_bound(&self) -> T;
     fn end_bound(&self) -> T;
     fn is_inclusive(&self) -> bool;
+    fn count(&self) -> T;
 }
 
-impl<T: Copy> Normalized<T> for Range<T> {
+impl<T> Normalized<T> for Range<T>
+where
+    T: Copy + Sub<Output = T>,
+{
     fn start_bound(&self) -> T {
         self.start
     }
@@ -22,9 +26,16 @@ impl<T: Copy> Normalized<T> for Range<T> {
     fn is_inclusive(&self) -> bool {
         false
     }
+
+    fn count(&self) -> T {
+        self.end - self.start
+    }
 }
 
-impl<T: Copy> Normalized<T> for RangeInclusive<T> {
+impl<T> Normalized<T> for RangeInclusive<T>
+where
+    T: Sub<Output = T> + Add<Output = T> + From<u8> + Copy,
+{
     fn start_bound(&self) -> T {
         *self.start()
     }
@@ -35,6 +46,10 @@ impl<T: Copy> Normalized<T> for RangeInclusive<T> {
 
     fn is_inclusive(&self) -> bool {
         true
+    }
+
+    fn count(&self) -> T {
+        *self.end() - *self.start() + T::from(1)
     }
 }
 
