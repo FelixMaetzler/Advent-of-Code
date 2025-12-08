@@ -1,4 +1,5 @@
 pub mod bitmask;
+pub mod dsu;
 pub mod graph;
 pub mod grid;
 pub mod i256;

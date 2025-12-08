@@ -20,6 +20,12 @@ impl<T> Position3d<T> {
             Some(Self { x, y, z })
         }
     }
+    pub fn euclidean_norm_squared(&self) -> T
+    where
+        T: Mul<Output = T> + Add<Output = T> + Copy,
+    {
+        self.x * self.x + self.y * self.y + self.z * self.z
+    }
 }
 impl<T> Sub for Position3d<T>
 where
@@ -137,7 +143,18 @@ where
         }
     }
 }
-
+impl<F> Position3d<F> {
+    pub fn cast<T>(self) -> Position3d<T>
+    where
+        T: From<F>,
+    {
+        Position3d {
+            x: T::from(self.x),
+            y: T::from(self.y),
+            z: T::from(self.z),
+        }
+    }
+}
 macro_rules! impl_mul_for_type {
     ($type:ty) => {
         impl Mul<Position3d<$type>> for $type {
@@ -197,3 +214,24 @@ impl_manhattan_for_unsigned!(u32);
 impl_manhattan_for_unsigned!(u64);
 impl_manhattan_for_unsigned!(u128);
 impl_manhattan_for_unsigned!(usize);
+
+macro_rules! impl_abs_diff {
+    ($type:ty) => {
+        impl Position3d<$type> {
+            #[must_use]
+            pub const fn abs_diff(&self, other: &Position3d<$type>) -> Position3d<$type> {
+                Position3d {
+                    x: self.x.abs_diff(other.x),
+                    y: self.y.abs_diff(other.y),
+                    z: self.z.abs_diff(other.z),
+                }
+            }
+        }
+    };
+}
+impl_abs_diff!(u8);
+impl_abs_diff!(u16);
+impl_abs_diff!(u32);
+impl_abs_diff!(u64);
+impl_abs_diff!(u128);
+impl_abs_diff!(usize);
