@@ -265,6 +265,7 @@ where
         Some(self.cmp(other))
     }
 }
+
 pub trait Graph {
     fn new() -> Self;
     fn incoming(&self, index: NodeIndex) -> impl Iterator<Item = NodeIndex>;
@@ -428,6 +429,7 @@ pub trait Graph {
     where
         Self: Clone,
     {
+        debug_assert!(self.is_dag());
         let mut graph = self.clone();
         let mut s = graph
             .nodes()
@@ -446,6 +448,42 @@ pub trait Graph {
         }
         assert!(graph.edges_count() == 0, "Graph has a cycle");
         l
+    }
+    fn is_dag(&self) -> bool
+    where
+        Self: Sized,
+    {
+        fn has_cycle(
+            graph: &impl Graph,
+            current: NodeIndex,
+            visited: &mut HashSet<NodeIndex>,
+            stack: &mut HashSet<NodeIndex>,
+        ) -> bool {
+            visited.insert(current);
+            stack.insert(current);
+
+            for neighbor in graph.outgoing(current) {
+                if !visited.contains(&neighbor) {
+                    if has_cycle(graph, neighbor, visited, stack) {
+                        return true;
+                    }
+                } else if stack.contains(&neighbor) {
+                    return true;
+                }
+            }
+
+            stack.remove(&current);
+            false
+        }
+        let mut visited = HashSet::new();
+        let mut stack = HashSet::new();
+
+        for node in self.nodes() {
+            if !visited.contains(&node) && has_cycle(self, node, &mut visited, &mut stack) {
+                return false;
+            }
+        }
+        true
     }
 }
 fn dfs(
