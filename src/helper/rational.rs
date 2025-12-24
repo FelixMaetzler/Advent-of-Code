@@ -1,18 +1,39 @@
 use core::{
-    fmt::Display,
-    ops::{Add, Div, Mul, Neg, Sub},
+    cmp::Ordering,
+    fmt::{Debug, Display},
+    ops::{Add, AddAssign, Div, Mul, Neg, Sub},
 };
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Rational {
     num: i64,
     den: i64,
 }
+impl Debug for Rational {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{self}")
+    }
+}
 impl Display for Rational {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}/{}", self.num, self.den)
+        if self.den == 1 {
+            write!(f, "{}", self.num)
+        } else {
+            write!(f, "{}/{}", self.num, self.den)
+        }
+    }
+}
+impl PartialOrd for Rational {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
+impl Ord for Rational {
+    fn cmp(&self, other: &Self) -> Ordering {
+        (self.num * other.den).cmp(&(other.num * self.den))
+    }
+}
 impl From<i64> for Rational {
     fn from(value: i64) -> Self {
         Self::new(value)
@@ -50,6 +71,13 @@ impl Rational {
     const fn reciprocal(&self) -> Self {
         Self::rat(self.den, self.num)
     }
+
+    pub fn floor(&self) -> i64 {
+        todo!()
+    }
+    pub fn ceil(&self) -> i64 {
+        todo!()
+    }
 }
 const fn gcd(mut a: i64, mut b: i64) -> i64 {
     while b != 0 {
@@ -69,6 +97,11 @@ impl Add for Rational {
         y.expand(self.den);
         debug_assert_eq!(x.den, y.den);
         Self::rat(x.num + y.num, x.den)
+    }
+}
+impl AddAssign for Rational {
+    fn add_assign(&mut self, rhs: Self) {
+        *self = *self + rhs;
     }
 }
 impl Sub for Rational {

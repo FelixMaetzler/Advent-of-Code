@@ -81,6 +81,25 @@ impl<T> Position<T> {
         x_diff + y_diff
     }
 }
+macro_rules! impl_abs_diff {
+    ($type:ty) => {
+        impl Position<$type> {
+            #[must_use]
+            pub const fn abs_diff(&self, other: &Position<$type>) -> Position<$type> {
+                Position {
+                    x: self.x.abs_diff(other.x),
+                    y: self.y.abs_diff(other.y),
+                }
+            }
+        }
+    };
+}
+impl_abs_diff!(u8);
+impl_abs_diff!(u16);
+impl_abs_diff!(u32);
+impl_abs_diff!(u64);
+impl_abs_diff!(u128);
+impl_abs_diff!(usize);
 impl<T> Sub for Position<T>
 where
     T: Sub<Output = T>,

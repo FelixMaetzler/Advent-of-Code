@@ -123,13 +123,14 @@ impl<T> DenseGrid<T> {
             width,
         }
     }
-
-    pub fn get_row(&self, n: usize) -> impl Iterator<Item = &T> {
-        self.data.iter().skip(n * self.width).take(self.width)
+    pub fn get_row(&self, n: usize) -> impl DoubleEndedIterator<Item = &T> {
+        let start = n * self.width;
+        let end = start + self.width;
+        self.data[start..end].iter()
     }
 
     pub fn get_col(&self, x: usize) -> impl Iterator<Item = &T> {
-        (0..self.height).map(move |row| &self.data[row * self.width + x])
+        self.data[x..].iter().step_by(self.width)
     }
 
     pub fn set_row(&mut self, i: usize, row: &[T])
@@ -193,6 +194,24 @@ impl<T> DenseGrid<T> {
         }
 
         self.width -= 1;
+    }
+    pub fn transpose(&mut self)
+    where
+        T: Clone,
+    {
+        let mut out = Self {
+            height: self.width,
+            width: self.height,
+            data: vec![self.data[0].clone(); self.data.len()],
+        };
+
+        for r in 0..self.height {
+            for c in 0..self.width {
+                out.data[c * out.width + r] = self.data[r * self.width + c].clone();
+            }
+        }
+
+        *self = out;
     }
 }
 impl<T> Index<usize> for DenseGrid<T> {
