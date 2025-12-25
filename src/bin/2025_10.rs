@@ -50,8 +50,8 @@ impl Machine {
             for b in 0..n {
                 if (mask >> b) & 1 == 1 {
                     cost += 1;
-                    for i in 0..vars {
-                        pattern[i] += u16::from(self.buttons[b].get_bit(i));
+                    for (i, item) in pattern.iter_mut().enumerate().take(vars) {
+                        *item += u16::from(self.buttons[b].get_bit(i));
                     }
                 }
             }
@@ -67,45 +67,43 @@ impl Machine {
     fn calc_min_joltage(&self) -> Option<u32> {
         let patterns = self.build_patterns();
         let mut cache = HashMap::new();
-        self.solve_goal(&self.joltage, &patterns, &mut cache)
-    }
-    fn solve_goal(
-        &self,
-        goal: &[u16],
-        patterns: &PatternDB,
-        cache: &mut HashMap<Vec<u16>, Option<u32>>,
-    ) -> Option<u32> {
-        if let Some(ret) = cache.get(goal) {
-            return *ret;
-        }
-        if goal.iter().all(|&v| v == 0) {
-            return Some(0);
-        }
-
-        let mut ret = None;
-        let pidx = parity_index(goal);
-
-        'outer: for (pattern, &cost) in &patterns.by_parity[pidx] {
-            let mut next = goal.to_vec();
-
-            for i in 0..next.len() {
-                if pattern[i] > next[i] {
-                    continue 'outer;
-                }
-                next[i] = (next[i] - pattern[i]) / 2;
-            }
-
-            if let Some(sub) = self.solve_goal(&next, patterns, cache) {
-                let cand = cost + 2 * sub;
-                ret = Some(ret.map_or(cand, |x: u32| x.min(cand)));
-            }
-        }
-
-        cache.insert(goal.to_vec(), ret);
-        ret
+        solve_goal(&self.joltage, &patterns, &mut cache)
     }
 }
+fn solve_goal(
+    goal: &[u16],
+    patterns: &PatternDB,
+    cache: &mut HashMap<Vec<u16>, Option<u32>>,
+) -> Option<u32> {
+    if let Some(ret) = cache.get(goal) {
+        return *ret;
+    }
+    if goal.iter().all(|&v| v == 0) {
+        return Some(0);
+    }
 
+    let mut ret = None;
+    let pidx = parity_index(goal);
+
+    'outer: for (pattern, &cost) in &patterns.by_parity[pidx] {
+        let mut next = goal.to_vec();
+
+        for i in 0..next.len() {
+            if pattern[i] > next[i] {
+                continue 'outer;
+            }
+            next[i] = (next[i] - pattern[i]) / 2;
+        }
+
+        if let Some(sub) = solve_goal(&next, patterns, cache) {
+            let cand = cost + 2 * sub;
+            ret = Some(ret.map_or(cand, |x: u32| x.min(cand)));
+        }
+    }
+
+    cache.insert(goal.to_vec(), ret);
+    ret
+}
 const fn next(from: u16, button: u16) -> u16 {
     from ^ button
 }

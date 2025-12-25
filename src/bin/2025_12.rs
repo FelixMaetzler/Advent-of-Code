@@ -41,6 +41,7 @@ pub fn part_one(input: &str) -> Option<u32> {
 pub const fn part_two(_: &str) -> Option<u32> {
     None
 }
+#[expect(clippy::type_complexity, reason = "its fine")]
 fn parse(input: &str) -> (Vec<DenseGrid<Tile>>, Vec<((usize, usize), Vec<usize>)>) {
     let mut first = input.split("\n\n").collect::<Vec<_>>();
     let second = first.pop().unwrap();
