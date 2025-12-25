@@ -72,11 +72,23 @@ impl Rational {
         Self::rat(self.den, self.num)
     }
 
-    pub fn floor(&self) -> i64 {
-        todo!()
+    pub const fn floor(&self) -> i64 {
+        let q = self.num / self.den;
+        let r = self.num % self.den;
+
+        if r == 0 || self.num >= 0 { q } else { q - 1 }
     }
-    pub fn ceil(&self) -> i64 {
-        todo!()
+    pub const fn ceil(&self) -> i64 {
+        let q = self.num / self.den;
+        let r = self.num % self.den;
+
+        if r == 0 {
+            q
+        } else if self.num > 0 {
+            q + 1
+        } else {
+            q
+        }
     }
 }
 const fn gcd(mut a: i64, mut b: i64) -> i64 {
